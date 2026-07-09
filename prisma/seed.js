@@ -6,7 +6,7 @@ const { toDelegateName } = require("../lib/next-id");
 const prisma = new PrismaClient();
 const sqlSeedPath = path.resolve(
   process.cwd(),
-  process.env.SQL_SEED_FILE || "../mybuddis_smshagor_portfolio.sql",
+  process.env.SQL_SEED_FILE || "mybuddis_smshagor_portfolio.sql",
 );
 const chunkSize = 250;
 
@@ -28,6 +28,62 @@ function buildModelMaps() {
   }
 
   return { tableToModel, fieldMaps };
+}
+
+function extractInsertStatements(sql) {
+  const statements = [];
+  let cursor = 0;
+
+  while (cursor < sql.length) {
+    const start = sql.indexOf("INSERT INTO `", cursor);
+    if (start === -1) {
+      break;
+    }
+
+    let index = start;
+    let inString = false;
+    let escaped = false;
+
+    while (index < sql.length) {
+      const char = sql[index];
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === "'") {
+          if (sql[index + 1] === "'") {
+            index += 1;
+          } else {
+            inString = false;
+          }
+        }
+        index += 1;
+        continue;
+      }
+
+      if (char === "'") {
+        inString = true;
+        index += 1;
+        continue;
+      }
+
+      if (char === ";") {
+        statements.push(sql.slice(start, index + 1));
+        cursor = index + 1;
+        break;
+      }
+
+      index += 1;
+    }
+
+    if (index >= sql.length) {
+      cursor = sql.length;
+    }
+  }
+
+  return statements;
 }
 
 function splitRows(rawValues) {
@@ -206,11 +262,15 @@ async function importSqlSeed() {
   }
 
   const sql = fs.readFileSync(sqlSeedPath, "utf8");
-  const insertRegex = /INSERT INTO `([^`]+)` \(([^)]+)\) VALUES\s*([\s\S]*?);/g;
   const { tableToModel, fieldMaps } = buildModelMaps();
   const rowsByModel = new Map();
 
-  for (const match of sql.matchAll(insertRegex)) {
+  for (const statement of extractInsertStatements(sql)) {
+    const match = statement.match(/^INSERT INTO `([^`]+)` \(([^)]+)\) VALUES\s*([\s\S]*);$/);
+    if (!match) {
+      continue;
+    }
+
     const [, tableName, rawColumns, rawValues] = match;
     const model = tableToModel.get(tableName);
     if (!model) {
