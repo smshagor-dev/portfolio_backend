@@ -1,0 +1,247 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 3790 >>
+stream
+BT
+/F1 13 Tf
+0.00 Tw
+225 744 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+218 726 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+145 712 Td
+(smshagor.ru@gmail.com  |  +7 995 494 9836  |  www.smshagor.com) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+168 698 Td
+(github.com/smshagor-dev  |  linkedin.com/in/sm-shagor) Tj
+ET
+BT
+/F1 11 Tf
+1.43 Tw
+56 668 Td
+(I am writing to apply for the Senior Data Analyst \(Community & Product Forensics\) role) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 653 Td
+(at Atolls. As a full-stack and AI engineer with experience building data-driven) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 638 Td
+(applications and real-time monitoring systems, I am drawn to the challenge of) Tj
+ET
+BT
+/F1 11 Tf
+2.35 Tw
+56 623 Td
+(uncovering insights from high-volume event data and ensuring data integrity at scale.) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 608 Td
+(Atolls' mission to help millions make smarter spending decisions through community) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 593 Td
+(intelligence aligns with my interest in building systems that turn raw data into) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 578 Td
+(actionable understanding.) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 553 Td
+(Through hands-on project development, I have built a real-time server health) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 538 Td
+(monitoring dashboard that tracks availability, latency, and system metrics across) Tj
+ET
+BT
+/F1 11 Tf
+2.15 Tw
+56 523 Td
+(multiple targets. This system uses Node.js and Express for the backend, Socket.IO for) Tj
+ET
+BT
+/F1 11 Tf
+3.58 Tw
+56 508 Td
+(live data streaming, and Python with psutil for collecting system metrics. I wrote) Tj
+ET
+BT
+/F1 11 Tf
+3.39 Tw
+56 493 Td
+(optimized SQL queries for SQLite and designed the architecture to handle concurrent) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 478 Td
+(data streams. This experience directly maps to the technical investigation and) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 463 Td
+(deep-dive analytics responsibilities described in the role.) Tj
+ET
+BT
+/F1 11 Tf
+2.42 Tw
+56 438 Td
+(One area that particularly interests me is data hygiene and forensic analysis. In my) Tj
+ET
+BT
+/F1 11 Tf
+3.74 Tw
+56 423 Td
+(work on the Wireless Vision-Aid for the Blind project, I built a real-time object) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 408 Td
+(detection pipeline using YOLOv8n and Python, processing video frames locally with) Tj
+ET
+BT
+/F1 11 Tf
+2.87 Tw
+56 393 Td
+(ultra-low latency. This required debugging data flows, handling noisy input from the) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 378 Td
+(camera module, and building robust logic to filter out false positives. I am) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 363 Td
+(comfortable inspecting network payloads, debugging event triggers, and tracing data) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 348 Td
+(discrepancies back to their root cause.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 323 Td
+(In addition to my technical experience, I work effectively across multidisciplinary) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 308 Td
+(teams and communicate clearly with both technical and non-technical stakeholders. I am) Tj
+ET
+BT
+/F1 11 Tf
+1.98 Tw
+56 293 Td
+(fluent in Bengali and English, have working knowledge of Russian and Hindi, and enjoy) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 278 Td
+(collaborating in international and cross-cultural environments.) Tj
+ET
+BT
+/F1 11 Tf
+1.34 Tw
+56 253 Td
+(I have attached my CV for your review and would welcome the opportunity to discuss how) Tj
+ET
+BT
+/F1 11 Tf
+1.67 Tw
+56 238 Td
+(my background in data analysis, Python, and web/app technologies can contribute to the) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 223 Td
+(Community Data Team at Atolls.) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 130 Td
+(Sincerely,) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 115 Td
+() Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 100 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 85 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+4153
+%%EOF

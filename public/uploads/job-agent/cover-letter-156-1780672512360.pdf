@@ -1,0 +1,235 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 3542 >>
+stream
+BT
+/F1 13 Tf
+0.00 Tw
+225 744 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+218 726 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+145 712 Td
+(smshagor.ru@gmail.com  |  +7 995 494 9836  |  www.smshagor.com) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+168 698 Td
+(github.com/smshagor-dev  |  linkedin.com/in/sm-shagor) Tj
+ET
+BT
+/F1 11 Tf
+3.07 Tw
+56 668 Td
+(I am writing to apply for the Software & AI Lead position at BugSense Diagnostics.) Tj
+ET
+BT
+/F1 11 Tf
+2.35 Tw
+56 653 Td
+(Your work on paper-based diagnostic tests for urinary tract infections and antibiotic) Tj
+ET
+BT
+/F1 11 Tf
+2.48 Tw
+56 638 Td
+(resistance is exactly the kind of real-world AI challenge I want to be part of. The) Tj
+ET
+BT
+/F1 11 Tf
+3.10 Tw
+56 623 Td
+(opportunity to build the computer vision and machine learning stack from the ground) Tj
+ET
+BT
+/F1 11 Tf
+1.67 Tw
+56 608 Td
+(up, with direct impact on clinical decisions, aligns with my background and interests.) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 583 Td
+(Through research and development work, I have built practical computer vision systems.) Tj
+ET
+BT
+/F1 11 Tf
+2.15 Tw
+56 568 Td
+(One example is WVAB \(Wireless Vision-Aid for the Blind\), a real-time assistive system) Tj
+ET
+BT
+/F1 11 Tf
+3.58 Tw
+56 553 Td
+(I architected using YOLOv8n for object detection. The system runs fully offline on) Tj
+ET
+BT
+/F1 11 Tf
+3.94 Tw
+56 538 Td
+(low-cost hardware, performing colour-based analysis and delivering directional audio) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 523 Td
+(feedback. I worked on model selection, inference optimization, and the full) Tj
+ET
+BT
+/F1 11 Tf
+2.87 Tw
+56 508 Td
+(capture-to-result pipeline using Python, C++, and edge devices like Raspberry Pi and) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 493 Td
+(ESP32-CAM. This experience directly maps to the computer vision and image) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 478 Td
+(interpretation work at BugSense.) Tj
+ET
+BT
+/F1 11 Tf
+1.67 Tw
+56 453 Td
+(I am comfortable working across the hardware-software boundary. In the WVAB project, I) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 438 Td
+(designed a custom UDP streaming protocol to connect the camera module to the) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 423 Td
+(processing unit, ensuring ultra-low latency communication. I also have experience) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 408 Td
+(deploying software on Linux servers with Docker and Nginx, and I understand the) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 393 Td
+(importance of building systems that are reliable, documented, and ready for production) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 378 Td
+(environments.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 353 Td
+(In addition to my technical experience, I work effectively across multidisciplinary) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 338 Td
+(teams and communicate clearly with both technical and non-technical stakeholders. I am) Tj
+ET
+BT
+/F1 11 Tf
+1.98 Tw
+56 323 Td
+(fluent in Bengali and English, have working knowledge of Russian and Hindi, and enjoy) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 308 Td
+(collaborating in international and cross-cultural environments.) Tj
+ET
+BT
+/F1 11 Tf
+2.33 Tw
+56 283 Td
+(I have attached my CV for your review. I would welcome the chance to discuss how my) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 268 Td
+(background in computer vision, AI, and software engineering can contribute to) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 253 Td
+(BugSense's mission.) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 130 Td
+(Sincerely,) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 115 Td
+() Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 100 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 85 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3905
+%%EOF

@@ -1,0 +1,217 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 3301 >>
+stream
+BT
+/F1 13 Tf
+0.00 Tw
+225 744 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+218 726 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+145 712 Td
+(smshagor.ru@gmail.com  |  +7 995 494 9836  |  www.smshagor.com) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+168 698 Td
+(github.com/smshagor-dev  |  linkedin.com/in/sm-shagor) Tj
+ET
+BT
+/F1 11 Tf
+1.72 Tw
+56 668 Td
+(I am writing to apply for the AI Agent Engineer position at TEQWERK GmbH. What stands) Tj
+ET
+BT
+/F1 11 Tf
+2.48 Tw
+56 653 Td
+(out to me about your approach is the focus on building AI systems that are actually) Tj
+ET
+BT
+/F1 11 Tf
+1.54 Tw
+56 638 Td
+(used, not just experimented with. That matches how I work: I prefer building practical) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 623 Td
+(tools that solve real problems over chasing technology trends.) Tj
+ET
+BT
+/F1 11 Tf
+3.39 Tw
+56 598 Td
+(Through hands-on project development, I have built AI agents and automation systems) Tj
+ET
+BT
+/F1 11 Tf
+3.39 Tw
+56 583 Td
+(that integrate LLMs, APIs, and real-world business logic. I developed an AI-powered) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 568 Td
+(financial application where I built backend APIs using Express, TypeScript, and) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 553 Td
+(OpenAI, trained custom AI assistants on proprietary datasets, and implemented) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 538 Td
+(voice-to-text processing via AWS Transcribe. The system generates PDF term sheets from) Tj
+ET
+BT
+/F1 11 Tf
+1.67 Tw
+56 523 Td
+(Google Sheets data and sends them automatically through AWS SES. This project required) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 508 Td
+(connecting multiple AI services into a single, reliable workflow.) Tj
+ET
+BT
+/F1 11 Tf
+2.63 Tw
+56 483 Td
+(I also built an AI-powered real estate platform that combines OpenAI assistants with) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 468 Td
+(Replicate API for image processing. The system supports role-based authentication,) Tj
+ET
+BT
+/F1 11 Tf
+2.58 Tw
+56 453 Td
+(subscription plans, Stripe payment integration, and cron job scheduling for automated) Tj
+ET
+BT
+/F1 11 Tf
+3.30 Tw
+56 438 Td
+(tasks. These projects have given me practical experience with the full cycle of AI) Tj
+ET
+BT
+/F1 11 Tf
+3.94 Tw
+56 423 Td
+(agent development: prototyping, API integration, testing, and production deployment.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 398 Td
+(In addition to my technical experience, I work effectively across multidisciplinary) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 383 Td
+(teams and communicate clearly with both technical and non-technical stakeholders. I am) Tj
+ET
+BT
+/F1 11 Tf
+1.98 Tw
+56 368 Td
+(fluent in Bengali and English, have working knowledge of Russian and Hindi, and enjoy) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 353 Td
+(collaborating in international and cross-cultural environments.) Tj
+ET
+BT
+/F1 11 Tf
+1.72 Tw
+56 328 Td
+(I have attached my CV for your review. I would welcome the opportunity to discuss how) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 313 Td
+(my background in AI engineering and automation could contribute to TEQWERK's projects.) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 288 Td
+(Best regards, Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 130 Td
+(Sincerely,) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 115 Td
+() Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 100 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 85 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3664
+%%EOF

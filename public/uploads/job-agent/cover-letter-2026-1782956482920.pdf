@@ -1,0 +1,217 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 3241 >>
+stream
+BT
+/F1 13 Tf
+0.00 Tw
+225 744 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+218 726 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+145 712 Td
+(smshagor.ru@gmail.com  |  +7 995 494 9836  |  www.smshagor.com) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+168 698 Td
+(github.com/smshagor-dev  |  linkedin.com/in/sm-shagor) Tj
+ET
+BT
+/F1 11 Tf
+1.54 Tw
+56 668 Td
+(I am writing to apply for the Senior Hardware Development Engineer position at Nordran) Tj
+ET
+BT
+/F1 11 Tf
+2.01 Tw
+56 653 Td
+(Technologies. Your work on making liquid cooling chemistry measurable and controllable) Tj
+ET
+BT
+/F1 11 Tf
+2.63 Tw
+56 638 Td
+(for AI infrastructure is a compelling challenge, and I am interested in contributing) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 623 Td
+(to the productization of your sensing platform.) Tj
+ET
+BT
+/F1 11 Tf
+2.63 Tw
+56 598 Td
+(Through research and development work, I have built and tested physical systems that) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 583 Td
+(combine embedded hardware, sensors, and real-time processing. One example is the) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 568 Td
+(Wireless Vision-Aid for the Blind \(WVAB\), where I integrated a YOLOv8n object) Tj
+ET
+BT
+/F1 11 Tf
+3.58 Tw
+56 553 Td
+(detection pipeline with a Raspberry Pi and ESP32-CAM, using a custom UDP streaming) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 538 Td
+(protocol for low-latency communication. This required hands-on debugging across) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 523 Td
+(electronics, firmware, and system integration, as well as validation testing for) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 508 Td
+(real-world deployment conditions.) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 483 Td
+(I also developed OmniGuard V2X, a privacy-preserving blockchain framework for) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 468 Td
+(autonomous vehicle networks, which involved working with NVIDIA Jetson Nano, ESP32,) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 453 Td
+(and Raspberry Pi for secure V2X communication. This project required me to think) Tj
+ET
+BT
+/F1 11 Tf
+3.15 Tw
+56 438 Td
+(deeply about failure modes, tolerances, and real-world operating conditions, as well) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 423 Td
+(as to iterate quickly based on test results and field feedback.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 398 Td
+(In addition to my technical experience, I work effectively across multidisciplinary) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 383 Td
+(teams and communicate clearly with both technical and non-technical stakeholders. I am) Tj
+ET
+BT
+/F1 11 Tf
+1.98 Tw
+56 368 Td
+(fluent in Bengali and English, have working knowledge of Russian and Hindi, and enjoy) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 353 Td
+(collaborating in international and cross-cultural environments.) Tj
+ET
+BT
+/F1 11 Tf
+1.54 Tw
+56 328 Td
+(I am eager to bring my hands-on hardware development skills and systematic approach to) Tj
+ET
+BT
+/F1 11 Tf
+2.25 Tw
+56 313 Td
+(productization to Nordran. I have attached my CV for your review and look forward to) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 298 Td
+(the possibility of discussing how I can contribute to your team.) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 130 Td
+(Sincerely,) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 115 Td
+() Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 100 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 85 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3604
+%%EOF

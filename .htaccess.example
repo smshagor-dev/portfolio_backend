@@ -1,0 +1,16 @@
+RewriteEngine On
+
+# Force HTTPS when the request arrives over plain HTTP.
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# Proxy Socket.IO websocket and polling traffic to the Node backend.
+RewriteCond %{REQUEST_URI} ^/socket.io [NC]
+RewriteCond %{HTTP:Upgrade} =websocket [NC]
+RewriteRule ^(.*)$ ws://127.0.0.1:5000/$1 [P,L]
+
+RewriteCond %{REQUEST_URI} ^/socket.io [NC]
+RewriteRule ^(.*)$ http://127.0.0.1:5000/$1 [P,L]
+
+# Proxy every other backend request to the Node app.
+RewriteRule ^(.*)$ http://127.0.0.1:5000/$1 [P,L]

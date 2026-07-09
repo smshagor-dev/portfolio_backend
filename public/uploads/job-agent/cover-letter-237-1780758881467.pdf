@@ -1,0 +1,259 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 4013 >>
+stream
+BT
+/F1 13 Tf
+0.00 Tw
+225 744 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+218 726 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+145 712 Td
+(smshagor.ru@gmail.com  |  +7 995 494 9836  |  www.smshagor.com) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+168 698 Td
+(github.com/smshagor-dev  |  linkedin.com/in/sm-shagor) Tj
+ET
+BT
+/F1 11 Tf
+1.84 Tw
+56 668 Td
+(I am writing to apply for the Founding AI Engineer Retrieval and Knowledge Layer role) Tj
+ET
+BT
+/F1 11 Tf
+3.10 Tw
+56 653 Td
+(at Lokalaise GmbH. Your mission to build local AI infrastructure for companies that) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 638 Td
+(cannot move sensitive knowledge into cloud systems is both timely and technically) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 623 Td
+(compelling. The idea of deploying AI inside customer-controlled environments with) Tj
+ET
+BT
+/F1 11 Tf
+3.50 Tw
+56 608 Td
+(secure connectors, permission-aware retrieval, and audit trails directly matches the) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 593 Td
+(kind of practical, privacy-first engineering I want to work on.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 568 Td
+(My background combines full-stack development with applied AI engineering. Over the) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 553 Td
+(past year, I have worked on multiple projects that involve integrating AI models,) Tj
+ET
+BT
+/F1 11 Tf
+3.39 Tw
+56 538 Td
+(building secure APIs, and deploying systems in production environments. I have used) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 523 Td
+(Python extensively for AI-related work, including object detection pipelines with) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 508 Td
+(YOLOv8n, real-time data processing with Flask, and automation workflows. I am) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 493 Td
+(comfortable working with open-source AI frameworks and deploying models in) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 478 Td
+(environments where data privacy and offline functionality are critical.) Tj
+ET
+BT
+/F1 11 Tf
+3.39 Tw
+56 453 Td
+(One area that particularly interests me is building secure connectors and retrieval) Tj
+ET
+BT
+/F1 11 Tf
+1.54 Tw
+56 438 Td
+(systems that respect permissions and maintain audit trails. In my project work, I have) Tj
+ET
+BT
+/F1 11 Tf
+2.87 Tw
+56 423 Td
+(designed systems that handle authentication, role-based access control, and real-time) Tj
+ET
+BT
+/F1 11 Tf
+3.39 Tw
+56 408 Td
+(data streaming. For example, I built a real-time server health monitoring dashboard) Tj
+ET
+BT
+/F1 11 Tf
+3.91 Tw
+56 393 Td
+(using Python, Flask, and Socket.IO that streams live metrics to connected clients,) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 378 Td
+(ensuring visibility without compromising security. I have also worked with Docker,) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 363 Td
+(Nginx, and Linux servers to deploy and maintain production systems in controlled) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 348 Td
+(environments.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 323 Td
+(In addition to my technical experience, I work effectively across multidisciplinary) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 308 Td
+(teams and communicate clearly with both technical and non-technical stakeholders. I am) Tj
+ET
+BT
+/F1 11 Tf
+1.98 Tw
+56 293 Td
+(fluent in Bengali and English, have working knowledge of Russian and Hindi, and enjoy) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 278 Td
+(collaborating in international and cross-cultural environments.) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 253 Td
+(I am eager to contribute to Lokalaise as a founding engineer, helping turn early) Tj
+ET
+BT
+/F1 11 Tf
+1.67 Tw
+56 238 Td
+(deployments into a repeatable product while working hands-on with the founders. I have) Tj
+ET
+BT
+/F1 11 Tf
+1.34 Tw
+56 223 Td
+(attached my CV for your review and look forward to the possibility of discussing how I) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 208 Td
+(can support your team.) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 183 Td
+(Best regards, Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 130 Td
+(Sincerely,) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 115 Td
+() Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 100 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 85 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+4376
+%%EOF

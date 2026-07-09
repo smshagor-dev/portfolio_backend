@@ -1,0 +1,235 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 3519 >>
+stream
+BT
+/F1 13 Tf
+0.00 Tw
+225 744 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+218 726 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+145 712 Td
+(smshagor.ru@gmail.com  |  +7 995 494 9836  |  www.smshagor.com) Tj
+ET
+BT
+/F1 10 Tf
+0.00 Tw
+168 698 Td
+(github.com/smshagor-dev  |  linkedin.com/in/sm-shagor) Tj
+ET
+BT
+/F1 11 Tf
+3.63 Tw
+56 668 Td
+(I am writing to apply for the Senior Data Scientist \(m/w/d\) mit Fokus AI role at) Tj
+ET
+BT
+/F1 11 Tf
+2.86 Tw
+56 653 Td
+(Skalar. Building AI agents and automation systems from the ground up is exactly the) Tj
+ET
+BT
+/F1 11 Tf
+2.10 Tw
+56 638 Td
+(kind of work I want to focus on, and Skalar's mission to simplify tax and accounting) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 623 Td
+(through AI is a compelling challenge.) Tj
+ET
+BT
+/F1 11 Tf
+3.15 Tw
+56 598 Td
+(My software engineering experience spans full-stack development and applied AI. Over) Tj
+ET
+BT
+/F1 11 Tf
+3.10 Tw
+56 583 Td
+(the past year, I have concentrated on building intelligent systems that combine LLM) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 568 Td
+(integrations, real-time data processing, and automation. I have worked with OpenAI) Tj
+ET
+BT
+/F1 11 Tf
+1.67 Tw
+56 553 Td
+(APIs, built AI assistants trained on custom datasets, and deployed systems that handle) Tj
+ET
+BT
+/F1 11 Tf
+2.23 Tw
+56 538 Td
+(voice-to-text conversion, PDF generation, and automated email delivery. These projects) Tj
+ET
+BT
+/F1 11 Tf
+2.58 Tw
+56 523 Td
+(required the same end-to-end ownership and pragmatic architecture choices that Skalar) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 508 Td
+(values.) Tj
+ET
+BT
+/F1 11 Tf
+3.10 Tw
+56 483 Td
+(One area that particularly interests me is building robust LLM integrations and RAG) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 468 Td
+(pipelines. In a recent AI-powered financial application, I designed and implemented) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 453 Td
+(the full backend using Express, TypeScript, and MongoDB, integrated OpenAI's latest) Tj
+ET
+BT
+/F1 11 Tf
+2.87 Tw
+56 438 Td
+(models for intelligent assistance, and used AWS Transcribe for voice processing. The) Tj
+ET
+BT
+/F1 11 Tf
+3.10 Tw
+56 423 Td
+(system fetched data from external sources, generated PDF term sheets, and sent them) Tj
+ET
+BT
+/F1 11 Tf
+1.43 Tw
+56 408 Td
+(via AWS SES. This experience directly maps to the core AI architecture work at Skalar:) Tj
+ET
+BT
+/F1 11 Tf
+2.01 Tw
+56 393 Td
+(taking features from specification to deployment, iterating fast, and making pragmatic) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 378 Td
+(decisions about the AI stack.) Tj
+ET
+BT
+/F1 11 Tf
+3.72 Tw
+56 353 Td
+(In addition to my technical experience, I work effectively across multidisciplinary) Tj
+ET
+BT
+/F1 11 Tf
+1.83 Tw
+56 338 Td
+(teams and communicate clearly with both technical and non-technical stakeholders. I am) Tj
+ET
+BT
+/F1 11 Tf
+1.98 Tw
+56 323 Td
+(fluent in Bengali and English, have working knowledge of Russian and Hindi, and enjoy) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 308 Td
+(collaborating in international and cross-cultural environments.) Tj
+ET
+BT
+/F1 11 Tf
+1.72 Tw
+56 283 Td
+(I have attached my CV for your review. I would welcome the opportunity to discuss how) Tj
+ET
+BT
+/F1 11 Tf
+4.00 Tw
+56 268 Td
+(my background in applied AI and software engineering can contribute to Skalar's) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 253 Td
+(early-stage growth.) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 130 Td
+(Sincerely,) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 115 Td
+() Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 100 Td
+(Md Shahanur Islam Shagor) Tj
+ET
+BT
+/F1 11 Tf
+0.00 Tw
+56 85 Td
+(Full-Stack Developer & AI Engineer) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3882
+%%EOF
