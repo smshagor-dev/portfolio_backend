@@ -1,9 +1,6 @@
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
 const bcrypt = require("bcryptjs");
 const { google } = require("googleapis");
-const multer = require("multer");
 const nodemailer = require("nodemailer");
 const QRCode = require("qrcode");
 const prisma = require("../lib/prisma");
@@ -29,10 +26,12 @@ const {
   normalizeSiteSettings,
   serializeSiteSettings,
 } = require("../lib/site-settings");
+const {
+  createMemoryUpload,
+  storeUploadedFile,
+} = require("../lib/upload-storage");
 
 const router = express.Router();
-const publicDirectory = path.resolve(process.cwd(), "public");
-const uploadDirectory = path.resolve(process.cwd(), "public", "uploads");
 const contactReplyReminderTimers = new Map();
 
 function emitContentUpdated(request, scope = "content", extra = {}) {
@@ -71,33 +70,7 @@ function emitArticlePublished(request, article) {
   });
 }
 
-if (!fs.existsSync(publicDirectory)) {
-  fs.mkdirSync(publicDirectory, { recursive: true });
-}
-
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (_request, _file, callback) => {
-    callback(null, uploadDirectory);
-  },
-  filename: (_request, file, callback) => {
-    const ext = path.extname(file.originalname || "").toLowerCase() || ".png";
-    const safeBaseName = path
-      .basename(file.originalname || "profile-image", ext)
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 40) || "profile-image";
-
-    callback(null, `${Date.now()}-${safeBaseName}${ext}`);
-  },
-});
-
-const upload = multer({
-  storage,
+const upload = createMemoryUpload({
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
@@ -111,8 +84,7 @@ const upload = multer({
   },
 });
 
-const contactChatUpload = multer({
-  storage,
+const contactChatUpload = createMemoryUpload({
   limits: {
     fileSize: 10 * 1024 * 1024,
     files: 2,
@@ -127,15 +99,13 @@ const contactChatUpload = multer({
   },
 });
 
-const resumeUpload = multer({
-  storage,
+const resumeUpload = createMemoryUpload({
   limits: {
     fileSize: 10 * 1024 * 1024,
   },
   fileFilter: (_request, file, callback) => {
-    const isPdf =
-      file.mimetype === "application/pdf" ||
-      path.extname(file.originalname || "").toLowerCase() === ".pdf";
+    const originalName = String(file.originalname || "").toLowerCase();
+    const isPdf = file.mimetype === "application/pdf" || originalName.endsWith(".pdf");
 
     if (!isPdf) {
       callback(new Error("Only PDF files are allowed."));
@@ -146,28 +116,7 @@ const resumeUpload = multer({
   },
 });
 
-const verificationFileStorage = multer.diskStorage({
-  destination: (_request, _file, callback) => {
-    callback(null, publicDirectory);
-  },
-  filename: (_request, file, callback) => {
-    const extension = path
-      .extname(file.originalname || "")
-      .trim()
-      .replace(/[^a-zA-Z0-9.]/g, "")
-      .slice(0, 20);
-    const safeBaseName = path
-      .basename(file.originalname || "google-verification", extension)
-      .replace(/[^a-zA-Z0-9._-]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 100) || "google-verification";
-
-    callback(null, `${safeBaseName}${extension.toLowerCase()}`);
-  },
-});
-
-const verificationFileUpload = multer({
-  storage: verificationFileStorage,
+const verificationFileUpload = createMemoryUpload({
   limits: {
     fileSize: 1024 * 1024,
   },
@@ -3580,11 +3529,15 @@ router.post(
       return response.status(400).json({ message: "Please choose an image to upload." });
     }
 
-    const uploadedPath = `/uploads/${request.file.filename}`;
+    const uploadedFile = await storeUploadedFile(request.file, {
+      directory: "uploads",
+      fallbackBaseName: "profile-image",
+    });
 
     return response.status(201).json({
       message: "Image uploaded successfully.",
-      path: uploadedPath,
+      path: uploadedFile.publicPath,
+      publicUrl: uploadedFile.publicUrl,
     });
   },
 );
@@ -3606,9 +3559,15 @@ router.post(
       return response.status(400).json({ message: "Please choose a PDF to upload." });
     }
 
+    const uploadedFile = await storeUploadedFile(request.file, {
+      directory: "uploads",
+      fallbackBaseName: "resume",
+    });
+
     return response.status(201).json({
       message: "Resume uploaded successfully.",
-      path: `/uploads/${request.file.filename}`,
+      path: uploadedFile.publicPath,
+      publicUrl: uploadedFile.publicUrl,
     });
   },
 );
@@ -3630,7 +3589,13 @@ router.post(
       return response.status(400).json({ message: "Please choose a verification file to upload." });
     }
 
-    const relativePath = `/${request.file.filename}`;
+    const uploadedFile = await storeUploadedFile(request.file, {
+      directory: "",
+      fallbackBaseName: "google-verification",
+      preserveOriginalName: true,
+    });
+
+    const relativePath = uploadedFile.publicPath;
     const siteSettings = await prisma.siteSettings.findUnique({
       where: { id: 1 },
     });
@@ -3641,7 +3606,7 @@ router.post(
     return response.status(201).json({
       message: "Verification file uploaded successfully.",
       path: relativePath,
-      publicUrl: canonicalBase ? `${canonicalBase}${relativePath}` : relativePath,
+      publicUrl: canonicalBase ? `${canonicalBase}${relativePath}` : uploadedFile.publicUrl,
     });
   },
 );

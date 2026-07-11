@@ -6,6 +6,11 @@ const path = require("path");
 const cors = require("cors");
 const prisma = require("./lib/prisma");
 const { validateAuthConfig, verifyAdminToken } = require("./lib/auth");
+const {
+  isRemoteStorageEnabled,
+  resolveLocalPublicPath,
+  toAbsolutePublicUrl,
+} = require("./lib/upload-storage");
 const adminRoutes = require("./routes/admin");
 const assistantRoutes = require("./routes/assistant");
 const jobAgentRoutes = require("./routes/job-agent");
@@ -14,10 +19,13 @@ const researchRoutes = require("./routes/research");
 const siteRoutes = require("./routes/site");
 
 const app = express();
-const publicDirectory = path.resolve(process.cwd(), "public");
 const port = Number(process.env.PORT || 5000);
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-const allowedOrigins = frontendUrl.split(",").map((item) => item.trim());
+const fallbackFrontendOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://smshagor.vercel.app",
+];
 const serverBaseUrl = process.env.BACKEND_URL || `http://127.0.0.1:${port}`;
 const isVercelRuntime =
   String(process.env.VERCEL || "").trim().toLowerCase() === "1" ||
@@ -31,19 +39,6 @@ try {
 }
 const forceHttps =
   String(process.env.FORCE_HTTPS || "").trim().toLowerCase() === "true";
-let io = null;
-
-if (!isVercelRuntime) {
-  const { Server } = require("socket.io");
-  const server = http.createServer(app);
-  io = new Server(server, {
-    cors: {
-      origin: allowedOrigins,
-      credentials: true,
-    },
-  });
-  app.set("server", server);
-}
 
 function getForwardedHeaderValue(header) {
   if (Array.isArray(header)) {
@@ -82,6 +77,67 @@ function isHttpsUrl(url) {
 
 function isPhpRequestPath(pathname) {
   return /\.php(?:\/|$)/i.test(String(pathname || "").trim());
+}
+
+function toOrigin(value) {
+  const normalizedValue = String(value || "").trim();
+
+  if (!normalizedValue) {
+    return "";
+  }
+
+  try {
+    return new URL(normalizedValue).origin;
+  } catch (_error) {
+    return "";
+  }
+}
+
+function buildAllowedOrigins() {
+  const configuredOrigins = [
+    ...frontendUrl.split(","),
+    process.env.NEXT_PUBLIC_APP_URL,
+    process.env.NEXT_PUBLIC_FRONTEND_URL,
+    process.env.CANONICAL_URL,
+    ...fallbackFrontendOrigins,
+  ];
+
+  return Array.from(
+    new Set(
+      configuredOrigins
+        .map((value) => toOrigin(value))
+        .filter(Boolean),
+    ),
+  );
+}
+
+const allowedOrigins = buildAllowedOrigins();
+const allowedOriginSet = new Set(allowedOrigins);
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    const normalizedOrigin = toOrigin(origin);
+    callback(null, allowedOriginSet.has(normalizedOrigin));
+  },
+  credentials: true,
+};
+
+let io = null;
+
+if (!isVercelRuntime) {
+  const { Server } = require("socket.io");
+  const server = http.createServer(app);
+  io = new Server(server, {
+    cors: {
+      origin: allowedOrigins,
+      credentials: true,
+    },
+  });
+  app.set("server", server);
 }
 
 app.set("trust proxy", true);
@@ -133,11 +189,9 @@ if (forceHttps) {
 }
 
 app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  }),
+  cors(corsOptions),
 );
+app.options(/.*/, cors(corsOptions));
 app.use("/api", (_request, response, next) => {
   response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   response.setHeader("Pragma", "no-cache");
@@ -146,13 +200,20 @@ app.use("/api", (_request, response, next) => {
   next();
 });
 app.use(express.json({ limit: "10mb" }));
-app.use(
-  "/uploads",
-  express.static(path.resolve(process.cwd(), "public", "uploads"), {
-    fallthrough: false,
-    maxAge: "7d",
-  }),
-);
+if (isRemoteStorageEnabled()) {
+  app.use("/uploads", (request, response) => {
+    response.redirect(307, toAbsolutePublicUrl(request.originalUrl));
+  });
+} else {
+  app.use(
+    "/uploads",
+    express.static(path.resolve(process.cwd(), "public", "uploads"), {
+      fallthrough: false,
+      maxAge: "7d",
+    }),
+  );
+}
+
 app.get(/^\/[^/]+\.[A-Za-z0-9_-]+$/, async (request, response, next) => {
   const requestedPath = String(request.path || "").trim();
 
@@ -172,10 +233,14 @@ app.get(/^\/[^/]+\.[A-Za-z0-9_-]+$/, async (request, response, next) => {
     }
 
     const filename = path.basename(verificationPath);
-    const resolvedPath = path.resolve(publicDirectory, filename);
+    const resolvedPath = resolveLocalPublicPath(`/${filename}`);
 
-    if (!resolvedPath.startsWith(publicDirectory)) {
+    if (!resolvedPath) {
       return response.status(400).end();
+    }
+
+    if (isRemoteStorageEnabled()) {
+      return response.redirect(307, toAbsolutePublicUrl(verificationPath));
     }
 
     return response.sendFile(resolvedPath, (error) => {

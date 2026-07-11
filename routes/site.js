@@ -1,8 +1,5 @@
 const express = require("express");
 const crypto = require("crypto");
-const fs = require("fs");
-const path = require("path");
-const multer = require("multer");
 const nodemailer = require("nodemailer");
 const prisma = require("../lib/prisma");
 const { getNextIntId } = require("../lib/next-id");
@@ -19,13 +16,14 @@ const {
   emitAdminNotification,
 } = require("../lib/admin-notifications");
 const { generatePortfolioAssistantReply } = require("../services/contact-assistant");
+const {
+  buildEmailAttachment,
+  createMemoryUpload,
+  deleteStoredFile,
+  storeUploadedFile,
+} = require("../lib/upload-storage");
 
 const router = express.Router();
-const uploadDirectory = path.resolve(process.cwd(), "public", "uploads");
-
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory, { recursive: true });
-}
 
 function buildContactChatHash(ticketId, token) {
   const normalizedId = String(ticketId || "").trim();
@@ -53,25 +51,7 @@ function buildContactChatUrl(canonicalUrl, ticketId, token) {
   }
 }
 
-const storage = multer.diskStorage({
-  destination: (_request, _file, callback) => {
-    callback(null, uploadDirectory);
-  },
-  filename: (_request, file, callback) => {
-    const ext = path.extname(file.originalname || "").toLowerCase() || ".png";
-    const safeBaseName = path
-      .basename(file.originalname || "comment-photo", ext)
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 40) || "comment-photo";
-
-    callback(null, `${Date.now()}-${safeBaseName}${ext}`);
-  },
-});
-
-const upload = multer({
-  storage,
+const upload = createMemoryUpload({
   limits: {
     fileSize: 5 * 1024 * 1024,
   },
@@ -85,8 +65,7 @@ const upload = multer({
   },
 });
 
-const contactUpload = multer({
-  storage,
+const contactUpload = createMemoryUpload({
   limits: {
     fileSize: 10 * 1024 * 1024,
     files: 2,
@@ -101,8 +80,7 @@ const contactUpload = multer({
   },
 });
 
-const contactChatUpload = multer({
-  storage,
+const contactChatUpload = createMemoryUpload({
   limits: {
     fileSize: 10 * 1024 * 1024,
     files: 2,
@@ -716,19 +694,7 @@ async function sendContactEmails(siteSettings, message) {
 
   const attachments = [message.photo, message.file]
     .filter(Boolean)
-    .map((filePath) => {
-      const filename = path.basename(filePath);
-      const resolvedPath = path.resolve(process.cwd(), "public", filePath.replace(/^\/+/, ""));
-
-      if (!resolvedPath.startsWith(uploadDirectory) || !fs.existsSync(resolvedPath)) {
-        return null;
-      }
-
-      return {
-        filename,
-        path: resolvedPath,
-      };
-    })
+    .map((filePath) => buildEmailAttachment(filePath))
     .filter(Boolean);
 
   await transporter.sendMail({
@@ -1450,9 +1416,15 @@ router.post(
       return response.status(400).json({ message: "Please choose an image to upload." });
     }
 
+    const uploadedFile = await storeUploadedFile(request.file, {
+      directory: "uploads",
+      fallbackBaseName: "service-image",
+    });
+
     return response.status(201).json({
       message: "Image uploaded successfully.",
-      path: `/uploads/${request.file.filename}`,
+      path: uploadedFile.publicPath,
+      publicUrl: uploadedFile.publicUrl,
     });
   },
 );
@@ -1990,9 +1962,15 @@ router.post(
       return response.status(400).json({ message: "Please choose an image to upload." });
     }
 
+    const uploadedFile = await storeUploadedFile(request.file, {
+      directory: "uploads",
+      fallbackBaseName: "testimonial-image",
+    });
+
     return response.status(201).json({
       message: "Image uploaded successfully.",
-      path: `/uploads/${request.file.filename}`,
+      path: uploadedFile.publicPath,
+      publicUrl: uploadedFile.publicUrl,
     });
   },
 );
@@ -2059,6 +2037,9 @@ router.post(
     });
   },
   async (request, response) => {
+  let storedPhoto = null;
+  let storedAttachment = null;
+
   try {
     const { name, email, subject, message } = request.body || {};
 
@@ -2068,6 +2049,18 @@ router.post(
 
     const photoFile = request.files?.photo?.[0];
     const attachedFile = request.files?.file?.[0];
+    storedPhoto = photoFile
+      ? await storeUploadedFile(photoFile, {
+          directory: "uploads",
+          fallbackBaseName: "contact-photo",
+        })
+      : null;
+    storedAttachment = attachedFile
+      ? await storeUploadedFile(attachedFile, {
+          directory: "uploads",
+          fallbackBaseName: "contact-file",
+        })
+      : null;
     const siteSettings = await getSiteSettingsRecord();
     const ticketToken = createTicketToken();
     const initialChatMessageId = await getNextIntId(prisma, "ContactChatMessage");
@@ -2077,8 +2070,8 @@ router.post(
         email: String(email).trim(),
         subject: String(subject || "").trim(),
         message: String(message).trim(),
-        photo: photoFile ? `/uploads/${photoFile.filename}` : "",
-        file: attachedFile ? `/uploads/${attachedFile.filename}` : "",
+        photo: storedPhoto?.publicPath || "",
+        file: storedAttachment?.publicPath || "",
         ticketToken,
         chatMessages: {
           create: {
@@ -2086,8 +2079,8 @@ router.post(
             senderType: "visitor",
             senderName: String(name).trim(),
             message: String(message).trim(),
-            photo: photoFile ? `/uploads/${photoFile.filename}` : "",
-            file: attachedFile ? `/uploads/${attachedFile.filename}` : "",
+            photo: storedPhoto?.publicPath || "",
+            file: storedAttachment?.publicPath || "",
           },
         },
       },
@@ -2160,6 +2153,11 @@ router.post(
       },
     });
   } catch (error) {
+    await Promise.all(
+      [storedPhoto?.publicPath, storedAttachment?.publicPath]
+        .filter(Boolean)
+        .map((item) => deleteStoredFile(item).catch(() => {})),
+    );
     console.error("Failed to save contact message:", error.message);
     return response.status(500).json({ message: "Failed to send message." });
   }
@@ -2203,6 +2201,9 @@ router.post(
     });
   },
   async (request, response) => {
+  let storedPhoto = null;
+  let storedAttachment = null;
+
   try {
     const messageId = Number.parseInt(request.params.messageId, 10);
     const ticketToken = normalizeString(request.query?.token);
@@ -2234,14 +2235,26 @@ router.post(
 
     const photoFile = request.files?.photo?.[0];
     const attachedFile = request.files?.file?.[0];
+    storedPhoto = photoFile
+      ? await storeUploadedFile(photoFile, {
+          directory: "uploads",
+          fallbackBaseName: "chat-photo",
+        })
+      : null;
+    storedAttachment = attachedFile
+      ? await storeUploadedFile(attachedFile, {
+          directory: "uploads",
+          fallbackBaseName: "chat-file",
+        })
+      : null;
     const savedChatMessage = await prisma.contactChatMessage.create({
       data: {
         contactMessageId: ticket.id,
         senderType: "visitor",
         senderName: ticket.name || "Visitor",
         message,
-        photo: photoFile ? `/uploads/${photoFile.filename}` : "",
-        file: attachedFile ? `/uploads/${attachedFile.filename}` : "",
+        photo: storedPhoto?.publicPath || "",
+        file: storedAttachment?.publicPath || "",
       },
     });
 
@@ -2292,6 +2305,11 @@ router.post(
       assistantReply: assistantReply ? serializeContactChatMessage(assistantReply) : null,
     });
   } catch (error) {
+    await Promise.all(
+      [storedPhoto?.publicPath, storedAttachment?.publicPath]
+        .filter(Boolean)
+        .map((item) => deleteStoredFile(item).catch(() => {})),
+    );
     console.error("Failed to save contact ticket reply:", error.message);
     return response.status(500).json({ message: "Failed to send reply." });
   }

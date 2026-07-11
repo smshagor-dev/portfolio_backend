@@ -2,12 +2,17 @@ const crypto = require("crypto");
 const express = require("express");
 const fs = require("fs");
 const { google } = require("googleapis");
-const multer = require("multer");
 const nodemailer = require("nodemailer");
 const path = require("path");
 const prisma = require("../lib/prisma");
 const { requireAdmin } = require("../lib/auth");
 const { decryptText, encryptText } = require("../utils/encryption");
+const {
+  buildEmailAttachment,
+  createMemoryUpload,
+  deleteStoredFile,
+  storeUploadedFile,
+} = require("../lib/upload-storage");
 const { generateAssistantResponse } = require("../services/ai");
 const { buildJobAgentProfileContext } = require("../services/job-agent-profile-builder");
 const {
@@ -42,7 +47,6 @@ const { buildManualJob } = require("../services/job-sources/manual-source");
 
 const router = express.Router();
 const oauthStates = new Map();
-const jobAgentCvUploadDirectory = path.resolve(process.cwd(), "public", "uploads", "job-agent", "cv");
 const GMAIL_AUTO_SYNC_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const APPROVED_SOURCES_AUTO_SYNC_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const EMAIL_AUTO_SEND_INTERVAL_MS = Math.max(60 * 1000, Number.parseInt(process.env.JOB_AGENT_EMAIL_AUTO_SEND_INTERVAL_MS, 10) || 10 * 60 * 1000);
@@ -51,20 +55,7 @@ let gmailAutoSyncRunning = false;
 let approvedSourcesAutoSyncRunning = false;
 let emailAutoSendRunning = false;
 
-if (!fs.existsSync(jobAgentCvUploadDirectory)) {
-  fs.mkdirSync(jobAgentCvUploadDirectory, { recursive: true });
-}
-
-const cvUpload = multer({
-  storage: multer.diskStorage({
-    destination(_request, _file, callback) {
-      callback(null, jobAgentCvUploadDirectory);
-    },
-    filename(_request, file, callback) {
-      const extension = path.extname(file.originalname || ".pdf").toLowerCase() || ".pdf";
-      callback(null, `agent-cv-${Date.now()}-${crypto.randomBytes(6).toString("hex")}${extension}`);
-    },
-  }),
+const cvUpload = createMemoryUpload({
   limits: { fileSize: 8 * 1024 * 1024 },
   fileFilter(_request, file, callback) {
     const extension = path.extname(file.originalname || "").toLowerCase();
@@ -1283,40 +1274,18 @@ function resolvePublicUploadPath(publicUrl) {
 }
 
 function deletePublicUploadIfLocal(publicUrl) {
-  const resolved = resolvePublicUploadPath(publicUrl);
-  if (resolved && fs.existsSync(resolved)) {
-    fs.unlinkSync(resolved);
-  }
-}
-
-function buildAttachment(publicUrl, fallbackFilename) {
-  const normalized = normalizeString(publicUrl);
-  if (!normalized) {
-    return null;
-  }
-
-  const filename = path.basename(normalized.split("?")[0]) || fallbackFilename;
-  const localPath = resolvePublicUploadPath(normalized);
-  if (localPath) {
-    return { filename, path: localPath };
-  }
-
-  if (/^https?:\/\//i.test(normalized)) {
-    return { filename, href: normalized };
-  }
-
-  return null;
+  return deleteStoredFile(publicUrl);
 }
 
 function buildDraftAttachments(draft, aiSettings) {
   const attachments = [];
   if (aiSettings.attachCv) {
-    const cv = buildAttachment(draft.cvUrl, "cv.pdf");
+    const cv = buildEmailAttachment(draft.cvUrl, "cv.pdf");
     if (cv) attachments.push(cv);
   }
 
   if (aiSettings.attachCoverLetterPdf) {
-    const coverLetter = buildAttachment(draft.coverLetterPdfUrl, "cover-letter.pdf");
+    const coverLetter = buildEmailAttachment(draft.coverLetterPdfUrl, "cover-letter.pdf");
     if (coverLetter) attachments.push(coverLetter);
   }
 
@@ -1697,25 +1666,22 @@ router.post("/profile-context/cv", requireAdmin, async (request, response) => {
       return response.status(400).json({ message: "Please choose a CV file to upload." });
     }
 
+    let uploadedFile = null;
+
     try {
+      uploadedFile = await storeUploadedFile(request.file, {
+        directory: "uploads/job-agent/cv",
+        fallbackBaseName: "agent-cv",
+      });
       const existing = await prisma.cvProfile.findFirst({
         where: { isDefault: true },
         orderBy: { updatedAt: "desc" },
       });
-      const publicUrl = `/uploads/job-agent/cv/${request.file.filename}`;
+      const publicUrl = uploadedFile.publicPath;
       const originalName = normalizeString(request.file.originalname) || request.file.filename;
 
       if (existing?.resumeUrl && existing.resumeUrl !== publicUrl) {
-        deletePublicUploadIfLocal(existing.resumeUrl);
-      }
-
-      for (const filename of fs.readdirSync(jobAgentCvUploadDirectory)) {
-        if (filename !== request.file.filename) {
-          const resolved = path.resolve(jobAgentCvUploadDirectory, filename);
-          if (resolved.startsWith(jobAgentCvUploadDirectory) && fs.existsSync(resolved)) {
-            fs.unlinkSync(resolved);
-          }
-        }
+        await deletePublicUploadIfLocal(existing.resumeUrl).catch(() => {});
       }
 
       const cvProfile = existing
@@ -1755,7 +1721,9 @@ router.post("/profile-context/cv", requireAdmin, async (request, response) => {
       });
     } catch (uploadError) {
       console.error("Failed to upload Job Agent CV:", uploadError.message);
-      deletePublicUploadIfLocal(`/uploads/job-agent/cv/${request.file.filename}`);
+      if (uploadedFile?.publicPath) {
+        await deletePublicUploadIfLocal(uploadedFile.publicPath).catch(() => {});
+      }
       return response.status(500).json({ message: uploadError.message || "Failed to upload Job Agent CV." });
     }
   });
