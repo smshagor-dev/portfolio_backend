@@ -27,9 +27,6 @@ const fallbackFrontendOrigins = [
   "https://smshagor.vercel.app",
 ];
 const serverBaseUrl = process.env.BACKEND_URL || `http://127.0.0.1:${port}`;
-const isVercelRuntime =
-  String(process.env.VERCEL || "").trim().toLowerCase() === "1" ||
-  String(process.env.VERCEL || "").trim().toLowerCase() === "true";
 let canonicalBackendOrigin = "";
 
 try {
@@ -127,18 +124,15 @@ const corsOptions = {
 };
 
 let io = null;
-
-if (!isVercelRuntime) {
-  const { Server } = require("socket.io");
-  const server = http.createServer(app);
-  io = new Server(server, {
-    cors: {
-      origin: allowedOrigins,
-      credentials: true,
-    },
-  });
-  app.set("server", server);
-}
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    credentials: true,
+  },
+});
+app.set("server", server);
 
 app.set("trust proxy", true);
 app.set("io", io);
