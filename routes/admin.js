@@ -3902,6 +3902,9 @@ router.put("/content", requireAdmin, async (request, response) => {
     const normalizedPricings = normalizePricings(pricings);
     const normalizedFaqs = normalizeFaqs(faqs);
     const normalizedTestimonials = normalizeTestimonials(testimonials);
+    const { id: _profileId, ...profileUpdateData } = normalizedProfile;
+    const { id: _siteSettingsId, ...siteSettingsUpdateData } = normalizedSiteSettings;
+    const { id: _serviceSectionId, ...serviceSectionUpdateData } = normalizedServiceSection;
 
     if (hasPricings && !hasPricingModel()) {
       return response.status(503).json({
@@ -3927,17 +3930,17 @@ router.put("/content", requireAdmin, async (request, response) => {
       });
     }
 
-    await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx) => {
       await tx.profile.upsert({
         where: { id: 1 },
-        update: normalizedProfile,
+        update: profileUpdateData,
         create: normalizedProfile,
       });
 
       if (hasSiteSettings) {
         await tx.siteSettings.upsert({
           where: { id: 1 },
-          update: normalizedSiteSettings,
+          update: siteSettingsUpdateData,
           create: normalizedSiteSettings,
         });
       }
@@ -3959,7 +3962,7 @@ router.put("/content", requireAdmin, async (request, response) => {
       if (hasServiceSection) {
         await tx.serviceSection.upsert({
           where: { id: 1 },
-          update: normalizedServiceSection,
+          update: serviceSectionUpdateData,
           create: normalizedServiceSection,
         });
       }
@@ -4065,7 +4068,7 @@ router.put("/content", requireAdmin, async (request, response) => {
       data: await getDashboardData(),
     });
   } catch (error) {
-    console.error("Failed to update content:", error.message);
+    console.error("Failed to update content:", error);
     return response.status(500).json({ message: "Failed to update content." });
   }
 });
