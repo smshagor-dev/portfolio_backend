@@ -1,1 +1,3 @@
-module.exports = require("../index");
+const server = require("../index");
+
+module.exports = server;

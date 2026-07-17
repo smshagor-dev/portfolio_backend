@@ -490,9 +490,9 @@ app.use("/api", assistantRoutes);
 validateAuthConfig();
 
 if (require.main === module) {
-  const server = app.get("server") || http.createServer(app);
+  const runtimeServer = app.get("server") || http.createServer(app);
 
-  server.listen(port, () => {
+  runtimeServer.listen(port, () => {
     console.log(`Backend server is running on ${serverBaseUrl}`);
   });
 
@@ -512,4 +512,7 @@ if (require.main === module) {
   }
 }
 
-module.exports = app;
+server.app = app;
+server.io = io;
+
+module.exports = server;
