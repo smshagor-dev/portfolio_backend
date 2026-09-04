@@ -1,4 +1,5 @@
 const express = require("express");
+const fs = require("fs");
 const path = require("path");
 const prisma = require("../lib/prisma");
 const { requireAdmin } = require("../lib/auth");
@@ -9,18 +10,28 @@ const {
   serializeResearchPublication,
 } = require("../lib/research-publications");
 const {
-  getResearchSyncRuntimeState,
+  getResearchSyncStatus,
   startResearchAutoSync,
+  SYNC_MARKER_SLUG,
   syncResearchPublications,
-} = require("../lib/research-sync");
+  syncResearchPublicationsIfDue,
+} = require("../lib/research-sync-coordinator");
 
 const router = express.Router();
 const defaultThumbnailPath = path.resolve(
-  process.cwd(),
+  __dirname,
+  "..",
   "public",
   "research",
   "research-publication.svg",
 );
+const fallbackThumbnailSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"><rect width="1200" height="675" fill="#0b1728"/><rect x="365" y="90" width="470" height="495" rx="28" fill="#12243a" stroke="#66d9ff" stroke-width="3"/><path d="M435 205h330M435 255h285M435 305h310M435 420h330M435 470h250" stroke="#9dc9e8" stroke-width="12" stroke-linecap="round" opacity=".62"/><circle cx="600" cy="365" r="48" fill="#162f4d" stroke="#7c8cff" stroke-width="4"/><path d="M600 335v60M570 365h60" stroke="#66d9ff" stroke-width="8" stroke-linecap="round"/></svg>`;
+let defaultThumbnailSvg = fallbackThumbnailSvg;
+try {
+  defaultThumbnailSvg = fs.readFileSync(defaultThumbnailPath, "utf8");
+} catch (_error) {
+  // Keep the inline fallback for serverless bundles that omit static files.
+}
 
 function buildResearchSuccessResponse(message, data, extra = {}) {
   return {
@@ -100,8 +111,7 @@ async function incrementResearchPublicationMetric(slug, metricName) {
 
 router.get("/research-publications/default-thumbnail.svg", (_request, response) => {
   response.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
-  response.type("image/svg+xml");
-  return response.sendFile(defaultThumbnailPath);
+  return response.type("image/svg+xml").send(defaultThumbnailSvg);
 });
 
 router.get("/research-publications", async (request, response) => {
@@ -112,6 +122,12 @@ router.get("/research-publications", async (request, response) => {
           "Research publication model is not available yet. Restart the backend after generating the Prisma client.",
         ),
       );
+    }
+
+    try {
+      await syncResearchPublicationsIfDue({ reason: "public-request-fallback" });
+    } catch (syncError) {
+      console.warn("Research request fallback sync failed; serving cached database data:", syncError.message);
     }
 
     const { page, limit, skip } = getPaginationParams(request.query);
@@ -457,7 +473,10 @@ router.post("/research-publications/:slug/share", async (request, response) => {
 
 router.get("/admin/research-publications", requireAdmin, async (request, response) => {
   try {
-    const where = buildResearchPublicationWhere(request.query, { publicOnly: false });
+    const where = {
+      ...buildResearchPublicationWhere(request.query, { publicOnly: false }),
+      slug: { not: SYNC_MARKER_SLUG },
+    };
     const items = await prisma.researchPublication.findMany({
       where,
       include: {
@@ -475,7 +494,7 @@ router.get("/admin/research-publications", requireAdmin, async (request, respons
         "Research publications loaded successfully.",
         items.map(serializeResearchPublication),
         {
-          sync: getResearchSyncRuntimeState(),
+          sync: await getResearchSyncStatus(),
           mode: "automatic-orcid-crossref",
         },
       ),
@@ -486,11 +505,11 @@ router.get("/admin/research-publications", requireAdmin, async (request, respons
   }
 });
 
-router.get("/admin/research-publications/sync-status", requireAdmin, (_request, response) => {
+router.get("/admin/research-publications/sync-status", requireAdmin, async (_request, response) => {
   return response.json(
     buildResearchSuccessResponse(
       "Research synchronization status loaded.",
-      getResearchSyncRuntimeState(),
+      await getResearchSyncStatus(),
     ),
   );
 });
@@ -507,7 +526,7 @@ router.post("/admin/research-publications/sync", requireAdmin, async (request, r
 
     return response.json(
       buildResearchSuccessResponse("Research publications synchronized successfully.", result, {
-        sync: getResearchSyncRuntimeState(),
+        sync: await getResearchSyncStatus(),
       }),
     );
   } catch (error) {
