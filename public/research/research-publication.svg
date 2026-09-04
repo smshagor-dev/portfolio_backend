@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Research publication</title>
+  <desc id="desc">Abstract research document illustration with connected scientific nodes.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#081426"/>
+      <stop offset="0.55" stop-color="#102a43"/>
+      <stop offset="1" stop-color="#07101d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#66d9ff"/>
+      <stop offset="1" stop-color="#7c8cff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="675" rx="36" fill="url(#bg)"/>
+  <circle cx="1040" cy="100" r="180" fill="#2c82ff" opacity=".08"/>
+  <circle cx="140" cy="600" r="220" fill="#50e3c2" opacity=".06"/>
+
+  <g opacity=".38" stroke="#6bdcff" stroke-width="2">
+    <path d="M126 152 258 214 354 132 486 210"/>
+    <path d="M760 134 864 218 1032 160"/>
+    <path d="M812 492 928 420 1052 508"/>
+  </g>
+  <g fill="#8cecff" filter="url(#glow)">
+    <circle cx="126" cy="152" r="7"/><circle cx="258" cy="214" r="7"/>
+    <circle cx="354" cy="132" r="7"/><circle cx="486" cy="210" r="7"/>
+    <circle cx="760" cy="134" r="7"/><circle cx="864" cy="218" r="7"/>
+    <circle cx="1032" cy="160" r="7"/><circle cx="812" cy="492" r="7"/>
+    <circle cx="928" cy="420" r="7"/><circle cx="1052" cy="508" r="7"/>
+  </g>
+
+  <g transform="translate(365 92)">
+    <rect x="0" y="0" width="470" height="492" rx="28" fill="#0e1d31" stroke="#4ac6ff" stroke-opacity=".45" stroke-width="2"/>
+    <path d="M322 0v92h148" fill="#132b45" stroke="#4ac6ff" stroke-opacity=".35" stroke-width="2"/>
+    <path d="M322 0 470 92" stroke="#4ac6ff" stroke-opacity=".35" stroke-width="2"/>
+    <rect x="54" y="74" width="208" height="18" rx="9" fill="url(#accent)"/>
+    <rect x="54" y="120" width="350" height="10" rx="5" fill="#9dc9e8" opacity=".58"/>
+    <rect x="54" y="148" width="310" height="10" rx="5" fill="#9dc9e8" opacity=".42"/>
+    <rect x="54" y="176" width="336" height="10" rx="5" fill="#9dc9e8" opacity=".42"/>
+    <rect x="54" y="232" width="130" height="118" rx="18" fill="#122a45" stroke="#66d9ff" stroke-opacity=".32"/>
+    <path d="M76 321 105 282l28 24 31-50" fill="none" stroke="#6ee7ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="76" cy="321" r="5" fill="#7c8cff"/><circle cx="105" cy="282" r="5" fill="#7c8cff"/><circle cx="133" cy="306" r="5" fill="#7c8cff"/><circle cx="164" cy="256" r="5" fill="#7c8cff"/>
+    <rect x="214" y="238" width="190" height="10" rx="5" fill="#9dc9e8" opacity=".5"/>
+    <rect x="214" y="270" width="166" height="10" rx="5" fill="#9dc9e8" opacity=".38"/>
+    <rect x="214" y="302" width="184" height="10" rx="5" fill="#9dc9e8" opacity=".38"/>
+    <rect x="214" y="334" width="142" height="10" rx="5" fill="#9dc9e8" opacity=".38"/>
+    <rect x="54" y="398" width="350" height="10" rx="5" fill="#9dc9e8" opacity=".4"/>
+    <rect x="54" y="430" width="282" height="10" rx="5" fill="#9dc9e8" opacity=".34"/>
+  </g>
+
+  <g transform="translate(925 288)" filter="url(#glow)">
+    <circle r="52" fill="#112946" stroke="#72e5ff" stroke-width="3"/>
+    <path d="M-20 4h40M0-20v40" stroke="#72e5ff" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>
