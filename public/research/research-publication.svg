@@ -1,216 +1,139 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1916 821" role="img" aria-labelledby="title desc">
   <title id="title">Research Publications</title>
-  <desc id="desc">Research portfolio banner covering artificial intelligence, autonomous systems, cybersecurity, and software engineering.</desc>
+  <desc id="desc">Research portfolio banner featuring research papers, AI, autonomous systems, cybersecurity, software engineering and connected global research.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#06111f"/>
-      <stop offset="0.48" stop-color="#09213a"/>
-      <stop offset="1" stop-color="#03101e"/>
+      <stop offset="0" stop-color="#071a2f"/><stop offset=".48" stop-color="#062544"/><stop offset="1" stop-color="#041224"/>
     </linearGradient>
-    <radialGradient id="halo" cx="50%" cy="40%" r="65%">
-      <stop offset="0" stop-color="#1b86bd" stop-opacity=".28"/>
-      <stop offset="1" stop-color="#071524" stop-opacity="0"/>
+    <radialGradient id="centerGlow" cx="58%" cy="45%" r="55%">
+      <stop offset="0" stop-color="#0e79ad" stop-opacity=".28"/><stop offset="1" stop-color="#06203a" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="titleAccent" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#91f4ff"/>
-      <stop offset=".55" stop-color="#32d4f2"/>
-      <stop offset="1" stop-color="#168fcb"/>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8ef5ff"/><stop offset=".52" stop-color="#35dcff"/><stop offset="1" stop-color="#159bd1"/>
     </linearGradient>
-    <linearGradient id="paper" x1="0" y1="0" x2=".8" y2="1">
-      <stop offset="0" stop-color="#f8fbff"/>
-      <stop offset="1" stop-color="#dce8f1"/>
+    <linearGradient id="paper" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dce8f2"/>
     </linearGradient>
-    <linearGradient id="globe" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#48dcff" stop-opacity=".95"/>
-      <stop offset=".18" stop-color="#1e8bd0" stop-opacity=".42"/>
-      <stop offset="1" stop-color="#03111e" stop-opacity="0"/>
+    <linearGradient id="earth" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#18bff8" stop-opacity=".82"/><stop offset=".18" stop-color="#0a79c0" stop-opacity=".40"/><stop offset="1" stop-color="#032542" stop-opacity="0"/>
     </linearGradient>
-    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
-      <feGaussianBlur stdDeviation="7" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="18"/>
-    </filter>
-    <clipPath id="globeClip"><ellipse cx="1002" cy="759" rx="570" ry="208"/></clipPath>
+    <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="18"/></filter>
+    <filter id="shadow" x="-30%" y="-30%" width="180%" height="180%"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#000" flood-opacity=".35"/></filter>
+    <clipPath id="earthClip"><ellipse cx="1020" cy="809" rx="790" ry="285"/></clipPath>
   </defs>
 
   <rect width="1916" height="821" fill="url(#bg)"/>
-  <rect width="1916" height="821" fill="url(#halo)"/>
+  <rect width="1916" height="821" fill="url(#centerGlow)"/>
 
-  <!-- subtle server/data columns -->
-  <g opacity=".17" fill="#2f9bd0">
-    <rect x="0" y="0" width="34" height="515"/><rect x="48" y="0" width="22" height="450"/>
-    <rect x="86" y="0" width="39" height="500"/><rect x="142" y="0" width="28" height="420"/>
-    <rect x="183" y="0" width="18" height="470"/><rect x="224" y="0" width="36" height="415"/>
+  <g opacity=".22" fill="#1477ac">
+    <rect x="0" y="0" width="34" height="488"/><rect x="48" y="0" width="20" height="438"/>
+    <rect x="82" y="0" width="38" height="475"/><rect x="136" y="0" width="28" height="410"/>
+    <rect x="180" y="0" width="18" height="458"/><rect x="216" y="0" width="34" height="402"/>
   </g>
-  <g stroke="#72cfff" stroke-width="2" opacity=".15">
-    <path d="M8 55h248M8 93h226M8 133h244M8 173h235M8 213h249M8 253h218M8 293h245M8 333h224"/>
+  <g opacity=".13" stroke="#55cfff" stroke-width="1.5"><path d="M0 68h258M0 110h234M0 152h250M0 194h224M0 236h247M0 278h230M0 320h252M0 362h216M0 404h246"/></g>
+
+  <g opacity=".52">
+    <path d="M920 154 1070 45 1142 120 1228 67 1308 139 1392 96 1495 165 1495 230 900 230z" fill="#153a5e"/>
+    <path d="M920 154 1070 45l24 54 48 21 86-53 31 49 49 23 84-43 103 69" fill="none" stroke="#3879ad" stroke-width="3"/>
+    <path d="m1048 63 22-18 17 38-24-7zm158 22 22-18 18 38-24-8zm165 24 21-13 27 27-31-7z" fill="#d6eff9" opacity=".45"/>
   </g>
 
-  <!-- mountains and autonomous drone -->
-  <g opacity=".74">
-    <path d="M1010 123 1100 48 1162 118 1240 58 1320 137 1415 82 1510 151v70h-500z" fill="#12334d"/>
-    <path d="M1010 123 1100 48l23 51 39 19 78-60 35 66 45 13 95-55 95 69" fill="none" stroke="#3e7598" stroke-width="3"/>
-    <path d="m1080 66 20-18 19 42-23-7zm139 10 21-18 19 38-23-9zm178 17 18-11 25 22-28-4z" fill="#d5edf7" opacity=".55"/>
-  </g>
-  <g transform="translate(1322 62)" stroke="#93eaff" stroke-width="4" fill="none" filter="url(#glow)">
-    <rect x="54" y="24" width="76" height="27" rx="8" fill="#0b2940"/>
-    <path d="M38 23h108M72 53l-13 27m66-27 13 27M92 51v25"/>
-    <path d="M37 23 16 7m130 16 21-16"/>
-    <ellipse cx="12" cy="5" rx="30" ry="6"/><ellipse cx="172" cy="5" rx="30" ry="6"/>
-    <circle cx="92" cy="84" r="9" fill="#4cdfff"/>
-  </g>
-  <text x="1436" y="160" fill="#8edbf5" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="2">AUTONOMOUS</text>
-  <text x="1436" y="183" fill="#8edbf5" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="2">SYSTEMS</text>
-
-  <!-- paper stack -->
-  <g transform="translate(18 32)">
-    <g transform="translate(150 75) rotate(-2 160 250)" opacity=".62">
-      <rect width="320" height="520" rx="4" fill="#bccddd"/>
-      <rect x="42" y="74" width="230" height="10" rx="5" fill="#6f8799"/>
-      <rect x="42" y="104" width="200" height="7" rx="3" fill="#8298a8"/>
-    </g>
-    <g transform="translate(88 45) rotate(3 160 250)" opacity=".8">
-      <rect width="320" height="520" rx="4" fill="#e4edf4"/>
-      <rect x="43" y="98" width="224" height="8" rx="4" fill="#7890a4"/>
-      <rect x="43" y="126" width="190" height="6" rx="3" fill="#94a9b8"/>
-      <polyline points="48,360 92,317 129,338 174,288 225,313 270,263" fill="none" stroke="#5b8eb2" stroke-width="5"/>
-    </g>
-    <g transform="translate(20 8) rotate(-1 160 250)">
-      <rect width="325" height="525" rx="5" fill="url(#paper)" stroke="#c7d8e3" stroke-width="2"/>
-      <text x="48" y="73" fill="#24364a" font-family="Georgia, 'Times New Roman', serif" font-size="33" font-weight="700">RESEARCH PAPER</text>
-      <text x="50" y="105" fill="#64798a" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="3">SCIENCE • METHODS • IMPACT</text>
-      <g fill="#8ca1af" opacity=".8">
-        <rect x="50" y="143" width="218" height="7" rx="3"/><rect x="50" y="164" width="232" height="7" rx="3"/>
-        <rect x="50" y="185" width="198" height="7" rx="3"/><rect x="50" y="206" width="225" height="7" rx="3"/>
-      </g>
-      <rect x="165" y="247" width="110" height="126" rx="3" fill="#c2d7e5"/>
-      <polyline points="174,345 194,321 213,333 235,294 253,310 267,273" fill="none" stroke="#4c87ae" stroke-width="4"/>
-      <text x="49" y="286" fill="#314a5d" font-family="Georgia, 'Times New Roman', serif" font-size="17">Advancing</text>
-      <text x="49" y="311" fill="#314a5d" font-family="Georgia, 'Times New Roman', serif" font-size="17">intelligent systems</text>
-      <text x="49" y="336" fill="#314a5d" font-family="Georgia, 'Times New Roman', serif" font-size="17">for a safer,</text>
-      <text x="49" y="361" fill="#314a5d" font-family="Georgia, 'Times New Roman', serif" font-size="17">connected world.</text>
-      <g fill="#9aadb9" opacity=".8">
-        <rect x="49" y="410" width="230" height="6" rx="3"/><rect x="49" y="430" width="214" height="6" rx="3"/>
-        <rect x="49" y="450" width="232" height="6" rx="3"/><rect x="49" y="470" width="188" height="6" rx="3"/>
-      </g>
-    </g>
-    <g transform="translate(0 535)">
-      <rect x="0" y="0" width="390" height="58" rx="5" fill="#071525" stroke="#173451"/>
-      <rect x="4" y="62" width="404" height="58" rx="5" fill="#081727" stroke="#173451"/>
-      <rect x="15" y="124" width="405" height="58" rx="5" fill="#081727" stroke="#173451"/>
-      <text x="55" y="38" fill="#7195ad" font-family="Arial, Helvetica, sans-serif" font-size="23">DISCOVERY</text>
-      <text x="64" y="101" fill="#7195ad" font-family="Arial, Helvetica, sans-serif" font-size="23">INNOVATION</text>
-      <text x="64" y="162" fill="#7195ad" font-family="Arial, Helvetica, sans-serif" font-size="22">REAL-WORLD IMPACT</text>
-    </g>
-    <g transform="translate(200 723) rotate(-10)">
-      <rect width="235" height="14" rx="7" fill="#0d2235" stroke="#7aa4bf"/>
-      <rect x="182" width="44" height="14" fill="#d6d8d7"/>
-      <path d="M235 7 263 2v10z" fill="#d6d8d7"/>
+  <g transform="translate(32 35)" filter="url(#shadow)">
+    <g transform="translate(130 70) rotate(-2 160 245)"><rect width="320" height="510" rx="4" fill="#bdcfdd" opacity=".62"/></g>
+    <g transform="translate(75 43) rotate(3 160 245)"><rect width="320" height="510" rx="4" fill="#eef5fa" opacity=".86"/></g>
+    <g>
+      <rect width="330" height="520" rx="5" fill="url(#paper)" stroke="#d7e5ef" stroke-width="2"/>
+      <text x="42" y="72" font-family="Georgia,Times New Roman,serif" font-size="34" font-weight="700" fill="#15243a">RESEARCH PAPER</text>
+      <text x="44" y="104" font-family="Arial,sans-serif" font-size="11" letter-spacing="3" fill="#58708a">IDEAS  •  METHODS  •  RESULTS  •  IMPACT</text>
+      <g fill="#879eb0"><rect x="43" y="143" width="246" height="6" rx="3"/><rect x="43" y="165" width="218" height="6" rx="3"/><rect x="43" y="187" width="233" height="6" rx="3"/></g>
+      <text x="43" y="236" font-family="Georgia,serif" font-size="17" font-weight="700" fill="#253a51">ABSTRACT</text>
+      <text x="43" y="267" font-family="Arial,sans-serif" font-size="16" fill="#314c66">Advancing knowledge</text>
+      <text x="43" y="292" font-family="Arial,sans-serif" font-size="16" fill="#314c66">for a safer, smarter</text>
+      <text x="43" y="317" font-family="Arial,sans-serif" font-size="16" fill="#314c66">and more connected</text>
+      <text x="43" y="342" font-family="Arial,sans-serif" font-size="16" fill="#314c66">world.</text>
+      <rect x="190" y="236" width="102" height="112" rx="3" fill="#cfe4f2"/>
+      <g stroke="#a9c7db" stroke-width="1"><path d="M204 252v82M226 252v82M248 252v82M270 252v82"/><path d="M200 274h84M200 296h84M200 318h84"/></g>
+      <polyline points="204,321 224,301 243,310 265,274 285,251" fill="none" stroke="#0f64a4" stroke-width="4"/>
+      <circle cx="204" cy="321" r="4" fill="#0f64a4"/><circle cx="224" cy="301" r="4" fill="#0f64a4"/><circle cx="243" cy="310" r="4" fill="#0f64a4"/><circle cx="265" cy="274" r="4" fill="#0f64a4"/><circle cx="285" cy="251" r="4" fill="#0f64a4"/>
+      <g fill="#8ba2b2"><rect x="43" y="387" width="242" height="6" rx="3"/><rect x="43" y="411" width="230" height="6" rx="3"/><rect x="43" y="435" width="246" height="6" rx="3"/><rect x="43" y="459" width="204" height="6" rx="3"/></g>
     </g>
   </g>
 
-  <!-- title -->
-  <text x="585" y="280" fill="#f4f8fb" font-family="Georgia, 'Times New Roman', serif" font-size="84" font-weight="700">Research</text>
-  <text x="932" y="280" fill="url(#titleAccent)" font-family="Georgia, 'Times New Roman', serif" font-size="84" font-weight="700">Publications</text>
-  <path d="M932 299h360" stroke="#3edaf4" stroke-width="2" opacity=".7"/>
-  <text x="603" y="337" fill="#d9e9f3" font-family="Arial, Helvetica, sans-serif" font-size="24" letter-spacing=".6">AI  •  Autonomous Systems  •  Cybersecurity  •  Software Engineering</text>
-
-  <!-- category row -->
-  <g transform="translate(650 385)" font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
-    <g transform="translate(40 0)" stroke="#45ddff" stroke-width="4" fill="none">
-      <path d="M31 12c-14-14-34-2-30 14-13 4-13 25 0 30-7 15 10 30 24 21 4 17 28 17 32 0 14 9 31-6 24-21 13-5 13-26 0-30 4-16-16-28-30-14-5-15-15-15-20 0z"/>
-      <path d="M40 8v75M20 26c11 0 20 8 20 19m22-19c-11 0-22 8-22 19M20 66c11 0 20-8 20-19m22 19c-11 0-22-8-22-19"/>
-      <text x="40" y="121" stroke="none" fill="#b9e9f8" font-size="16" font-weight="700">AI</text>
-      <text x="40" y="145" stroke="none" fill="#6faec9" font-size="13" letter-spacing="1.3">INTELLIGENT</text>
-      <text x="40" y="164" stroke="none" fill="#6faec9" font-size="13" letter-spacing="1.3">SOLUTIONS</text>
-    </g>
-    <path d="M178 8v166" stroke="#47708a" opacity=".55"/>
-    <g transform="translate(230 8)" stroke="#45ddff" stroke-width="4" fill="none">
-      <rect x="26" y="26" width="70" height="28" rx="7"/>
-      <path d="M10 23h102M39 55l-10 27m55-27 10 27M61 54v26M10 23-2 12m114 11 12-11"/>
-      <ellipse cx="-5" cy="10" rx="20" ry="4"/><ellipse cx="129" cy="10" rx="20" ry="4"/>
-      <text x="61" y="113" stroke="none" fill="#b9e9f8" font-size="16" font-weight="700">AUTONOMOUS</text>
-      <text x="61" y="134" stroke="none" fill="#b9e9f8" font-size="16" font-weight="700">SYSTEMS</text>
-      <text x="61" y="159" stroke="none" fill="#6faec9" font-size="13" letter-spacing="1">SAFER TOMORROW</text>
-    </g>
-    <path d="M404 8v166" stroke="#47708a" opacity=".55"/>
-    <g transform="translate(457 4)" stroke="#45ddff" stroke-width="4" fill="none">
-      <path d="M53 8 91 24v34c0 28-15 47-38 60C30 105 15 86 15 58V24z"/>
-      <rect x="39" y="50" width="28" height="28" rx="4"/><path d="M45 50v-9c0-11 16-11 16 0v9"/>
-      <text x="53" y="143" stroke="none" fill="#b9e9f8" font-size="16" font-weight="700">CYBERSECURITY</text>
-      <text x="53" y="166" stroke="none" fill="#6faec9" font-size="13" letter-spacing="1">RESILIENT SYSTEMS</text>
-    </g>
-    <path d="M626 8v166" stroke="#47708a" opacity=".55"/>
-    <g transform="translate(686 12)" stroke="#45ddff" stroke-width="4" fill="none">
-      <path d="m17 28-22 20 22 20m48-40 22 20-22 20M53 14 31 82"/>
-      <text x="40" y="121" stroke="none" fill="#b9e9f8" font-size="16" font-weight="700">SOFTWARE</text>
-      <text x="40" y="143" stroke="none" fill="#b9e9f8" font-size="16" font-weight="700">ENGINEERING</text>
-      <text x="40" y="166" stroke="none" fill="#6faec9" font-size="13" letter-spacing="1">BUILDING POSSIBILITIES</text>
-    </g>
+  <g transform="translate(28 505)" font-family="Arial,sans-serif" filter="url(#shadow)">
+    <g><rect width="365" height="56" rx="6" fill="#06162a" stroke="#12669b"/><rect width="5" height="56" fill="#27d7ff"/><circle cx="47" cy="28" r="12" fill="none" stroke="#d9f5ff" stroke-width="3"/><path d="m56 37 10 10" stroke="#d9f5ff" stroke-width="3"/><text x="87" y="36" fill="#e3f2fa" font-size="20" letter-spacing="1">DISCOVERY</text></g>
+    <g transform="translate(0 62)"><rect width="385" height="56" rx="6" fill="#07172a" stroke="#12669b"/><rect width="5" height="56" fill="#27d7ff"/><path d="M47 17c-9 0-16 7-16 16 0 6 4 11 9 14v6h14v-6c5-3 9-8 9-14 0-9-7-16-16-16z" fill="none" stroke="#d9f5ff" stroke-width="2.5"/><text x="87" y="36" fill="#e3f2fa" font-size="20" letter-spacing="1">INNOVATION</text></g>
+    <g transform="translate(12 124)"><rect width="392" height="56" rx="6" fill="#07172a" stroke="#12669b"/><rect width="5" height="56" fill="#27d7ff"/><g fill="#d9f5ff"><rect x="33" y="34" width="6" height="14"/><rect x="44" y="26" width="6" height="22"/><rect x="55" y="17" width="6" height="31"/></g><text x="87" y="36" fill="#e3f2fa" font-size="20" letter-spacing="1">REAL-WORLD IMPACT</text></g>
   </g>
 
-  <!-- AI head/network -->
-  <g transform="translate(1567 25)" opacity=".9" stroke="#4adaff" fill="none">
-    <path d="M138 12c-75 0-116 49-116 111 0 43 20 67 50 89l-5 50 72 4c35 1 68-23 76-58 5-21 0-39-7-56 17-22 19-50 8-75C203 38 174 12 138 12z" stroke-width="3"/>
-    <g stroke-width="1.4" opacity=".8">
-      <path d="M53 78 95 49 137 75 178 48 205 88 175 120 208 150 166 177 126 142 87 176 55 138 91 106z"/>
-      <path d="M95 49 91 106m46-31-11 67m52-94-12 129M53 78l113 99m39-89L87 176m4-70 117 44"/>
-    </g>
-    <g fill="#67e6ff" stroke="none" filter="url(#glow)">
-      <circle cx="53" cy="78" r="4"/><circle cx="95" cy="49" r="4"/><circle cx="137" cy="75" r="4"/>
-      <circle cx="178" cy="48" r="4"/><circle cx="205" cy="88" r="4"/><circle cx="175" cy="120" r="4"/>
-      <circle cx="208" cy="150" r="4"/><circle cx="166" cy="177" r="4"/><circle cx="126" cy="142" r="4"/>
-      <circle cx="87" cy="176" r="4"/><circle cx="55" cy="138" r="4"/><circle cx="91" cy="106" r="4"/>
-    </g>
-  </g>
-  <text x="1768" y="154" fill="#8edbf5" font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="2">AI</text>
-  <text x="1768" y="179" fill="#8edbf5" font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="2">FROM DATA</text>
-  <text x="1768" y="204" fill="#8edbf5" font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="2">TO IMPACT</text>
+  <text x="530" y="268" font-family="Georgia,Times New Roman,serif" font-size="86" font-weight="700" fill="#f5f8fb">Research</text>
+  <text x="929" y="268" font-family="Georgia,Times New Roman,serif" font-size="86" font-weight="700" fill="url(#cyan)" filter="url(#glow)">Publications</text>
+  <path d="M530 286h865" stroke="#2dd8ff" stroke-width="2" opacity=".38"/>
+  <text x="582" y="327" font-family="Arial,sans-serif" font-size="25" fill="#dcecf6" letter-spacing=".4">AI  •  Autonomous Systems  •  Cybersecurity  •  Software Engineering</text>
 
-  <!-- cyber shield / world grid -->
-  <g transform="translate(1385 296)" opacity=".76">
-    <g stroke="#2e769d" stroke-width="1" opacity=".42">
-      <path d="M0 20h270M0 50h270M0 80h270M0 110h270M0 140h270M25 0v164M65 0v164M105 0v164M145 0v164M185 0v164M225 0v164"/>
-    </g>
-    <g transform="translate(84 5)" stroke="#4ce0ff" stroke-width="4" fill="#09233a" filter="url(#glow)">
-      <path d="M50 0 98 19v43c0 38-20 65-48 81C22 127 2 100 2 62V19z"/>
-      <rect x="34" y="55" width="32" height="30" rx="4" fill="none"/><path d="M40 55V44c0-14 20-14 20 0v11" fill="none"/>
-    </g>
+  <g transform="translate(1278 48)" fill="none" stroke="#42e0ff" stroke-width="4" filter="url(#glow)">
+    <ellipse cx="25" cy="9" rx="29" ry="6"/><ellipse cx="187" cy="9" rx="29" ry="6"/><path d="M25 15 57 35M187 15 155 35M52 35h108"/>
+    <rect x="68" y="32" width="76" height="30" rx="8" fill="#0a2943"/>
+    <path d="M82 62 70 88M130 62l12 26M106 62v29"/><circle cx="106" cy="98" r="9" fill="#34dfff"/>
   </g>
-  <text x="1555" y="437" fill="#a6e8fb" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700">CYBERSECURITY</text>
-  <text x="1555" y="460" fill="#72b6d0" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="1.2">STRONGER TOGETHER</text>
+  <text x="1432" y="142" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#b6eaff">AUTONOMOUS</text><text x="1432" y="164" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#b6eaff">SYSTEMS</text>
 
-  <!-- laptop -->
-  <g transform="translate(1650 390)">
-    <path d="M30 0h215c13 0 23 10 23 23v145H7V23C7 10 17 0 30 0z" fill="#071521" stroke="#477a99" stroke-width="3"/>
-    <rect x="24" y="18" width="228" height="134" rx="3" fill="#06101a"/>
-    <g font-family="monospace" font-size="10" fill="#53d7ff" opacity=".75">
-      <text x="40" y="44"># research</text><text x="40" y="62"># innovation</text><text x="40" y="80"># collaboration</text>
-      <text x="40" y="98"># real-world impact</text><text x="40" y="125">def brighter_tomorrow():</text>
-      <text x="55" y="143">return knowledge</text>
-    </g>
-    <path d="M0 169h283l-17 24H17z" fill="#102638" stroke="#477a99" stroke-width="2"/>
+  <g transform="translate(1545 22)" filter="url(#glow)">
+    <path d="M112 8c58 0 104 45 104 103 0 32-14 60-38 79l-4 49-89 4-2-39c-22-8-37-24-47-46-9-19-10-41-3-61C47 47 75 8 112 8z" fill="none" stroke="#38d6ff" stroke-width="3"/>
+    <g stroke="#3bdcff" stroke-width="1.8" opacity=".8"><path d="M68 76 108 53 145 81 183 52M68 76 85 126 132 115 167 145 192 102M108 53 132 115 145 81M85 126 105 170 167 145M167 145 185 188"/></g>
+    <g fill="#dff9ff"><circle cx="68" cy="76" r="5"/><circle cx="108" cy="53" r="5"/><circle cx="145" cy="81" r="5"/><circle cx="183" cy="52" r="5"/><circle cx="85" cy="126" r="5"/><circle cx="132" cy="115" r="5"/><circle cx="167" cy="145" r="5"/><circle cx="192" cy="102" r="5"/><circle cx="105" cy="170" r="5"/><circle cx="185" cy="188" r="5"/></g>
   </g>
+  <text x="1770" y="168" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#b7eaff">AI &amp; DATA</text><text x="1770" y="191" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#b7eaff">SCIENCE</text>
 
-  <!-- luminous globe -->
-  <ellipse cx="1002" cy="760" rx="575" ry="212" fill="url(#globe)" opacity=".48"/>
-  <g clip-path="url(#globeClip)" fill="none" stroke="#5adfff" opacity=".38">
-    <ellipse cx="1002" cy="760" rx="570" ry="205" stroke-width="3"/>
-    <ellipse cx="1002" cy="760" rx="430" ry="205"/><ellipse cx="1002" cy="760" rx="275" ry="205"/><ellipse cx="1002" cy="760" rx="120" ry="205"/>
-    <path d="M430 680h1140M430 720h1140M430 760h1140M430 800h1140"/>
-  </g>
-  <path d="M430 642c202-69 370-74 569-69 213 5 381 32 575 91" fill="none" stroke="#56ddff" stroke-width="4" filter="url(#glow)"/>
-  <g fill="#e8c87f" filter="url(#glow)">
-    <circle cx="650" cy="676" r="5"/><circle cx="886" cy="660" r="5"/><circle cx="1045" cy="652" r="5"/><circle cx="1220" cy="669" r="5"/><circle cx="1390" cy="697" r="5"/>
-  </g>
-  <g stroke="#70e8ff" stroke-width="1.7" fill="none" opacity=".8">
-    <path d="M650 676Q762 568 886 660"/><path d="M886 660Q965 565 1045 652"/><path d="M1045 652Q1135 561 1220 669"/><path d="M1220 669Q1312 586 1390 697"/>
+  <g font-family="Arial,sans-serif" text-anchor="middle">
+    <g transform="translate(635 366)" stroke="#33ddff" stroke-width="4" fill="none" filter="url(#glow)">
+      <path d="M0 27c-15-14-35-2-31 15-14 4-14 26 0 31-7 16 10 31 25 22 4 18 29 18 33 0 15 9 32-6 25-22 14-5 14-27 0-31 4-17-16-29-31-15-5-16-16-16-21 0z"/>
+      <path d="M10 18v75M-9 36c11 0 19 8 19 18m21-18c-11 0-21 8-21 18M-9 76c11 0 19-8 19-18m21 18c-11 0-21-8-21-18"/>
+    </g>
+    <text x="645" y="489" fill="#e3f7ff" font-size="17" font-weight="700">AI</text><text x="645" y="512" fill="#79bdd8" font-size="13" letter-spacing="1">INTELLIGENT</text><text x="645" y="530" fill="#79bdd8" font-size="13" letter-spacing="1">SOLUTIONS</text>
+    <path d="M747 374v158" stroke="#2c6688" opacity=".55"/>
+
+    <g transform="translate(808 377)" stroke="#33ddff" stroke-width="4" fill="none" filter="url(#glow)">
+      <ellipse cx="4" cy="6" rx="23" ry="5"/><ellipse cx="128" cy="6" rx="23" ry="5"/><path d="M4 11 29 28M128 11 103 28M25 28h82"/><rect x="35" y="26" width="62" height="26" rx="7"/><path d="M48 53 39 75M84 53l9 22M66 52v24"/>
+    </g>
+    <text x="875" y="489" fill="#e3f7ff" font-size="17" font-weight="700">AUTONOMOUS</text><text x="875" y="510" fill="#e3f7ff" font-size="17" font-weight="700">SYSTEMS</text><text x="875" y="533" fill="#79bdd8" font-size="13" letter-spacing="1">REAL-WORLD AUTONOMY</text>
+    <path d="M978 374v158" stroke="#2c6688" opacity=".55"/>
+
+    <g transform="translate(1058 362)" stroke="#33ddff" stroke-width="4" fill="none" filter="url(#glow)">
+      <path d="M54 8 96 25v37c0 31-16 53-42 68C28 115 12 93 12 62V25z"/>
+      <rect x="39" y="53" width="30" height="31" rx="4"/><path d="M45 53v-10c0-12 18-12 18 0v10"/>
+    </g>
+    <text x="1112" y="489" fill="#e3f7ff" font-size="17" font-weight="700">CYBERSECURITY</text><text x="1112" y="512" fill="#79bdd8" font-size="13" letter-spacing="1">TRUSTED SYSTEMS</text>
+    <path d="M1214 374v158" stroke="#2c6688" opacity=".55"/>
+
+    <g transform="translate(1282 386)" stroke="#33ddff" stroke-width="4" fill="none" filter="url(#glow)"><path d="m18 0-28 26 28 26m64-52 28 26-28 26M66-10 40 63"/></g>
+    <text x="1335" y="489" fill="#e3f7ff" font-size="17" font-weight="700">SOFTWARE</text><text x="1335" y="510" fill="#e3f7ff" font-size="17" font-weight="700">ENGINEERING</text><text x="1335" y="533" fill="#79bdd8" font-size="13" letter-spacing="1">BUILDING POSSIBILITIES</text>
   </g>
 
-  <g transform="translate(670 756)" font-family="Arial, Helvetica, sans-serif">
-    <path d="M0 0h90M648 0h90" stroke="#7eddf3" stroke-width="1.5" opacity=".75"/>
-    <text x="128" y="7" fill="#89acc1" font-size="15" letter-spacing="6">KNOWLEDGE DRIVES A BRIGHTER TOMORROW</text>
+  <g transform="translate(1488 298)" stroke="#42e0ff" stroke-width="4" fill="none" filter="url(#glow)"><path d="M62 0 111 20v43c0 36-18 62-49 79C31 125 13 99 13 63V20z"/><rect x="46" y="55" width="33" height="35" rx="5"/><path d="M52 55V44c0-14 21-14 21 0v11"/></g>
+  <text x="1549" y="456" font-family="Arial,sans-serif" text-anchor="middle" font-size="15" font-weight="700" fill="#d8f5ff">CYBERSECURITY</text><text x="1549" y="477" font-family="Arial,sans-serif" text-anchor="middle" font-size="13" fill="#82bdd7">SAFEGUARDING</text><text x="1549" y="495" font-family="Arial,sans-serif" text-anchor="middle" font-size="13" fill="#82bdd7">TOMORROW</text>
+
+  <g transform="translate(1640 355)">
+    <rect width="255" height="178" rx="15" fill="#061224" stroke="#466e88" stroke-width="2"/>
+    <rect x="15" y="15" width="225" height="143" rx="6" fill="#03101d"/>
+    <text x="35" y="48" font-family="monospace" font-size="13" fill="#6fe5ff">/*</text>
+    <text x="35" y="76" font-family="monospace" font-size="13" fill="#6fe5ff">Research today</text><text x="35" y="99" font-family="monospace" font-size="13" fill="#6fe5ff">builds a smarter,</text><text x="35" y="122" font-family="monospace" font-size="13" fill="#6fe5ff">safer tomorrow.</text><text x="35" y="148" font-family="monospace" font-size="13" fill="#6fe5ff">*/</text>
+    <path d="M-20 178h295l-18 17H0z" fill="#a7c7d9" stroke="#e2f2fa"/><path d="M90 181h75" stroke="#1edfff" stroke-width="4" filter="url(#glow)"/>
   </g>
+
+  <g clip-path="url(#earthClip)">
+    <ellipse cx="1010" cy="810" rx="790" ry="285" fill="#062745" stroke="#43dfff" stroke-width="4" filter="url(#glow)"/>
+    <ellipse cx="1010" cy="810" rx="790" ry="285" fill="url(#earth)"/>
+    <g opacity=".42" fill="none" stroke="#1f8dcc" stroke-width="2"><ellipse cx="1010" cy="810" rx="570" ry="245"/><ellipse cx="1010" cy="810" rx="390" ry="226"/><path d="M221 804h1578M266 748h1485M340 696h1340"/><path d="M430 541q180 180 0 415M650 530q120 200 0 430M980 525q0 220 0 440M1270 530q-120 200 0 430M1500 545q-180 180 0 410"/></g>
+    <g fill="#0d5f95" opacity=".58"><path d="M460 664c74-63 146-56 210-29 43 18 52 49 20 67-44 24-70 35-96 83-28 52-88 36-110-3-23-41-77-73-24-118z"/><path d="M890 623c52-38 130-28 170 2 33 25 15 47-25 59-33 10-37 39-57 61-33 35-92 22-113-12-24-39-21-77 25-110z"/><path d="M1190 634c75-40 165-18 211 20 27 22 19 50-18 62-44 14-51 43-82 68-42 34-102 13-123-28-22-42-37-94 12-122z"/></g>
+  </g>
+
+  <g fill="none" stroke="#56ddff" stroke-width="2.2" opacity=".84" filter="url(#glow)">
+    <path d="M456 694 Q600 542 716 603"/><path d="M575 706 Q760 515 872 648"/><path d="M716 603 Q885 500 1032 579"/><path d="M872 648 Q1060 520 1164 637"/><path d="M1032 579 Q1230 494 1305 618"/><path d="M1164 637 Q1370 520 1441 673"/><path d="M1305 618 Q1535 555 1608 732"/>
+  </g>
+  <g fill="#fff7cd" stroke="#dffbff" stroke-width="2" filter="url(#glow)"><circle cx="456" cy="694" r="8"/><circle cx="575" cy="706" r="6"/><circle cx="716" cy="603" r="6"/><circle cx="872" cy="648" r="7"/><circle cx="1032" cy="579" r="6"/><circle cx="1164" cy="637" r="7"/><circle cx="1305" cy="618" r="6"/><circle cx="1441" cy="673" r="7"/><circle cx="1608" cy="732" r="8"/></g>
+
+  <g transform="translate(620 738)" font-family="Arial,sans-serif"><path d="M0 0h112M660 0h112" stroke="#79cfe8" stroke-width="1"/><text x="386" y="7" text-anchor="middle" fill="#b8d9ea" font-size="15" letter-spacing="7">KNOWLEDGE DRIVES A BRIGHTER TOMORROW</text></g>
 </svg>
