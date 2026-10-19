@@ -194,6 +194,22 @@ app.use("/api", (_request, response, next) => {
   next();
 });
 app.use(express.json({ limit: "10mb" }));
+
+// Public, version-controlled screenshots for the founder's product case studies.
+// These assets live in this backend repository and must be available even when
+// user-uploaded files use FTP storage. Serve only this fixed public directory.
+app.use(
+  "/uploads/founder",
+  express.static(path.join(__dirname, "public", "uploads", "founder"), {
+    fallthrough: false,
+    maxAge: "7d",
+    index: false,
+    setHeaders(response) {
+      response.setHeader("X-Content-Type-Options", "nosniff");
+    },
+  }),
+);
+
 if (isRemoteStorageEnabled()) {
   app.use("/uploads", (request, response) => {
     response.redirect(307, toAbsolutePublicUrl(request.originalUrl));
