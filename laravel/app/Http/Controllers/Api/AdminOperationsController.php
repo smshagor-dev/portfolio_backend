@@ -8,6 +8,7 @@ use App\Models\AnalyticsSession;
 use App\Models\Article;
 use App\Models\ContactChatMessage;
 use App\Models\ContactMessage;
+use App\Services\ContactNotificationService;
 use App\Models\JobEmailDraft;
 use App\Models\Project;
 use App\Models\ResearchPublication;
@@ -82,6 +83,7 @@ class AdminOperationsController extends Controller
             'senderName' => (string) $request->user()->name, 'message' => $input['message'],
             'photo' => $files['photo'], 'file' => $files['file'],
         ]);
+        app(ContactNotificationService::class)->onAdminReply($ticket);
         return response()->json(['message' => 'Reply saved.', 'data' => $reply], 201);
     }
 

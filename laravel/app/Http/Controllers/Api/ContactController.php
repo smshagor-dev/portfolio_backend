@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\ContactChatMessage;
 use App\Models\ContactMessage;
+use App\Services\ContactNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -54,6 +55,7 @@ class ContactController extends Controller
             ]);
             return $saved;
         });
+        app(ContactNotificationService::class)->onCreated($ticket);
         return response()->json([
             'message' => 'Contact ticket created.',
             'ticket' => $ticket->load('chatMessages'),
@@ -83,6 +85,7 @@ class ContactController extends Controller
             'message' => (string) ($data['message'] ?? ''),
             'photo' => $files['photo'], 'file' => $files['file'],
         ]);
+        app(ContactNotificationService::class)->onVisitorReply($ticket, (string) ($data['message'] ?? ''));
         return response()->json(['message' => 'Reply created.', 'chatMessage' => $chatMessage], 201);
     }
 
