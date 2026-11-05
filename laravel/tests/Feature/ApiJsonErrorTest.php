@@ -17,6 +17,39 @@ class ApiJsonErrorTest extends TestCase
             ->assertJsonValidationErrors(['email', 'password']);
     }
 
+    public function test_blank_optional_two_factor_code_does_not_fail_string_validation(): void
+    {
+        // Laravel converts "" into null before validating. The invalid email
+        // ensures this test never queries the real admin database.
+        $this->postJson('/api/admin/login', [
+            'email' => 'not-an-email',
+            'password' => '',
+            'twoFactorCode' => '',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['email', 'password'])
+            ->assertJsonMissingValidationErrors(['twoFactorCode']);
+    }
+
+    public function test_explicit_null_optional_two_factor_code_is_accepted_by_validator(): void
+    {
+        $this->postJson('/api/admin/login', [
+            'email' => 'not-an-email',
+            'password' => '',
+            'twoFactorCode' => null,
+        ])->assertStatus(422)
+            ->assertJsonMissingValidationErrors(['twoFactorCode']);
+    }
+
+    public function test_numeric_two_factor_code_is_rejected(): void
+    {
+        $this->postJson('/api/admin/login', [
+            'email' => 'not-an-email',
+            'password' => '',
+            'twoFactorCode' => 123456,
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['twoFactorCode']);
+    }
+
     public function test_unknown_api_routes_respond_with_json(): void
     {
         $response = $this->get('/api/__not_a_route__', ['Accept' => 'text/html']);

@@ -23,7 +23,9 @@ class AdminAuthController extends Controller
         $input = $request->validate([
             'email' => ['required', 'email', 'max:255'],
             'password' => ['required', 'string'],
-            'twoFactorCode' => ['sometimes', 'string'],
+            // Laravel converts an empty submitted string to null; 2FA is optional
+            // until enabled for this admin, so don't reject the initial login.
+            'twoFactorCode' => ['sometimes', 'nullable', 'string'],
         ]);
 
         $admin = AdminUser::where('email', strtolower($input['email']))->first();
