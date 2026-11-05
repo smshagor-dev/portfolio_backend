@@ -14,17 +14,18 @@ class ResearchController extends Controller
         $query = ResearchPublication::query()->where('status', 'published');
         foreach (['publicationType', 'researchArea'] as $field) {
             if ($request->filled($field)) {
-                $query->where($field, $request->string($field)->toString());
+                $query->where($field === 'publicationType' ? 'publication_type' : 'research_area', $request->string($field)->toString());
             }
         }
         if ($request->boolean('featured')) {
-            $query->where('isFeatured', true);
+            $query->where('is_featured', true);
         }
         if ($request->filled('search')) {
             $search = '%'.addcslashes($request->string('search')->toString(), '%_\\').'%';
             $query->where(function ($q) use ($search): void {
                 foreach (['title', 'shortSummary', 'researchArea', 'publisherName', 'doi'] as $field) {
-                    $q->orWhere($field, 'like', $search);
+                    $physical = ['shortSummary' => 'short_summary', 'researchArea' => 'research_area', 'publisherName' => 'publisher_name'][$field] ?? $field;
+                    $q->orWhere($physical, 'like', $search);
                 }
             });
         }
@@ -44,7 +45,7 @@ class ResearchController extends Controller
         $page = max(1, (int) ($data['page'] ?? 1));
         $limit = min(50, max(1, (int) ($data['limit'] ?? 9)));
         $publications = $this->query($request)->with('comments.replies')
-            ->orderByDesc('publishedDate')->orderByDesc('createdAt')->paginate($limit, ['*'], 'page', $page);
+            ->orderByDesc('published_date')->orderByDesc('created_at')->paginate($limit, ['*'], 'page', $page);
         return response()->json([
             'success' => true,
             'message' => 'Research publications loaded successfully.',
@@ -57,8 +58,8 @@ class ResearchController extends Controller
                 'featured' => $request->input('featured', ''),
             ],
             'options' => [
-                'publicationTypes' => ResearchPublication::where('status', 'published')->distinct()->orderBy('publicationType')->pluck('publicationType'),
-                'researchAreas' => ResearchPublication::where('status', 'published')->distinct()->orderBy('researchArea')->pluck('researchArea'),
+                'publicationTypes' => ResearchPublication::where('status', 'published')->distinct()->orderBy('publication_type')->pluck('publication_type'),
+                'researchAreas' => ResearchPublication::where('status', 'published')->distinct()->orderBy('research_area')->pluck('research_area'),
             ],
         ]);
     }
@@ -67,7 +68,7 @@ class ResearchController extends Controller
     {
         return response()->json([
             'success' => true, 'message' => 'Featured research publications loaded successfully.',
-            'data' => ResearchPublication::where('status', 'published')->where('isFeatured', true)->with('comments.replies')->orderByDesc('publishedDate')->get(),
+            'data' => ResearchPublication::where('status', 'published')->where('is_featured', true)->with('comments.replies')->orderByDesc('published_date')->get(),
         ]);
     }
 
@@ -83,13 +84,13 @@ class ResearchController extends Controller
 
     public function impression(string $slug): JsonResponse
     {
-        $count = ResearchPublication::where('slug', $slug)->where('status', 'published')->increment('impressionCount');
+        $count = ResearchPublication::where('slug', $slug)->where('status', 'published')->increment('impression_count');
         return response()->json(['success' => $count > 0]);
     }
 
     public function share(string $slug): JsonResponse
     {
-        $count = ResearchPublication::where('slug', $slug)->where('status', 'published')->increment('shareCount');
+        $count = ResearchPublication::where('slug', $slug)->where('status', 'published')->increment('share_count');
         return response()->json(['success' => $count > 0]);
     }
 }

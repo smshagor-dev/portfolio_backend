@@ -38,7 +38,7 @@ class PortfolioAiService
     {
         $settings = AiSettings::find(1);
         $name = strtolower((string) ($settings?->activeProvider ?: 'openai'));
-        $provider = AiProvider::where('name', $name)->where('isActive', true)->first();
+        $provider = AiProvider::where('name', $name)->where('is_active', true)->first();
         // Never send a default OpenAI credential to a different AI provider.
         $key = $provider?->apiKey
             ? Crypt::decryptString($provider->apiKey)
