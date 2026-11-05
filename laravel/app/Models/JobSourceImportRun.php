@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class JobSourceImportRun extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'job_source_import_runs';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = false;
     protected $fillable = ['sourceId', 'status', 'startedAt', 'finishedAt', 'importedCount', 'duplicateCount', 'needsDescriptionCount', 'errorMessage'];
 
