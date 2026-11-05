@@ -119,7 +119,7 @@ return new class extends Migration {
 
         Schema::create('service_comments', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('serviceId');
+            $table->unsignedBigInteger('serviceId');
             $table->string('photo', 255);
             $table->string('comment', 255);
             $table->string('impression', 255);
@@ -130,7 +130,7 @@ return new class extends Migration {
 
         Schema::create('service_replies', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('commentId');
+            $table->unsignedBigInteger('commentId');
             $table->string('reply', 255);
             $table->string('impression', 255);
             $table->integer('sortOrder');
@@ -160,7 +160,7 @@ return new class extends Migration {
 
         Schema::create('project_comments', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('projectId');
+            $table->unsignedBigInteger('projectId');
             $table->string('name', 255);
             $table->string('comment', 255);
             $table->integer('sortOrder');
@@ -170,7 +170,7 @@ return new class extends Migration {
 
         Schema::create('project_replies', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('commentId');
+            $table->unsignedBigInteger('commentId');
             $table->string('name', 255);
             $table->string('reply', 255);
             $table->integer('sortOrder');
@@ -278,7 +278,7 @@ return new class extends Migration {
 
         Schema::create('research_comments', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('publicationId');
+            $table->unsignedBigInteger('publicationId');
             $table->string('name', 255);
             $table->string('comment', 255);
             $table->integer('sortOrder');
@@ -289,7 +289,7 @@ return new class extends Migration {
 
         Schema::create('research_replies', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('commentId');
+            $table->unsignedBigInteger('commentId');
             $table->string('name', 255);
             $table->string('reply', 255);
             $table->integer('sortOrder');
@@ -300,7 +300,7 @@ return new class extends Migration {
 
         Schema::create('article_comments', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('articleId');
+            $table->unsignedBigInteger('articleId');
             $table->string('name', 255);
             $table->string('comment', 255);
             $table->integer('sortOrder');
@@ -310,7 +310,7 @@ return new class extends Migration {
 
         Schema::create('article_replies', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('commentId');
+            $table->unsignedBigInteger('commentId');
             $table->string('name', 255);
             $table->string('reply', 255);
             $table->integer('sortOrder');
@@ -330,8 +330,8 @@ return new class extends Migration {
 
         Schema::create('article_category_assignments', function (Blueprint $table): void {
             $table->string('id', 64)->primary();
-            $table->integer('articleId');
-            $table->integer('categoryId');
+            $table->unsignedBigInteger('articleId');
+            $table->unsignedBigInteger('categoryId');
             $table->unique(['articleId', 'categoryId'], 'article_category__articled_categoryd_u');
             $table->index(['categoryId'], 'article_category__categoryd_i');
         });
@@ -352,7 +352,7 @@ return new class extends Migration {
 
         Schema::create('contact_chat_messages', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('contactMessageId');
+            $table->unsignedBigInteger('contactMessageId');
             $table->string('senderType', 255);
             $table->string('senderName', 255)->default('');
             $table->longText('message')->nullable();
@@ -489,7 +489,7 @@ return new class extends Migration {
 
         Schema::create('analytics_daily_visits', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('sessionRef');
+            $table->unsignedBigInteger('sessionRef');
             $table->dateTime('visitDate');
             $table->string('path', 255)->default('/');
             $table->dateTime('createdAt')->useCurrent();
@@ -499,7 +499,7 @@ return new class extends Migration {
 
         Schema::create('analytics_page_views', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('sessionRef');
+            $table->unsignedBigInteger('sessionRef');
             $table->string('path', 191)->default('/');
             $table->dateTime('firstViewedAt')->useCurrent();
             $table->dateTime('lastViewedAt')->useCurrent();
@@ -537,7 +537,7 @@ return new class extends Migration {
 
         Schema::create('job_posts', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('sourceId')->nullable();
+            $table->unsignedBigInteger('sourceId')->nullable();
             $table->string('sourceType', 191);
             $table->string('externalId', 191)->nullable();
             $table->string('sourceEmail', 255)->default('');
@@ -618,7 +618,7 @@ return new class extends Migration {
 
         Schema::create('job_source_import_runs', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('sourceId');
+            $table->unsignedBigInteger('sourceId');
             $table->string('status', 255);
             $table->dateTime('startedAt');
             $table->dateTime('finishedAt')->nullable();
@@ -632,8 +632,8 @@ return new class extends Migration {
 
         Schema::create('job_matchs', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('jobPostId');
-            $table->integer('cvProfileId')->nullable();
+            $table->unsignedBigInteger('jobPostId');
+            $table->unsignedBigInteger('cvProfileId')->nullable();
             $table->integer('score');
             $table->json('matchedSkills')->nullable();
             $table->json('missingSkills')->nullable();
@@ -648,7 +648,7 @@ return new class extends Migration {
 
         Schema::create('recruiter_contacts', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('jobPostId')->nullable();
+            $table->unsignedBigInteger('jobPostId')->nullable();
             $table->string('name', 255)->default('');
             $table->string('email', 191);
             $table->string('companyName', 255)->default('');
@@ -674,8 +674,8 @@ return new class extends Migration {
 
         Schema::create('job_email_drafts', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('jobPostId');
-            $table->integer('recruiterContactId')->nullable();
+            $table->unsignedBigInteger('jobPostId');
+            $table->unsignedBigInteger('recruiterContactId')->nullable();
             $table->string('toEmail', 255)->default('');
             $table->string('subject', 255);
             $table->longText('body')->nullable();
@@ -748,7 +748,7 @@ return new class extends Migration {
 
         Schema::create('job_agent_email_events', function (Blueprint $table): void {
             $table->bigIncrements('id');
-            $table->integer('draftId');
+            $table->unsignedBigInteger('draftId');
             $table->integer('jobPostId');
             $table->longText('recipientEmail')->nullable();
             $table->string('eventType', 191);

@@ -36,4 +36,4 @@ API: http://localhost:8080/api/health
 
 **Important**: Database credentials and APP_KEY belong in environment variables, never in Git. Existing MongoDB data is **not migrated automatically**. Run MySQL migrations on a separate database and validate API parity before switching traffic.
 
-See `docs/MIGRATION_PLAN.md` and `docs/API_PARITY.md` for milestones and scope.
+See `docs/DEPLOYMENT.md`, `docs/MIGRATION_PLAN.md`, `docs/API_PARITY.md` and `docs/DATA_IMPORT.md` for milestones and scope.
