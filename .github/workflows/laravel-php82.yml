@@ -1,0 +1,73 @@
+name: Laravel PHP 8.2 and MySQL
+
+on:
+  pull_request:
+    paths:
+      - "laravel/**"
+      - ".github/workflows/laravel-php82.yml"
+  push:
+    branches:
+      - "feat/laravel12-php82-mysql-migration"
+    paths:
+      - "laravel/**"
+      - ".github/workflows/laravel-php82.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  php82:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: portfolio
+          MYSQL_USER: portfolio
+          MYSQL_PASSWORD: testing-password
+          MYSQL_ROOT_PASSWORD: testing-root-password
+        ports:
+          - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -ptesting-root-password"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    defaults:
+      run:
+        working-directory: laravel
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: "base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_DATABASE: portfolio
+      DB_USERNAME: portfolio
+      DB_PASSWORD: testing-password
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          extensions: mbstring, pdo_mysql, pdo_sqlite, zip, intl, bcmath
+      - name: Validate composer metadata
+        run: composer validate --no-check-publish
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Node-to-Laravel HTTP route parity
+        run: node tools/audit-route-parity.js
+      - name: PHP syntax check
+        run: find app bootstrap config database routes tests public -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Execute MySQL migrations
+        run: php artisan migrate --force
+      - name: Check routes
+        run: php artisan route:list
+      - name: PHPUnit tests (SQLite in-memory)
+        run: php artisan test

@@ -1,0 +1,14 @@
+**/.env
+**/.env.*
+!**/.env.example
+vendor/
+node_modules/
+.git/
+.gitignore
+storage/app/imports/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+*.log
+*.sql
