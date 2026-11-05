@@ -64,6 +64,48 @@ jobs:
       - name: Isolated regression tests (no real FTP or MongoDB network)
         run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest|LinkedInEmbedValidationTest|ApiSecurityHeadersTest|CompanySourceProbeTest)' --display-warnings
 
-# NOTE: This is deliberately not a full MongoDB API/end-to-end certification.
-# Staging tests with an isolated Atlas database and real FTPS server are required
-# before making the Laravel app live or merging the migration PR.
+  mongo-integration:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    defaults:
+      run:
+        working-directory: laravel
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: "base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      DB_CONNECTION: mongodb
+      DATABASE_URL: mongodb://127.0.0.1:27017/portfolio_ci
+      MONGODB_DATABASE: portfolio_ci
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          extensions: mongodb, ftp, mbstring, zip, intl, bcmath, dom, xml
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Prepare isolated test dotenv
+        run: touch .env
+      - name: MongoDB model, API, and admin token integration tests
+        run: php artisan test --filter=IsolatedMongoIntegrationTest
+
+# NOTE: Tests run only against ephemeral GitHub Actions MongoDB, never Atlas.
+# Real FTPS, production cPanel behaviour and full legacy parity still
+# require independent staging smoke tests before any production deployment.
