@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AssistantController;
 use App\Http\Controllers\Api\JobAgentController;
+use App\Http\Controllers\Api\JobPdfController;
 use App\Http\Controllers\Api\JobSettingsController;
 use App\Http\Controllers\Api\JobDraftGenerationController;
 use App\Http\Controllers\Api\JobIntegrationController;
@@ -137,6 +138,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::put('job-agent/drafts/{id}', [JobDraftGenerationController::class, 'update'])->whereNumber('id');
     Route::get('job-agent/matches', [JobAgentController::class, 'matches']);
     Route::get('job-agent/drafts', [JobAgentController::class, 'drafts']);
+    Route::post('job-agent/drafts/{id}/generate-cover-letter-pdf', [JobPdfController::class, 'generate'])->whereNumber('id');
+    Route::get('job-agent/drafts/{id}/cover-letter-pdf', [JobPdfController::class, 'download'])->whereNumber('id');
     Route::get('job-agent/sources', [JobAgentController::class, 'sources']);
     Route::post('job-agent/sources', [JobIntegrationController::class, 'addSource']);
     Route::put('job-agent/sources/{id}', [JobIntegrationController::class, 'updateSource'])->whereNumber('id');
