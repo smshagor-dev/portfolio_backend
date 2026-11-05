@@ -14,6 +14,8 @@ class JobAgentAiSetting extends Model
     const UPDATED_AT = 'updatedAt';
     protected $fillable = ['aiProvider', 'aiModel', 'deepseekApiKeyEncrypted', 'geminiApiKeyEncrypted', 'openaiApiKeyEncrypted', 'fallbackProvider', 'fallbackEnabled', 'systemPrompt', 'recruiterEmailPrompt', 'coverLetterPrompt', 'tone', 'maxEmailWords', 'maxCoverLetterWords', 'requireAdminApproval', 'attachCv', 'attachCoverLetterPdf', 'autoGenerateCoverLetter'];
 
+    protected $hidden = ['deepseekApiKeyEncrypted', 'geminiApiKeyEncrypted', 'openaiApiKeyEncrypted'];
+
     protected $casts = [
         'fallbackEnabled' => 'boolean',
         'maxEmailWords' => 'integer',

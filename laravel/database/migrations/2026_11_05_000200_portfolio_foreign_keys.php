@@ -52,11 +52,11 @@ return new class extends Migration {
         Schema::table('job_source_import_runs', function (Blueprint $table): void {
             $table->foreign('sourceId', 'fk_14_job_source_import__sourceId')->references('id')->on('job_board_sources')->onDelete('cascade');
         });
-        Schema::table('job_matchs', function (Blueprint $table): void {
-            $table->foreign('jobPostId', 'fk_15_job_matchs_jobPostId')->references('id')->on('job_posts')->onDelete('cascade');
+        Schema::table('job_matches', function (Blueprint $table): void {
+            $table->foreign('jobPostId', 'fk_15_job_matches_jobPostId')->references('id')->on('job_posts')->onDelete('cascade');
         });
-        Schema::table('job_matchs', function (Blueprint $table): void {
-            $table->foreign('cvProfileId', 'fk_16_job_matchs_cvProfileId')->references('id')->on('cv_profiles')->onDelete('set null');
+        Schema::table('job_matches', function (Blueprint $table): void {
+            $table->foreign('cvProfileId', 'fk_16_job_matches_cvProfileId')->references('id')->on('cv_profiles')->onDelete('set null');
         });
         Schema::table('recruiter_contacts', function (Blueprint $table): void {
             $table->foreign('jobPostId', 'fk_17_recruiter_contacts_jobPostId')->references('id')->on('job_posts')->onDelete('cascade');
@@ -78,8 +78,8 @@ return new class extends Migration {
         Schema::table('job_email_drafts', function (Blueprint $table): void { $table->dropForeign('fk_19_job_email_drafts_recruiterContac'); });
         Schema::table('job_email_drafts', function (Blueprint $table): void { $table->dropForeign('fk_18_job_email_drafts_jobPostId'); });
         Schema::table('recruiter_contacts', function (Blueprint $table): void { $table->dropForeign('fk_17_recruiter_contacts_jobPostId'); });
-        Schema::table('job_matchs', function (Blueprint $table): void { $table->dropForeign('fk_16_job_matchs_cvProfileId'); });
-        Schema::table('job_matchs', function (Blueprint $table): void { $table->dropForeign('fk_15_job_matchs_jobPostId'); });
+        Schema::table('job_matches', function (Blueprint $table): void { $table->dropForeign('fk_16_job_matches_cvProfileId'); });
+        Schema::table('job_matches', function (Blueprint $table): void { $table->dropForeign('fk_15_job_matches_jobPostId'); });
         Schema::table('job_source_import_runs', function (Blueprint $table): void { $table->dropForeign('fk_14_job_source_import__sourceId'); });
         Schema::table('job_posts', function (Blueprint $table): void { $table->dropForeign('fk_13_job_posts_sourceId'); });
         Schema::table('analytics_page_views', function (Blueprint $table): void { $table->dropForeign('fk_12_analytics_page_vie_sessionRef'); });

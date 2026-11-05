@@ -414,7 +414,7 @@ return new class extends Migration {
             $table->dateTime('createdAt')->useCurrent();
         });
 
-        Schema::create('ai_settingses', function (Blueprint $table): void {
+        Schema::create('ai_settings', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->string('activeProvider', 255);
             $table->string('modelName', 255);
@@ -429,7 +429,7 @@ return new class extends Migration {
             $table->dateTime('createdAt')->useCurrent();
         });
 
-        Schema::create('site_settingses', function (Blueprint $table): void {
+        Schema::create('site_settings', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->string('websiteTitle', 255);
             $table->longText('websiteDescription')->nullable();
@@ -630,7 +630,7 @@ return new class extends Migration {
             $table->index(['sourceId', 'createdAt'], 'job_source_import_sourced_createdt_i');
         });
 
-        Schema::create('job_matchs', function (Blueprint $table): void {
+        Schema::create('job_matches', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('jobPostId');
             $table->unsignedBigInteger('cvProfileId')->nullable();
@@ -642,8 +642,8 @@ return new class extends Migration {
             $table->longText('coverLetter')->nullable();
             $table->dateTime('createdAt')->useCurrent();
             $table->dateTime('updatedAt')->nullable();
-            $table->index(['jobPostId', 'cvProfileId'], 'job_matchs_jobostd_cvrofiled_i');
-            $table->index(['score'], 'job_matchs_score_i');
+            $table->index(['jobPostId', 'cvProfileId'], 'job_matches_jobostd_cvrofiled_i');
+            $table->index(['score'], 'job_matches_score_i');
         });
 
         Schema::create('recruiter_contacts', function (Blueprint $table): void {
@@ -712,7 +712,7 @@ return new class extends Migration {
             $table->index(['sentAt'], 'job_email_drafts_sentt_i');
         });
 
-        Schema::create('job_agent_settingses', function (Blueprint $table): void {
+        Schema::create('job_agent_settings', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->string('gmailConnectedEmail', 255)->default('');
             $table->string('gmailRefreshToken', 255)->default('');
@@ -791,10 +791,10 @@ return new class extends Migration {
         Schema::dropIfExists('job_agent_ai_settings');
         Schema::dropIfExists('job_agent_email_events');
         Schema::dropIfExists('job_agent_email_settings');
-        Schema::dropIfExists('job_agent_settingses');
+        Schema::dropIfExists('job_agent_settings');
         Schema::dropIfExists('job_email_drafts');
         Schema::dropIfExists('recruiter_contacts');
-        Schema::dropIfExists('job_matchs');
+        Schema::dropIfExists('job_matches');
         Schema::dropIfExists('job_source_import_runs');
         Schema::dropIfExists('job_board_sources');
         Schema::dropIfExists('job_search_preferences');
@@ -804,9 +804,9 @@ return new class extends Migration {
         Schema::dropIfExists('analytics_page_views');
         Schema::dropIfExists('analytics_daily_visits');
         Schema::dropIfExists('analytics_sessions');
-        Schema::dropIfExists('site_settingses');
+        Schema::dropIfExists('site_settings');
         Schema::dropIfExists('ai_training_entries');
-        Schema::dropIfExists('ai_settingses');
+        Schema::dropIfExists('ai_settings');
         Schema::dropIfExists('ai_providers');
         Schema::dropIfExists('admin_users');
         Schema::dropIfExists('emergency_contacts');

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobMatch extends Model
 {
-    protected $table = 'job_matchs';
+    protected $table = 'job_matches';
     protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = true;

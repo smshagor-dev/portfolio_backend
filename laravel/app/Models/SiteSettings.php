@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SiteSettings extends Model
 {
-    protected $table = 'site_settingses';
+    protected $table = 'site_settings';
     protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = true;

@@ -34,9 +34,9 @@ This schema mirrors 49 Prisma models using Laravel Eloquent. Properties use orig
 | EmergencyContact | `emergency_contacts` | 8 |
 | AdminUser | `admin_users` | 8 |
 | AiProvider | `ai_providers` | 6 |
-| AiSettings | `ai_settingses` | 4 |
+| AiSettings | `ai_settings` | 4 |
 | AiTrainingEntry | `ai_training_entries` | 5 |
-| SiteSettings | `site_settingses` | 40 |
+| SiteSettings | `site_settings` | 40 |
 | AnalyticsSession | `analytics_sessions` | 11 |
 | AnalyticsDailyVisit | `analytics_daily_visits` | 5 |
 | AnalyticsPageView | `analytics_page_views` | 6 |
@@ -46,10 +46,10 @@ This schema mirrors 49 Prisma models using Laravel Eloquent. Properties use orig
 | JobSearchPreference | `job_search_preferences` | 13 |
 | JobBoardSource | `job_board_sources` | 20 |
 | JobSourceImportRun | `job_source_import_runs` | 10 |
-| JobMatch | `job_matchs` | 11 |
+| JobMatch | `job_matches` | 11 |
 | RecruiterContact | `recruiter_contacts` | 22 |
 | JobEmailDraft | `job_email_drafts` | 34 |
-| JobAgentSettings | `job_agent_settingses` | 13 |
+| JobAgentSettings | `job_agent_settings` | 13 |
 | JobAgentEmailSetting | `job_agent_email_settings` | 15 |
 | JobAgentEmailEvent | `job_agent_email_events` | 10 |
 | JobAgentAiSetting | `job_agent_ai_settings` | 20 |

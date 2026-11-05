@@ -55,7 +55,7 @@ class JobSettingsController extends Controller
         $path = $file->store('job-cv', 'local');
         $profile = CvProfile::firstOrNew(['id' => 1]);
         $profile->fill([
-            'title' => 'Default CV Profile', 'isDefault' => true,
+            'title' => 'Default CV Profile', 'isDefault' => true, 'extraNotes' => $profile->extraNotes ?? '',
             'resumeUrl' => $path, 'resumeFileName' => $file->getClientOriginalName(),
             'resumeUpdatedAt' => now(),
         ])->save();

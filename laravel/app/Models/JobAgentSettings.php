@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobAgentSettings extends Model
 {
-    protected $table = 'job_agent_settingses';
+    protected $table = 'job_agent_settings';
     protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = true;

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AiSettings extends Model
 {
-    protected $table = 'ai_settingses';
+    protected $table = 'ai_settings';
     protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = false;
