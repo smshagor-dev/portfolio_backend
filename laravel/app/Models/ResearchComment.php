@@ -6,6 +6,14 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class ResearchComment extends Model
 {
+    use \App\Models\Concerns\MapsPrismaFields;
+
+    protected const PRISMA_FIELD_MAP = [
+        'publicationId' => 'publication_id',
+        'sortOrder' => 'sort_order',
+        'createdAt' => 'created_at',
+        'updatedAt' => 'updated_at',
+    ];
     use \App\Models\Concerns\UsesPrismaNumericId;
 
     protected $table = 'researchcomment';
@@ -25,7 +33,7 @@ class ResearchComment extends Model
     ];
     public function replies(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(ResearchReply::class, 'commentId');
+        return $this->hasMany(ResearchReply::class, 'comment_id');
     }
 
 }
