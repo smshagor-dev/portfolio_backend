@@ -2,7 +2,7 @@
 
 The original MongoDB profile and content records hold paths such as /uploads/photo.png.
 After the Laravel migration, the app server returns 404 for those paths because
-the old files reside on remote FTP, not in laravel/public/uploads.
+the old files reside on remote FTP, not in public/uploads.
 
 The new GET /uploads/{filename} route reads public files from the configured
 ftp_public disk and streams them to the browser with restricted MIME types.
