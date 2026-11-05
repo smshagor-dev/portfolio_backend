@@ -1,6 +1,6 @@
-const server = require("../index");
-const { startResearchAutoSync } = require("../services/research-sync");
+require("../routes/research-admin-crud");
+require("../routes/linkedin-posts");
 
-startResearchAutoSync();
+const server = require("../index");
 
 module.exports = server;

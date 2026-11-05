@@ -12,8 +12,8 @@
     "smoke:job-agent-email": "node scripts/job-agent-email-smoke.js",
     "smoke:job-agent-gmail": "node scripts/job-agent-gmail-smoke.js",
     "smoke:job-agent-prompt": "node scripts/job-agent-prompt-smoke.js",
-    "dev": "node scripts/stop-port-process.js 5000 && npm run db:setup && nodemon index.js",
-    "start": "npm run db:prepare && node index.js",
+    "dev": "node scripts/stop-port-process.js 5000 && npm run db:setup && nodemon --exec \"node -r ./routes/linkedin-posts\" index.js",
+    "start": "npm run db:prepare && node -r ./routes/linkedin-posts index.js",
     "vercel-build": "npm run db:generate"
   },
   "dependencies": {

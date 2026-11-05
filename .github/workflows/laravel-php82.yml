@@ -1,0 +1,111 @@
+name: Laravel PHP 8.2 MongoDB and FTP (static checks)
+
+on:
+  pull_request:
+    paths:
+      - "laravel/**"
+      - ".github/workflows/laravel-php82.yml"
+  push:
+    branches:
+      - "feat/laravel12-php82-mysql-migration"
+    paths:
+      - "laravel/**"
+      - ".github/workflows/laravel-php82.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  php82:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: laravel
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: "base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      DB_CONNECTION: mongodb
+      DATABASE_URL: mongodb://127.0.0.1:27017/portfolio_ci
+      MONGODB_DATABASE: portfolio_ci
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      UPLOAD_STORAGE_DRIVER: ftp
+      FILESYSTEM_DISK: ftp_public
+      UPLOAD_STORAGE_PUBLIC_BASE_URL: https://uploads.example.test
+      UPLOAD_STORAGE_FTP_HOST: ftp.example.test
+      UPLOAD_STORAGE_FTP_USER: test-only
+      UPLOAD_STORAGE_FTP_PASSWORD: test-only
+      UPLOAD_STORAGE_FTP_BASE_DIR: public_html
+      UPLOAD_STORAGE_FTP_PRIVATE_BASE_DIR: private
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          extensions: mongodb, ftp, mbstring, zip, intl, bcmath, dom, xml, pdo_sqlite
+      - name: Validate Composer metadata
+        run: composer validate --no-check-publish
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Prepare isolated test dotenv
+        run: touch .env
+      - name: Node-to-Laravel HTTP route shape audit
+        run: node tools/audit-route-parity.js
+      - name: PHP syntax check
+        run: find app bootstrap config database routes tests public -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Check route registration
+        run: php artisan route:list
+      - name: Isolated regression tests (no real FTP or MongoDB network)
+        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest|LinkedInEmbedValidationTest|ApiSecurityHeadersTest|CompanySourceProbeTest)' --display-warnings
+
+  mongo-integration:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 })'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    defaults:
+      run:
+        working-directory: laravel
+    env:
+      APP_ENV: testing
+      APP_DEBUG: "false"
+      APP_KEY: "base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      DB_CONNECTION: mongodb
+      DATABASE_URL: mongodb://127.0.0.1:27017/portfolio_ci
+      MONGODB_DATABASE: portfolio_ci
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          extensions: mongodb, ftp, mbstring, zip, intl, bcmath, dom, xml
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Prepare isolated test dotenv
+        run: touch .env
+      - name: MongoDB model, API, and admin token integration tests
+        run: php artisan test --filter=IsolatedMongoIntegrationTest
+
+# NOTE: Tests run only against ephemeral GitHub Actions MongoDB, never Atlas.
+# Real FTPS, production cPanel behaviour and full legacy parity still
+# require independent staging smoke tests before any production deployment.

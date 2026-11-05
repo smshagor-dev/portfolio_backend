@@ -1,0 +1,45 @@
+<?php
+
+use App\Models\AdminUser;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
+
+Artisan::command('portfolio:admin {email} {name}', function (): void {
+    $email = strtolower(trim($this->argument('email')));
+    $name = trim($this->argument('name'));
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !$name) {
+        $this->error('Valid email and name are required.');
+        return;
+    }
+    $password = $this->secret('Admin password (minimum 12 characters)');
+    if (!$password || strlen($password) < 12) {
+        $this->error('Password must contain at least 12 characters.');
+        return;
+    }
+    $admin = AdminUser::firstOrNew(['email' => $email]);
+    $admin->forceFill([
+        'name' => $name, 'email' => $email, 'passwordHash' => Hash::make($password),
+        'twoFactorEnabled' => false, 'twoFactorSecret' => null,
+    ])->save();
+    $this->info('Admin account saved. Enable 2FA after login.');
+})->purpose('Create or reset a portfolio admin interactively');
+
+Artisan::command('portfolio:status', function (): void {
+    $this->info('Laravel 12 / MongoDB Atlas portfolio backend configured.');
+})->purpose('Show the configured Laravel backend type');
+
+// FTP uploads are HTTP multipart requests: NO FTP cron, queue, or browser FTP credentials.
+// The optional schedules below are unrelated and require an external cron
+// running "php /path/to/artisan schedule:run" every minute.
+if (config('research.enabled')) {
+    // Run at the configured interval on an absolute UTC hour boundary.
+    // Avoid a hard-coded twiceDaily schedule that ignores the .env setting.
+    \Illuminate\Support\Facades\Schedule::command('portfolio:sync-research')
+        ->hourly()
+        ->when(fn (): bool => intdiv(time(), 3600) % max(1, min(168, (int) config('research.interval_hours', 12))) === 0)
+        ->withoutOverlapping();
+}
+if (config('job_agent.source_sync_enabled')) {
+    \Illuminate\Support\Facades\Schedule::command('portfolio:sync-job-sources')
+        ->everySixHours()->withoutOverlapping();
+}

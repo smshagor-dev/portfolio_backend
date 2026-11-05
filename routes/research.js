@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const prisma = require("../lib/prisma");
 const { requireAdmin } = require("../lib/auth");
 const {
@@ -9,23 +11,53 @@ const {
 } = require("../lib/research-publications");
 const {
   getResearchSyncStatus,
+  startResearchAutoSync,
+  SYNC_MARKER_SLUG,
   syncResearchPublications,
-} = require("../services/research-sync");
+  syncResearchPublicationsIfDue,
+} = require("../lib/research-sync-coordinator");
 
 const router = express.Router();
-
-function ok(message, data, extra = {}) {
-  return { success: true, message, data, ...extra };
+const defaultThumbnailPath = path.resolve(
+  __dirname,
+  "..",
+  "public",
+  "research",
+  "research-publication.svg",
+);
+const fallbackThumbnailSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"><rect width="1200" height="675" fill="#0b1728"/><rect x="365" y="90" width="470" height="495" rx="28" fill="#12243a" stroke="#66d9ff" stroke-width="3"/><path d="M435 205h330M435 255h285M435 305h310M435 420h330M435 470h250" stroke="#9dc9e8" stroke-width="12" stroke-linecap="round" opacity=".62"/><circle cx="600" cy="365" r="48" fill="#162f4d" stroke="#7c8cff" stroke-width="4"/><path d="M600 335v60M570 365h60" stroke="#66d9ff" stroke-width="8" stroke-linecap="round"/></svg>`;
+let defaultThumbnailSvg = fallbackThumbnailSvg;
+try {
+  defaultThumbnailSvg = fs.readFileSync(defaultThumbnailPath, "utf8");
+} catch (_error) {
+  // Keep the inline fallback for serverless bundles that omit static files.
 }
 
-function fail(message, data = null) {
-  return { success: false, message, data };
+function buildResearchSuccessResponse(message, data, extra = {}) {
+  return {
+    success: true,
+    message,
+    data,
+    ...extra,
+  };
+}
+
+function buildResearchErrorResponse(message, data = null) {
+  return {
+    success: false,
+    message,
+    data,
+  };
 }
 
 function getPaginationParams(query = {}) {
   const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
   const limit = Math.min(50, Math.max(1, Number.parseInt(query.limit, 10) || 9));
-  return { page, limit, skip: (page - 1) * limit };
+  return {
+    page,
+    limit,
+    skip: (page - 1) * limit,
+  };
 }
 
 function serializeResearchReply(reply) {
@@ -51,27 +83,51 @@ function serializeResearchComment(comment) {
   };
 }
 
-async function incrementMetric(slug, field) {
+async function incrementResearchPublicationMetric(slug, metricName) {
   const normalizedSlug = normalizeString(slug).toLowerCase();
-  const allowedFields = new Set(["views", "impressionCount", "shareCount"]);
-  if (!normalizedSlug || !allowedFields.has(field)) {
-    return null;
+  const fieldName = {
+    views: "views",
+    impression_count: "impressionCount",
+    share_count: "shareCount",
+  }[metricName];
+
+  if (!normalizedSlug || !fieldName) {
+    return;
   }
 
   try {
-    return await prisma.researchPublication.update({
+    await prisma.researchPublication.update({
       where: { slug: normalizedSlug },
-      data: { [field]: { increment: 1 } },
+      data: {
+        [fieldName]: {
+          increment: 1,
+        },
+      },
     });
   } catch (_error) {
-    return null;
+    // Metrics should never break the public research experience.
   }
 }
+
+router.get("/research-publications/default-thumbnail.svg", (_request, response) => {
+  response.setHeader("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+  return response.type("image/svg+xml").send(defaultThumbnailSvg);
+});
 
 router.get("/research-publications", async (request, response) => {
   try {
     if (!hasResearchPublicationModel()) {
-      return response.status(503).json(fail("Research publication model is not available."));
+      return response.status(503).json(
+        buildResearchErrorResponse(
+          "Research publication model is not available yet. Restart the backend after generating the Prisma client.",
+        ),
+      );
+    }
+
+    try {
+      await syncResearchPublicationsIfDue({ reason: "public-request-fallback" });
+    } catch (syncError) {
+      console.warn("Research request fallback sync failed; serving cached database data:", syncError.message);
     }
 
     const { page, limit, skip } = getPaginationParams(request.query);
@@ -80,7 +136,13 @@ router.get("/research-publications", async (request, response) => {
     const [items, total, publicationTypes, researchAreas] = await Promise.all([
       prisma.researchPublication.findMany({
         where,
-        include: { comments: { include: { replies: true } } },
+        include: {
+          comments: {
+            include: {
+              replies: true,
+            },
+          },
+        },
         orderBy: [{ publishedDate: "desc" }, { createdAt: "desc" }],
         skip,
         take: limit,
@@ -101,92 +163,152 @@ router.get("/research-publications", async (request, response) => {
     ]);
 
     return response.json(
-      ok("Research publications loaded successfully.", items.map(serializeResearchPublication), {
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages: Math.max(1, Math.ceil(total / limit)),
+      buildResearchSuccessResponse(
+        "Research publications loaded successfully.",
+        items.map(serializeResearchPublication),
+        {
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages: Math.max(1, Math.ceil(total / limit)),
+          },
+          filters: {
+            search: normalizeString(request.query.search),
+            publicationType: normalizeString(request.query.publicationType),
+            researchArea: normalizeString(request.query.researchArea),
+            featured: normalizeString(request.query.featured),
+          },
+          options: {
+            publicationTypes: publicationTypes.map((item) => item.publicationType).filter(Boolean),
+            researchAreas: researchAreas.map((item) => item.researchArea).filter(Boolean),
+          },
         },
-        filters: {
-          search: normalizeString(request.query.search),
-          publicationType: normalizeString(request.query.publicationType),
-          researchArea: normalizeString(request.query.researchArea),
-          status: "published",
-          featured: normalizeString(request.query.featured),
-        },
-        options: {
-          publicationTypes: publicationTypes.map((item) => item.publicationType).filter(Boolean),
-          researchAreas: researchAreas.map((item) => item.researchArea).filter(Boolean),
-          statuses: ["published"],
-        },
-        sync: {
-          source: "ORCID + Crossref",
-          intervalHours: 12,
-        },
-      }),
+      ),
     );
   } catch (error) {
     console.error("Failed to load research publications:", error.message);
-    return response.status(500).json(fail("Failed to load research publications."));
+    return response.status(500).json(buildResearchErrorResponse("Failed to load research publications."));
   }
 });
 
 router.get("/research-publications/featured", async (_request, response) => {
   try {
+    if (!hasResearchPublicationModel()) {
+      return response.status(503).json(
+        buildResearchErrorResponse(
+          "Research publication model is not available yet. Restart the backend after generating the Prisma client.",
+        ),
+      );
+    }
+
     const items = await prisma.researchPublication.findMany({
-      where: { status: "published", isFeatured: true },
-      include: { comments: { include: { replies: true } } },
+      where: {
+        status: "published",
+        isFeatured: true,
+      },
+      include: {
+        comments: {
+          include: {
+            replies: true,
+          },
+        },
+      },
       orderBy: [{ publishedDate: "desc" }, { createdAt: "desc" }],
       take: 6,
     });
 
-    return response.json(ok("Featured research publications loaded successfully.", items.map(serializeResearchPublication)));
+    return response.json(
+      buildResearchSuccessResponse(
+        "Featured research publications loaded successfully.",
+        items.map(serializeResearchPublication),
+      ),
+    );
   } catch (error) {
     console.error("Failed to load featured research publications:", error.message);
-    return response.status(500).json(fail("Failed to load featured research publications."));
+    return response.status(500).json(buildResearchErrorResponse("Failed to load featured research publications."));
   }
 });
 
 router.get("/research-publications/:slug", async (request, response) => {
   try {
+    if (!hasResearchPublicationModel()) {
+      return response.status(503).json(
+        buildResearchErrorResponse(
+          "Research publication model is not available yet. Restart the backend after generating the Prisma client.",
+        ),
+      );
+    }
+
     const slug = normalizeString(request.params.slug).toLowerCase();
     const publication = await prisma.researchPublication.findFirst({
-      where: { slug, status: "published" },
+      where: {
+        slug,
+        status: "published",
+      },
       include: {
         comments: {
           orderBy: { sortOrder: "asc" },
-          include: { replies: { orderBy: { sortOrder: "asc" } } },
+          include: {
+            replies: {
+              orderBy: { sortOrder: "asc" },
+            },
+          },
         },
       },
     });
 
     if (!publication) {
-      return response.status(404).json(fail("Research publication not found."));
+      return response.status(404).json(buildResearchErrorResponse("Research publication not found."));
     }
 
-    await incrementMetric(slug, "views");
+    await incrementResearchPublicationMetric(slug, "views");
+    const updatedPublication = await prisma.researchPublication.findUnique({
+      where: { slug },
+      include: {
+        comments: {
+          orderBy: { sortOrder: "asc" },
+          include: {
+            replies: {
+              orderBy: { sortOrder: "asc" },
+            },
+          },
+        },
+      },
+    });
 
     const relatedPublications = await prisma.researchPublication.findMany({
-      where: { status: "published", slug: { not: slug } },
-      include: { comments: { include: { replies: true } } },
-      orderBy: [{ isFeatured: "desc" }, { publishedDate: "desc" }],
+      where: {
+        status: "published",
+        slug: { not: slug },
+      },
+      include: {
+        comments: {
+          include: {
+            replies: true,
+          },
+        },
+      },
+      orderBy: [{ isFeatured: "desc" }, { publishedDate: "desc" }, { createdAt: "desc" }],
       take: 5,
     });
 
+    const resolved = updatedPublication || publication;
     return response.json(
-      ok(
+      buildResearchSuccessResponse(
         "Research publication loaded successfully.",
         {
-          ...serializeResearchPublication({ ...publication, views: (publication.views || 0) + 1 }),
-          comments: (publication.comments || []).map(serializeResearchComment),
+          ...serializeResearchPublication(resolved),
+          comments: (resolved.comments || []).map(serializeResearchComment),
         },
-        { relatedPublications: relatedPublications.map(serializeResearchPublication) },
+        {
+          relatedPublications: relatedPublications.map(serializeResearchPublication),
+        },
       ),
     );
   } catch (error) {
     console.error("Failed to load research publication detail:", error.message);
-    return response.status(500).json(fail("Failed to load research publication."));
+    return response.status(500).json(buildResearchErrorResponse("Failed to load research publication."));
   }
 });
 
@@ -197,27 +319,33 @@ router.post("/research-publications/:slug/comments", async (request, response) =
     const commentText = normalizeString(request.body?.comment);
 
     if (!name || !commentText) {
-      return response.status(400).json(fail("Name and comment are required."));
+      return response.status(400).json(buildResearchErrorResponse("Name and comment are required."));
     }
 
     const publication = await prisma.researchPublication.findFirst({
       where: { slug, status: "published" },
-      include: { comments: { orderBy: { sortOrder: "desc" }, take: 1 } },
+      include: {
+        comments: {
+          orderBy: { sortOrder: "desc" },
+          take: 1,
+        },
+      },
     });
 
     if (!publication) {
-      return response.status(404).json(fail("Research publication not found."));
+      return response.status(404).json(buildResearchErrorResponse("Research publication not found."));
     }
 
     const savedComment = await prisma.researchComment.create({
       data: {
-        id: Date.now(),
         publicationId: publication.id,
         name,
         comment: commentText,
         sortOrder: (publication.comments?.[0]?.sortOrder || 0) + 1,
       },
-      include: { replies: true },
+      include: {
+        replies: true,
+      },
     });
 
     request.app.get("io")?.to(`research:${slug}`).emit("research:comment_created", {
@@ -225,10 +353,14 @@ router.post("/research-publications/:slug/comments", async (request, response) =
       comment: serializeResearchComment(savedComment),
     });
 
-    return response.status(201).json(ok("Comment saved successfully.", serializeResearchComment(savedComment)));
+    return response.status(201).json({
+      success: true,
+      message: "Comment saved successfully.",
+      comment: serializeResearchComment(savedComment),
+    });
   } catch (error) {
     console.error("Failed to save research comment:", error.message);
-    return response.status(500).json(fail("Failed to save comment."));
+    return response.status(500).json(buildResearchErrorResponse("Failed to save comment."));
   }
 });
 
@@ -240,28 +372,37 @@ router.post("/research-publications/:slug/comments/:commentId/replies", async (r
     const replyText = normalizeString(request.body?.reply);
 
     if (!commentId || !name || !replyText) {
-      return response.status(400).json(fail("Name and reply are required."));
+      return response.status(400).json(buildResearchErrorResponse("Name and reply are required."));
     }
 
     const publication = await prisma.researchPublication.findFirst({
       where: { slug, status: "published" },
       select: { id: true },
     });
+
     if (!publication) {
-      return response.status(404).json(fail("Research publication not found."));
+      return response.status(404).json(buildResearchErrorResponse("Research publication not found."));
     }
 
     const comment = await prisma.researchComment.findFirst({
-      where: { id: commentId, publicationId: publication.id },
-      include: { replies: { orderBy: { sortOrder: "desc" }, take: 1 } },
+      where: {
+        id: commentId,
+        publicationId: publication.id,
+      },
+      include: {
+        replies: {
+          orderBy: { sortOrder: "desc" },
+          take: 1,
+        },
+      },
     });
+
     if (!comment) {
-      return response.status(404).json(fail("Comment not found."));
+      return response.status(404).json(buildResearchErrorResponse("Comment not found."));
     }
 
     const savedReply = await prisma.researchReply.create({
       data: {
-        id: Date.now(),
         commentId: comment.id,
         name,
         reply: replyText,
@@ -275,87 +416,129 @@ router.post("/research-publications/:slug/comments/:commentId/replies", async (r
       reply: serializeResearchReply(savedReply),
     });
 
-    return response.status(201).json(ok("Reply saved successfully.", serializeResearchReply(savedReply)));
+    return response.status(201).json({
+      success: true,
+      message: "Reply saved successfully.",
+      reply: serializeResearchReply(savedReply),
+    });
   } catch (error) {
     console.error("Failed to save research reply:", error.message);
-    return response.status(500).json(fail("Failed to save reply."));
+    return response.status(500).json(buildResearchErrorResponse("Failed to save reply."));
   }
 });
 
 router.post("/research-publications/:slug/impression", async (request, response) => {
-  const slug = normalizeString(request.params.slug).toLowerCase();
-  const updated = await incrementMetric(slug, "impressionCount");
-  if (!updated) {
-    return response.status(404).json(fail("Research publication not found."));
+  try {
+    const slug = normalizeString(request.params.slug).toLowerCase();
+    const publication = await prisma.researchPublication.findFirst({
+      where: { slug, status: "published" },
+      select: { id: true },
+    });
+
+    if (!publication) {
+      return response.status(404).json(buildResearchErrorResponse("Research publication not found."));
+    }
+
+    await incrementResearchPublicationMetric(slug, "impression_count");
+    return response.status(201).json(
+      buildResearchSuccessResponse("Research publication impression tracked.", { slug }),
+    );
+  } catch (error) {
+    console.error("Failed to track research publication impression:", error.message);
+    return response.status(500).json(buildResearchErrorResponse("Failed to track research publication impression."));
   }
-  return response.status(201).json(ok("Research publication impression tracked.", { slug }));
 });
 
 router.post("/research-publications/:slug/share", async (request, response) => {
-  const slug = normalizeString(request.params.slug).toLowerCase();
-  const updated = await incrementMetric(slug, "shareCount");
-  if (!updated) {
-    return response.status(404).json(fail("Research publication not found."));
+  try {
+    const slug = normalizeString(request.params.slug).toLowerCase();
+    const publication = await prisma.researchPublication.findFirst({
+      where: { slug, status: "published" },
+      select: { id: true },
+    });
+
+    if (!publication) {
+      return response.status(404).json(buildResearchErrorResponse("Research publication not found."));
+    }
+
+    await incrementResearchPublicationMetric(slug, "share_count");
+    return response.status(201).json(
+      buildResearchSuccessResponse("Research publication share tracked.", { slug }),
+    );
+  } catch (error) {
+    console.error("Failed to track research publication share:", error.message);
+    return response.status(500).json(buildResearchErrorResponse("Failed to track research publication share."));
   }
-  return response.status(201).json(ok("Research publication share tracked.", { slug }));
 });
 
 router.get("/admin/research-publications", requireAdmin, async (request, response) => {
   try {
-    const where = buildResearchPublicationWhere(request.query, { publicOnly: false });
+    const where = {
+      ...buildResearchPublicationWhere(request.query, { publicOnly: false }),
+      slug: { not: SYNC_MARKER_SLUG },
+    };
     const items = await prisma.researchPublication.findMany({
       where,
+      include: {
+        comments: {
+          include: {
+            replies: true,
+          },
+        },
+      },
       orderBy: [{ publishedDate: "desc" }, { createdAt: "desc" }],
     });
-    return response.json(ok("Synced research publications loaded successfully.", items.map(serializeResearchPublication), {
-      sync: getResearchSyncStatus(),
-    }));
+
+    return response.json(
+      buildResearchSuccessResponse(
+        "Research publications loaded successfully.",
+        items.map(serializeResearchPublication),
+        {
+          sync: await getResearchSyncStatus(),
+          mode: "automatic-orcid-crossref",
+        },
+      ),
+    );
   } catch (error) {
     console.error("Failed to load admin research publications:", error.message);
-    return response.status(500).json(fail("Failed to load research publications."));
+    return response.status(500).json(buildResearchErrorResponse("Failed to load research publications."));
   }
 });
 
-router.get("/admin/research-sync/status", requireAdmin, (_request, response) => {
-  return response.json(ok("Research sync status loaded.", getResearchSyncStatus()));
+router.get(["/admin/research-publications/sync-status", "/admin/research-sync/status"], requireAdmin, async (_request, response) => {
+  return response.json(
+    buildResearchSuccessResponse(
+      "Research synchronization status loaded.",
+      await getResearchSyncStatus(),
+    ),
+  );
 });
 
-router.post("/admin/research-sync", requireAdmin, async (request, response) => {
+router.post(["/admin/research-publications/sync", "/admin/research-sync"], requireAdmin, async (request, response) => {
   try {
-    const result = await syncResearchPublications();
+    const result = await syncResearchPublications({ reason: "admin-manual" });
     request.app.get("io")?.emit("content:updated", {
       scope: "research",
-      action: "synced",
+      action: "sync",
       updatedAt: new Date().toISOString(),
+      result,
     });
-    return response.json(ok("Research publications synchronized successfully.", result));
+
+    return response.json(
+      buildResearchSuccessResponse("Research publications synchronized successfully.", result, {
+        sync: await getResearchSyncStatus(),
+      }),
+    );
   } catch (error) {
-    console.error("Manual research sync failed:", error.message);
-    return response.status(502).json(fail("Research synchronization failed.", { error: error.message }));
+    console.error("Failed to synchronize research publications:", error.message);
+    return response.status(502).json(
+      buildResearchErrorResponse("Failed to synchronize research publications from ORCID/Crossref.", {
+        error: error.message,
+      }),
+    );
   }
 });
 
-router.all("/admin/research-publications/:id", requireAdmin, (request, response, next) => {
-  if (request.method === "GET") {
-    return next();
-  }
-  return response.status(405).json(fail("Research publications are source-managed by ORCID/Crossref and cannot be modified manually."));
-});
-
-router.get("/admin/research-publications/:id", requireAdmin, async (request, response) => {
-  const publicationId = Number.parseInt(request.params.id, 10);
-  if (!publicationId) {
-    return response.status(400).json(fail("A valid publication id is required."));
-  }
-  const publication = await prisma.researchPublication.findUnique({ where: { id: publicationId } });
-  if (!publication) {
-    return response.status(404).json(fail("Research publication not found."));
-  }
-  return response.json(ok("Research publication loaded successfully.", serializeResearchPublication(publication)));
-});
-
-router.post("/admin/research-publications", requireAdmin, (_request, response) => {
-  return response.status(405).json(fail("Manual publication creation is disabled. Use the research sync endpoint."));
-});
+startResearchAutoSync();
 
 module.exports = router;
