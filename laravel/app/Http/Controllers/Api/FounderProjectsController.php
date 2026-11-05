@@ -46,6 +46,7 @@ class FounderProjectsController extends Controller
         return response()->json([
             'success' => true, 'initialized' => $records !== null,
             'data' => $this->sorted($data),
+            'section' => $this->settings()->founderSection,
         ]);
     }
 
@@ -55,6 +56,24 @@ class FounderProjectsController extends Controller
         return response()->json([
             'success' => true, 'initialized' => $records !== null,
             'data' => $this->sorted($records ?? []),
+            'section' => $this->settings()->founderSection,
+        ]);
+    }
+
+    public function updateSection(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'eyebrow' => ['required', 'string', 'max:120'],
+            'title' => ['required', 'string', 'max:300'],
+            'description' => ['required', 'string', 'max:800'],
+            'badge' => ['nullable', 'string', 'max:200'],
+            'footer' => ['nullable', 'string', 'max:500'],
+        ]);
+        $settings = $this->settings();
+        $settings->forceFill(['founderSection' => $data])->save();
+        return response()->json([
+            'success' => true, 'message' => 'Founder section updated.',
+            'section' => $data,
         ]);
     }
 
