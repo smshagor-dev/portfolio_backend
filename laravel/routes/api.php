@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\AdminAiController;
 use App\Http\Controllers\Api\BulkContentController;
 use App\Http\Controllers\Api\GmailController;
 use App\Http\Controllers\Api\AdminResearchController;
@@ -61,6 +62,13 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('t
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('me', [AdminAuthController::class, 'me']);
     Route::get('dashboard', [AdminOperationsController::class, 'dashboard']);
+    Route::get('ai/providers', [AdminAiController::class, 'providers']);
+    Route::put('ai/providers/{name}', [AdminAiController::class, 'saveProvider']);
+    Route::get('ai/settings', [AdminAiController::class, 'settings']);
+    Route::put('ai/settings', [AdminAiController::class, 'saveSettings']);
+    Route::get('ai/training', [AdminAiController::class, 'training']);
+    Route::post('ai/training', [AdminAiController::class, 'addTraining']);
+    Route::delete('ai/training/{id}', [AdminAiController::class, 'deleteTraining'])->whereNumber('id');
     Route::get('research-publications', [AdminResearchController::class, 'index']);
     Route::get('research-publications/sync-status', [AdminResearchController::class, 'status']);
     Route::post('research-publications/sync', [AdminResearchController::class, 'sync'])->middleware('throttle:2,1');
