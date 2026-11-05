@@ -9,6 +9,7 @@ services:
     volumes:
       - ./storage:/var/www/html/storage
       - ./public:/var/www/html/public
+      - ../public:/var/www/legacy-public:ro
   nginx:
     image: nginx:1.27-alpine
     restart: unless-stopped

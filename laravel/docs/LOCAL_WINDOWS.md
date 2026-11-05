@@ -41,3 +41,10 @@ Debugging:
     docker compose exec app php artisan migrate:status
 
 Never run migrate:fresh or db:wipe on the production database. Read docs/API_PARITY.md before frontend switch.
+
+Legacy media (dry-run first, then confirm):
+
+    docker compose exec app php artisan portfolio:import-assets
+    docker compose exec app php artisan portfolio:import-assets --commit
+
+The Docker Compose stack mounts the old ../public/ directory read-only at /var/www/legacy-public, so both commands work inside the container. Imported files are copied only into laravel/public, which is backed by a local volume.

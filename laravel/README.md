@@ -43,3 +43,5 @@ Windows setup: docs/LOCAL_WINDOWS.md. The Node/Vercel production backend remains
 ## Read-only checks
 
 After migrations: `php artisan portfolio:preflight --strict`. From repository root: `node laravel/tools/audit-route-parity.js` to compare HTTP route shapes with Express. These checks are not substitutes for end-to-end tests.
+
+Legacy public asset dry-run: `php artisan portfolio:import-assets`; see `docs/ASSET_MIGRATION.md`.
