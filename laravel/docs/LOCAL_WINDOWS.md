@@ -7,9 +7,10 @@ The Laravel backend uses MongoDB Atlas via `DATABASE_URL` and `MONGODB_DATABASE`
 ```powershell
 cd E:\portfolio_backend\laravel
 php -v
-php -m | Select-String mongodb
+php -m | Select-String 'mongodb|ftp'
 composer install
 php artisan key:generate
+# Set UPLOAD_STORAGE_* FTP settings in laravel/.env (see docs/FTP_UPLOAD.md).
 php artisan optimize:clear
 php artisan portfolio:preflight
 php artisan serve
@@ -34,4 +35,4 @@ Welcome page: `http://127.0.0.1:8000/` with `php artisan serve`; Docker: `http:/
 
 **Do not run** `php artisan migrate`, `php artisan db:seed`, `portfolio:import` or `migrate:fresh` against the existing Atlas database. Existing Prisma collections are the source of truth.
 
-Legacy media: `php artisan portfolio:import-assets` first for a dry run. Old FTP media is not downloaded by this tool. The PHP FTP adapter still needs parity work and staging tests before live cutover.
+Legacy media: existing FTP-hosted files are served from the original asset host; do NOT copy them into Laravel storage. The optional `portfolio:import-assets` command is only for old tracked Git media and is not needed for new FTP uploads. Test FTP uploads live on staging before cutover.

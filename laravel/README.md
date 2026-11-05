@@ -38,6 +38,6 @@ Docker Compose now contains only `app` and `nginx`, not MySQL.
 
 ## Deployment and legacy FTP warning
 
-**Do not switch production yet.** The old Express uploader supports FTP through `UPLOAD_STORAGE_DRIVER` and `UPLOAD_STORAGE_FTP_*`; the new Laravel upload controller currently saves to Laravel local storage and returns `/storage/*` paths. Remote FTP files are not automatically copied. Preserve the old frontend and media URLs until FTP parity, compatibility and end-to-end tests pass.
+**Do not switch production yet.** The Laravel upload controller now uses the old Express FTP settings through `league/flysystem-ftp` and returns `/uploads/*` paths and `publicUrl`; it does not save uploads locally. Remote FTP functionality needs a real staging upload/download test before live cutover. A private FTP root must be explicitly configured for Job Agent CVs and PDFs. See [docs/FTP_UPLOAD.md](docs/FTP_UPLOAD.md).
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/LOCAL_WINDOWS.md](docs/LOCAL_WINDOWS.md), [docs/ASSET_MIGRATION.md](docs/ASSET_MIGRATION.md) and [docs/OPEN_ITEMS.md](docs/OPEN_ITEMS.md).
