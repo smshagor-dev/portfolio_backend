@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands([__DIR__.'/../app/Console/Commands'])
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
+        // Admin API uses Sanctum bearer tokens, not stateful cookie sessions.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
