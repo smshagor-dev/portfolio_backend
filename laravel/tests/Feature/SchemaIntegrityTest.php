@@ -2,42 +2,45 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdminUser;
+use App\Models\AiProvider;
 use App\Models\AiSettings;
-use App\Models\JobAgentSettings;
-use App\Models\JobMatch;
+use App\Models\ContactChatMessage;
+use App\Models\ContactMessage;
+use App\Models\JobPost;
+use App\Models\Profile;
+use App\Models\ResearchComment;
+use App\Models\ResearchPublication;
+use App\Models\ResearchReply;
 use App\Models\SiteSettings;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class SchemaIntegrityTest extends TestCase
 {
-    use RefreshDatabase;
-
-    public function test_mysql_domain_table_names_are_consistent_with_eloquent_models(): void
+    public function test_collections_match_existing_prisma_mongodb_documents(): void
     {
-        $expected = [
+        foreach ([
+            AdminUser::class => 'AdminUser',
+            AiProvider::class => 'ai_providers',
             AiSettings::class => 'ai_settings',
-            SiteSettings::class => 'site_settings',
-            JobMatch::class => 'job_matches',
-            JobAgentSettings::class => 'job_agent_settings',
-        ];
-
-        foreach ($expected as $model => $table) {
-            $this->assertSame($table, (new $model())->getTable());
-            $this->assertTrue(Schema::hasTable($table), $table.' must be migrated');
+            Profile::class => 'Profile',
+            SiteSettings::class => 'SiteSettings',
+            ContactMessage::class => 'ContactMessage',
+            ContactChatMessage::class => 'ContactChatMessage',
+            ResearchPublication::class => 'research_publications',
+            ResearchComment::class => 'researchcomment',
+            ResearchReply::class => 'researchreply',
+            JobPost::class => 'job_posts',
+        ] as $model => $collection) {
+            $this->assertSame($collection, (new $model())->getTable());
         }
     }
 
-    public function test_admin_and_portfolio_relational_tables_exist(): void
+    public function test_prisma_numeric_keys_are_preserved(): void
     {
-        foreach ([
-            'admin_users', 'personal_access_tokens', 'profiles',
-            'projects', 'project_comments', 'articles', 'article_comments',
-            'research_publications', 'research_comments', 'contact_messages',
-            'contact_chat_messages', 'job_posts', 'job_email_drafts',
-        ] as $table) {
-            $this->assertTrue(Schema::hasTable($table), $table.' missing');
+        foreach ([AdminUser::class, Profile::class, JobPost::class, ResearchPublication::class] as $model) {
+            $this->assertSame('id', (new $model())->getKeyName());
+            $this->assertFalse((new $model())->getIncrementing());
         }
     }
 }

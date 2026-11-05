@@ -60,7 +60,7 @@ jobs:
       - name: Check route registration
         run: php artisan route:list
       - name: Isolated regression tests (no real FTP or MongoDB network)
-        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest)'
+        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest)'
 
 # NOTE: This is deliberately not a full MongoDB API/end-to-end certification.
 # Staging tests with an isolated Atlas database and real FTPS server are required
