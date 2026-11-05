@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\AdminCmsCompatibilityController;
 use App\Http\Controllers\Api\AdminAiController;
 use App\Http\Controllers\Api\BulkContentController;
 use App\Http\Controllers\Api\GmailController;
@@ -63,6 +64,23 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('t
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('me', [AdminAuthController::class, 'me']);
     Route::get('dashboard', [AdminOperationsController::class, 'dashboard']);
+    Route::get('articles', [AdminCmsCompatibilityController::class, 'articles']);
+    Route::get('articles/{articleId}', [AdminCmsCompatibilityController::class, 'article'])->whereNumber('articleId');
+    Route::post('articles/generate', [AdminCmsCompatibilityController::class, 'generateArticle'])->middleware('throttle:5,1');
+    Route::post('articles', fn (\Illuminate\Http\Request $request) => app(ContentController::class)->store($request, 'articles'));
+    Route::put('articles/{id}', fn (\Illuminate\Http\Request $request, int $id) => app(ContentController::class)->update($request, 'articles', $id))->whereNumber('id');
+    Route::delete('articles/{id}', fn (int $id) => app(ContentController::class)->destroy('articles', $id))->whereNumber('id');
+    Route::get('article-categories', [AdminCmsCompatibilityController::class, 'categories']);
+    Route::post('article-categories', [AdminCmsCompatibilityController::class, 'saveCategory']);
+    Route::put('article-categories/{id}', [AdminCmsCompatibilityController::class, 'saveCategory'])->whereNumber('id');
+    Route::delete('article-categories/{id}', [AdminCmsCompatibilityController::class, 'deleteCategory'])->whereNumber('id');
+    Route::get('emergency-contacts', [AdminCmsCompatibilityController::class, 'emergencyContacts']);
+    Route::post('emergency-contacts', [AdminCmsCompatibilityController::class, 'saveEmergencyContact']);
+    Route::put('emergency-contacts/{id}', [AdminCmsCompatibilityController::class, 'saveEmergencyContact'])->whereNumber('id');
+    Route::delete('emergency-contacts/{id}', [AdminCmsCompatibilityController::class, 'deleteEmergencyContact'])->whereNumber('id');
+    Route::post('projects', [AdminCmsCompatibilityController::class, 'saveProject']);
+    Route::put('projects/{id}', [AdminCmsCompatibilityController::class, 'saveProject'])->whereNumber('id');
+    Route::delete('projects/{id}', [AdminCmsCompatibilityController::class, 'deleteProject'])->whereNumber('id');
     Route::get('ai/providers', [AdminAiController::class, 'providers']);
     Route::put('ai/providers/{name}', [AdminAiController::class, 'saveProvider']);
     Route::get('ai/settings', [AdminAiController::class, 'settings']);

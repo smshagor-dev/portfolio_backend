@@ -31,7 +31,7 @@ class ContentController extends Controller
     {
         return match ($resource) {
             'projects' => ['slug', 'name', 'description', 'content', 'role', 'code', 'demo', 'image', 'views', 'impressionCount', 'buttons', 'tools', 'sortOrder'],
-            'articles' => ['title', 'slug', 'shortDescription', 'content', 'category', 'tags', 'featuredImage', 'metaTitle', 'status', 'commentsEnabled', 'isFeatured', 'author', 'publishDate', 'sortOrder'],
+            'articles' => ['title', 'slug', 'shortDescription', 'content', 'category', 'tags', 'featuredImage', 'metaTitle', 'metaDescription', 'status', 'commentsEnabled', 'isFeatured', 'author', 'publishDate', 'sortOrder'],
             'article-categories' => ['name', 'slug'],
             'research-publications' => ['title', 'slug', 'shortSummary', 'content', 'publicationType', 'researchArea', 'publisherName', 'publishedDate', 'doi', 'publicationUrl', 'citationUrl', 'authors', 'myAuthorRole', 'thumbnailImage', 'isFeatured', 'status'],
             default => [],
@@ -56,6 +56,7 @@ class ContentController extends Controller
             'featuredImage' => ['sometimes', 'string', 'max:1000'],
             'thumbnailImage' => ['sometimes', 'string', 'max:1000'],
             'metaTitle' => ['sometimes', 'string', 'max:191'],
+            'metaDescription' => ['sometimes', 'string', 'max:500'],
             'category' => ['sometimes', 'string', 'max:191'],
             'tags' => ['sometimes', 'array'],
             'tags.*' => ['string', 'max:191'],
@@ -103,6 +104,12 @@ class ContentController extends Controller
         $data = $this->validatedPayload($request, $resource);
         if (in_array('slug', $this->allowed($resource), true) && empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title'] ?? $data['name'] ?? '');
+        }
+        if ($resource === 'articles') {
+            $data += [
+                'title' => '', 'shortDescription' => '', 'content' => '', 'category' => '',
+                'metaDescription' => '', 'author' => '', 'status' => 'draft', 'tags' => [],
+            ];
         }
         $record = $model::create($data);
         return response()->json(['message' => 'Created successfully.', 'data' => $record], 201);
