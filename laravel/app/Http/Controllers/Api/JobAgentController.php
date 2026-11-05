@@ -21,7 +21,7 @@ class JobAgentController extends Controller
     {
         $settings = JobAgentSettings::find(1)?->toArray() ?? [];
         unset($settings['gmailRefreshToken']);
-        return array_merge(['autoSendEnabled' => false], $settings);
+        return array_merge($settings, ['autoSendEnabled' => false]);
     }
 
     public function index(): JsonResponse

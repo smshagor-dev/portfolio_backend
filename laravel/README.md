@@ -15,6 +15,8 @@ cp .env.example .env
 php artisan key:generate
 # Configure DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD in .env
 php artisan migrate
+php artisan db:seed
+php artisan portfolio:admin admin@example.com Administrator
 php artisan storage:link
 php artisan serve
 ```
@@ -27,6 +29,7 @@ cp .env.example .env
 docker compose up -d --build
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate
+docker compose exec app php artisan db:seed
 docker compose exec app php artisan storage:link
 ```
 API: http://localhost:8080/api/health
