@@ -27,7 +27,7 @@ class StatusController extends Controller
                 throw new \RuntimeException('MongoDB configuration incomplete');
             }
             // Force the driver cursor to execute the read-only ping.
-            DB::connection('mongodb')->getMongoClient()
+            DB::connection('mongodb')->getClient()
                 ->selectDatabase($database)
                 ->command(['ping' => 1])->toArray();
 

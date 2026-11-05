@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([__DIR__.'/../app/Console/Commands'])
     ->withMiddleware(function (Middleware $middleware): void {
         // Admin API uses Sanctum bearer tokens, not stateful cookie sessions.
+        $middleware->append(\App\Http\Middleware\PortfolioSecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Always render API failures as JSON, including validation, throttling,

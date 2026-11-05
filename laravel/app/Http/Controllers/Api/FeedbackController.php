@@ -51,7 +51,7 @@ class FeedbackController extends Controller
             }
             return $commentModel::create(array_merge([
                 $foreignKey => $parent->id,
-                'sortOrder' => (int) $commentModel::where($foreignKey, $parent->id)->max('sortOrder') + 1,
+                'sortOrder' => (int) $commentModel::where($parentModel === ResearchPublication::class ? 'publication_id' : $foreignKey, $parent->id)->max($parentModel === ResearchPublication::class ? 'sort_order' : 'sortOrder') + 1,
             ], $content));
         }, 3);
         return response()->json(['message' => 'Comment created.', 'comment' => $saved], 201);
@@ -68,7 +68,7 @@ class FeedbackController extends Controller
         ]);
         $saved = DB::transaction(function () use ($parentModel, $commentModel, $replyModel, $foreignKey, $slug, $commentId, $input) {
             $parent = $parentModel::where('slug', $slug)->lockForUpdate()->firstOrFail();
-            $comment = $commentModel::where($foreignKey, $parent->id)->findOrFail($commentId);
+            $comment = $commentModel::where($parentModel === ResearchPublication::class ? 'publication_id' : $foreignKey, $parent->id)->findOrFail($commentId);
             $allowed = (new $replyModel)->getFillable();
             $content = array_intersect_key($input, array_flip($allowed));
             if ($parentModel === Service::class) {
@@ -76,7 +76,7 @@ class FeedbackController extends Controller
             }
             return $replyModel::create(array_merge([
                 'commentId' => $comment->id,
-                'sortOrder' => (int) $replyModel::where('commentId', $comment->id)->max('sortOrder') + 1,
+                'sortOrder' => (int) $replyModel::where($parentModel === ResearchPublication::class ? 'comment_id' : 'commentId', $comment->id)->max($parentModel === ResearchPublication::class ? 'sort_order' : 'sortOrder') + 1,
             ], $content));
         }, 3);
         return response()->json(['message' => 'Reply created.', 'reply' => $saved], 201);

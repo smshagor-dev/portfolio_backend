@@ -12,7 +12,9 @@ class ContactChatMessage extends Model
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'int';
-    public $timestamps = false;
+    public $timestamps = true;
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = null;
     protected $fillable = ['contactMessageId', 'senderType', 'senderName', 'message', 'photo', 'file'];
 
     protected $casts = [

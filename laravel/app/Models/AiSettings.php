@@ -6,6 +6,13 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class AiSettings extends Model
 {
+    use \App\Models\Concerns\MapsPrismaFields;
+
+    protected const PRISMA_FIELD_MAP = [
+        'activeProvider' => 'active_provider',
+        'modelName' => 'model_name',
+        'createdAt' => 'created_at',
+    ];
     use \App\Models\Concerns\UsesPrismaNumericId;
 
     protected $table = 'ai_settings';

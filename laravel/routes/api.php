@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/health', [StatusController::class, 'health']);
 
 Route::prefix('site')->group(function (): void {
+    Route::get('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'publicIndex']);
     Route::get('home', [PublicSiteController::class, 'home']);
     Route::get('settings', [PublicSiteController::class, 'settingsJson']);
     Route::get('pricing', [PublicSiteController::class, 'pricings']);
@@ -76,6 +77,10 @@ Route::get('admin/job-agent/gmail/callback', [GmailController::class, 'callback'
 Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
+    Route::get('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'adminIndex']);
+    Route::post('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'store']);
+    Route::put('linkedin-posts/{postId}', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'update']);
+    Route::delete('linkedin-posts/{postId}', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'destroy']);
     Route::get('me', [AdminAuthController::class, 'me']);
     Route::get('dashboard', [AdminOperationsController::class, 'dashboard']);
     Route::get('articles', [AdminCmsCompatibilityController::class, 'articles']);
@@ -133,18 +138,18 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::post('job-agent/company-sources', [JobCompatibilityController::class, 'addCompany']);
     Route::put('job-agent/company-sources/{id}', [JobCompatibilityController::class, 'updateCompany'])->whereNumber('id');
     Route::delete('job-agent/company-sources/{id}', [JobCompatibilityController::class, 'deleteCompany'])->whereNumber('id');
-    Route::post('job-agent/company-sources/{id}/test', [JobCompatibilityController::class, 'unsupportedCompany'])->whereNumber('id');
-    Route::post('job-agent/company-sources/{id}/import', [JobCompatibilityController::class, 'unsupportedCompany'])->whereNumber('id');
+    Route::post('job-agent/company-sources/{id}/test', [JobCompatibilityController::class, 'testCompany'])->whereNumber('id');
+    Route::post('job-agent/company-sources/{id}/import', [JobCompatibilityController::class, 'importCompany'])->whereNumber('id');
     Route::post('job-agent/jobs/manual-import', [JobAgentController::class, 'manualJob']);
     Route::put('job-agent/jobs/{id}/description', [JobCompatibilityController::class, 'updateDescription'])->whereNumber('id');
     Route::delete('job-agent/jobs/{id}', [JobCompatibilityController::class, 'deleteJob'])->whereNumber('id');
-    Route::post('job-agent/jobs/{id}/contact-discovery', [JobCompatibilityController::class, 'notYetSupported'])->whereNumber('id');
-    Route::post('job-agent/contacts/{id}/revalidate', [JobCompatibilityController::class, 'notYetSupported'])->whereNumber('id');
+    Route::post('job-agent/jobs/{id}/contact-discovery', [JobCompatibilityController::class, 'discoverContacts'])->whereNumber('id');
+    Route::post('job-agent/contacts/{id}/revalidate', [JobCompatibilityController::class, 'revalidateContact'])->whereNumber('id');
     Route::post('job-agent/contacts/{id}/reject', [JobCompatibilityController::class, 'rejectContact'])->whereNumber('id');
     Route::post('job-agent/drafts/collect-emails', [JobCompatibilityController::class, 'collectEmails']);
     Route::post('job-agent/drafts/approve-all', [JobCompatibilityController::class, 'approveAll'])->middleware('throttle:3,1');
-    Route::post('job-agent/drafts/{id}/approve-send', [JobCompatibilityController::class, 'notYetSupported'])->whereNumber('id');
-    Route::post('job-agent/sources/api-placeholder', [JobCompatibilityController::class, 'notYetSupported']);
+    Route::post('job-agent/drafts/{id}/approve-send', [JobIntegrationController::class, 'send'])->whereNumber('id');
+    Route::post('job-agent/sources/api-placeholder', [JobCompatibilityController::class, 'apiPlaceholder']);
     Route::get('job-agent/overview', [JobAgentController::class, 'overview']);
     Route::get('job-agent/profile-context', [JobSettingsController::class, 'profile']);
     Route::put('job-agent/profile-context/notes', [JobSettingsController::class, 'notes']);

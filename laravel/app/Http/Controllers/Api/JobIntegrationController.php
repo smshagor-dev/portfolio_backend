@@ -6,6 +6,8 @@ use App\Models\JobBoardSource;
 use App\Models\JobEmailDraft;
 use App\Models\JobAgentEmailEvent;
 use App\Models\JobAgentSettings;
+use App\Models\JobAgentEmailSetting;
+use App\Services\LegacyCredentialCodec;
 use App\Models\RecruiterContact;
 use App\Services\JobSourceService;
 use Illuminate\Http\JsonResponse;
@@ -60,12 +62,13 @@ class JobIntegrationController extends Controller
     public function addContact(Request $request): JsonResponse
     {
         $input = $request->validate([
-            'jobPostId' => ['required', 'integer', 'exists:job_posts,id'],
+            'jobPostId' => ['required', 'integer', 'min:1'],
             'name' => ['sometimes', 'string', 'max:191'],
             'email' => ['required', 'email', 'max:191'],
             'companyDomain' => ['required', 'string', 'max:191'],
             'sourceUrl' => ['required', 'url:https', 'max:255'],
         ]);
+        \App\Models\JobPost::findOrFail($input['jobPostId']);
         $contact = RecruiterContact::create(array_merge([
             'companyName' => '', 'source' => 'manual',
             'verification' => 'manual', 'verified' => false,
@@ -97,9 +100,38 @@ class JobIntegrationController extends Controller
         if (($wantsCv || $wantsLetter) && !config('job_agent.allow_attachments')) {
             return response()->json(['message' => 'Attachments are disabled by server configuration.'], 422);
         }
-        if (!config('job_agent.allow_sending') || config('mail.default') !== 'smtp') {
+        if (!config('job_agent.allow_sending')) {
             return response()->json(['message' => 'SMTP sending disabled by server configuration.'], 503);
         }
+        $smtpSettings = JobAgentEmailSetting::find(1);
+        if ($smtpSettings && !$smtpSettings->isEnabled) {
+            return response()->json(['message' => 'SMTP sending disabled in Job Agent settings.'], 503);
+        }
+        try {
+            $password = $smtpSettings?->smtpPasswordEncrypted
+                ? LegacyCredentialCodec::storedSecret($smtpSettings, 'smtpPasswordEncrypted')
+                : (string) config('mail.mailers.smtp.password');
+        } catch (\Throwable $error) {
+            report($error);
+            return response()->json(['message' => 'Stored SMTP credential requires migration configuration.'], 503);
+        }
+        $host = (string) ($smtpSettings?->smtpHost ?: config('mail.mailers.smtp.host'));
+        $username = (string) ($smtpSettings?->smtpUsername ?: config('mail.mailers.smtp.username'));
+        if (!$host || !$username || !$password) {
+            return response()->json(['message' => 'SMTP host, username and password are required.'], 503);
+        }
+        $smtpPort = (int) ($smtpSettings?->smtpPort ?: config('mail.mailers.smtp.port') ?: 587);
+        config()->set('mail.mailers.job_agent_smtp', [
+            'transport' => 'smtp',
+            'scheme' => ($smtpSettings?->smtpSecure ?? true) ? 'smtps' : 'smtp',
+            'host' => $host,
+            'port' => $smtpPort,
+            'username' => $username,
+            'password' => $password,
+            'timeout' => 15,
+        ]);
+        $fromEmail = (string) ($smtpSettings?->fromEmail ?: config('mail.from.address'));
+        $fromName = (string) ($smtpSettings?->fromName ?: config('mail.from.name'));
 
         // Attach only explicitly requested files from private, known folders.
         // Check paths and size before reserving a daily send slot.
@@ -155,7 +187,8 @@ class JobIntegrationController extends Controller
 
         try {
             // SMTP is opt-in and attachments are independently opt-in for each send.
-            Mail::raw($draft->body, function ($message) use ($draft, $attachments): void {
+            Mail::mailer('job_agent_smtp')->raw($draft->body, function ($message) use ($draft, $attachments, $fromEmail, $fromName): void {
+                $message->from($fromEmail, $fromName);
                 $message->to($draft->toEmail)->subject($draft->subject);
                 foreach ($attachments as $file) {
                     $message->attachData(

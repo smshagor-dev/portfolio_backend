@@ -14,6 +14,41 @@ class JobSourceService
         'api.lever.co', 'boards-api.greenhouse.io',
     ];
 
+    /**
+     * Network probe of an approved public ATS API, without creating job records.
+     * Restrict destination to provider-owned hosts computed from the saved
+     * career page to avoid arbitrary admin-submitted URLs and redirects.
+     */
+    public function probeCompany(JobBoardSource $source): array
+    {
+        $adapter = CompanyCareerSourceService::recognize((string) $source->careersUrl);
+        if (!$adapter || !hash_equals((string) $adapter['apiUrl'], (string) $source->baseUrl)) {
+            throw new \InvalidArgumentException('Career API URL does not match the approved public ATS adapter.');
+        }
+        $url = $adapter['apiUrl'];
+        $response = Http::timeout(12)->withoutRedirecting()->withHeaders([
+            'User-Agent' => 'PortfolioJobAgent/1.0',
+            'Accept' => 'application/json',
+        ])->get($url);
+        $response->throw();
+        if (strlen($response->body()) > 4 * 1024 * 1024) {
+            throw new \RuntimeException('Job provider response is too large.');
+        }
+        $raw = $adapter['provider'] === 'GREENHOUSE'
+            ? $response->json('jobs')
+            : $response->json();
+        if (!is_array($raw)) {
+            throw new \RuntimeException('Job provider returned unexpected data.');
+        }
+        return [
+            'supported' => true,
+            'provider' => $adapter['provider'],
+            'endpoint' => $url,
+            'availableJobs' => count($raw),
+            'reachable' => true,
+        ];
+    }
+
     public function sync(JobBoardSource $source): array
     {
         if (!$source->enabled) {

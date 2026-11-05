@@ -13,7 +13,7 @@ trait UsesPrismaNumericId
             if ($model->getKey() !== null) {
                 return;
             }
-            $db = DB::connection('mongodb')->getMongoClient()
+            $db = DB::connection('mongodb')->getClient()
                 ->selectDatabase((string) config('database.connections.mongodb.database'));
             $collection = $db->selectCollection($model->getTable());
             $last = $collection->findOne(

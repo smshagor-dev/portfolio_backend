@@ -6,6 +6,14 @@ use MongoDB\Laravel\Eloquent\Model;
 
 class ResearchReply extends Model
 {
+    use \App\Models\Concerns\MapsPrismaFields;
+
+    protected const PRISMA_FIELD_MAP = [
+        'commentId' => 'comment_id',
+        'sortOrder' => 'sort_order',
+        'createdAt' => 'created_at',
+        'updatedAt' => 'updated_at',
+    ];
     use \App\Models\Concerns\UsesPrismaNumericId;
 
     protected $table = 'researchreply';

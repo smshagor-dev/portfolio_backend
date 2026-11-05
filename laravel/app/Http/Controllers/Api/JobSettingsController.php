@@ -8,6 +8,7 @@ use App\Models\Experience;
 use App\Models\JobAgentAiSetting;
 use App\Models\JobAgentEmailEvent;
 use App\Models\JobAgentEmailSetting;
+use Illuminate\Support\Facades\Crypt;
 use App\Models\JobAgentSettings;
 use App\Models\JobSearchPreference;
 use App\Models\Profile;
@@ -92,17 +93,20 @@ class JobSettingsController extends Controller
     public function emailSettings(): JsonResponse
     {
         $model = JobAgentEmailSetting::find(1);
+        $enabled = (bool) $model?->isEnabled && (bool) config('job_agent.allow_sending');
         return response()->json(['settings' => [
-            'fromName' => $model?->fromName ?? config('mail.from.name'),
-            'fromEmail' => $model?->fromEmail ?? config('mail.from.address'),
-            'smtpHost' => config('mail.mailers.smtp.host'),
-            'smtpPort' => config('mail.mailers.smtp.port'),
-            'smtpSecure' => true,
-            'passwordConfigured' => (bool) config('mail.mailers.smtp.password'),
-            'isEnabled' => (bool) config('job_agent.allow_sending'),
+            'fromName' => $model?->fromName ?: config('mail.from.name'),
+            'fromEmail' => $model?->fromEmail ?: config('mail.from.address'),
+            'smtpHost' => $model?->smtpHost ?: config('mail.mailers.smtp.host'),
+            'smtpPort' => $model?->smtpPort ?: config('mail.mailers.smtp.port'),
+            'smtpSecure' => (bool) ($model?->smtpSecure ?? true),
+            'smtpUsername' => $model?->smtpUsername ?: config('mail.mailers.smtp.username'),
+            'passwordConfigured' => (bool) ($model?->smtpPasswordEncrypted ?: config('mail.mailers.smtp.password')),
+            'isEnabled' => $enabled,
+            'configuredEnabled' => (bool) $model?->isEnabled,
             'dailySendLimit' => $model?->dailySendLimit ?: 5,
-            'openTrackingEnabled' => false,
-            'clickTrackingEnabled' => false,
+            'openTrackingEnabled' => (bool) $model?->openTrackingEnabled && (bool) config('job_agent.tracking_enabled'),
+            'clickTrackingEnabled' => (bool) $model?->clickTrackingEnabled && (bool) config('job_agent.tracking_enabled'),
         ]]);
     }
 
@@ -111,13 +115,22 @@ class JobSettingsController extends Controller
         $input = $request->validate([
             'fromName' => ['sometimes', 'string', 'max:191'],
             'fromEmail' => ['sometimes', 'email', 'max:191'],
+            'smtpHost' => ['sometimes', 'string', 'max:255', 'regex:/^[a-zA-Z0-9.-]+$/'],
+            'smtpPort' => ['sometimes', 'integer', 'min:1', 'max:65535'],
+            'smtpSecure' => ['sometimes', 'boolean'],
+            'smtpUsername' => ['sometimes', 'string', 'max:191'],
+            'smtpPassword' => ['sometimes', 'nullable', 'string', 'max:1024'],
+            'isEnabled' => ['sometimes', 'boolean'],
             'dailySendLimit' => ['sometimes', 'integer', 'min:1', 'max:5'],
+            'openTrackingEnabled' => ['sometimes', 'boolean'],
+            'clickTrackingEnabled' => ['sometimes', 'boolean'],
         ]);
-        $settings = JobAgentEmailSetting::firstOrNew(['id' => 1]);
-        $settings->forceFill(array_merge([
-            'isEnabled' => false, 'openTrackingEnabled' => false,
-            'clickTrackingEnabled' => false, 'smtpPasswordEncrypted' => '',
-        ], $input))->save();
+        $model = JobAgentEmailSetting::firstOrNew(['id' => 1]);
+        if (isset($input['smtpPassword']) && $input['smtpPassword'] !== '') {
+            $model->forceFill(['smtpPasswordEncrypted' => Crypt::encryptString($input['smtpPassword'])]);
+        }
+        unset($input['smtpPassword']);
+        $model->fill($input)->save();
         return $this->emailSettings();
     }
 
@@ -165,7 +178,7 @@ class JobSettingsController extends Controller
                 'Write a professional, accurate '.$data['kind'].' draft based on the portfolio facts only. '
                 .'Do not invent credentials or work history. Job: '.$data['jobTitle'].
                 ' Company: '.$data['company'].' Description: '.$data['description']
-            );
+                , true);
             return response()->json(['preview' => $result]);
         } catch (\Throwable $error) {
             report($error);
