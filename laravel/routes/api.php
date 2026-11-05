@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AssistantController;
 use App\Http\Controllers\Api\JobAgentController;
+use App\Http\Controllers\Api\JobDraftGenerationController;
 use App\Http\Controllers\Api\JobIntegrationController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\PublicSiteController;
@@ -95,6 +96,10 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::post('job-agent/gmail/disconnect', [GmailController::class, 'disconnect']);
     Route::get('job-agent/jobs', [JobAgentController::class, 'jobs']);
     Route::get('job-agent/jobs/{id}', [JobAgentController::class, 'job'])->whereNumber('id');
+    Route::post('job-agent/jobs/{id}/match', [JobDraftGenerationController::class, 'match'])->whereNumber('id');
+    Route::get('job-agent/jobs/{id}/contacts', [JobDraftGenerationController::class, 'contacts'])->whereNumber('id');
+    Route::post('job-agent/jobs/{id}/generate-draft', [JobDraftGenerationController::class, 'draft'])->whereNumber('id')->middleware('throttle:5,1');
+    Route::put('job-agent/drafts/{id}', [JobDraftGenerationController::class, 'update'])->whereNumber('id');
     Route::get('job-agent/matches', [JobAgentController::class, 'matches']);
     Route::get('job-agent/drafts', [JobAgentController::class, 'drafts']);
     Route::get('job-agent/sources', [JobAgentController::class, 'sources']);

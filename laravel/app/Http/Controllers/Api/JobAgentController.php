@@ -116,11 +116,16 @@ class JobAgentController extends Controller
     {
         $job = JobPost::findOrFail($id);
         $input = $request->validate([
+            'recruiterContactId' => ['required', 'integer', 'exists:recruiter_contacts,id'],
             'toEmail' => ['required', 'email', 'max:191'],
             'subject' => ['required', 'string', 'max:191'],
             'body' => ['required', 'string', 'max:20000'],
             'coverLetterText' => ['sometimes', 'string', 'max:20000'],
         ]);
+        $contact = \App\Models\RecruiterContact::where('jobPostId', $job->id)
+            ->where('verified', true)->where('contactEmailStatus', 'approved')
+            ->findOrFail($input['recruiterContactId']);
+        abort_unless(strcasecmp($contact->email, $input['toEmail']) === 0, 422, 'Recipient mismatch.');
         $draft = JobEmailDraft::create(array_merge([
             'jobPostId' => $job->id,
             'trackingId' => (string) Str::uuid(),
