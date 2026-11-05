@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Pricing extends Model
 {
-    protected $table = 'pricings';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'Pricing';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -16,7 +19,7 @@ class Pricing extends Model
 
     protected $casts = [
         'price' => 'float',
-        'features' => 'array',
+
         'status' => 'boolean',
         'isPopular' => 'boolean',
         'sortOrder' => 'integer',
