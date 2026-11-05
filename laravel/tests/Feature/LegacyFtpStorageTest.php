@@ -79,4 +79,24 @@ class LegacyFtpStorageTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         app(LegacyFtpStorage::class)->deletePublic('/../settings.env');
     }
+    public function test_public_media_get_streams_existing_ftp_asset_without_local_storage(): void
+    {
+        Storage::disk('ftp_public')->put('uploads/example-image.png', 'safe-png-test-data');
+        $response = $this->get('/uploads/example-image.png');
+        $response->assertOk()->assertHeader('Content-Type', 'image/png');
+        $this->assertSame('safe-png-test-data', $response->streamedContent());
+        Storage::disk('public')->assertMissing('uploads/example-image.png');
+    }
+
+    public function test_public_media_get_returns_404_for_missing_asset(): void
+    {
+        $this->get('/uploads/not-found.png')->assertNotFound();
+    }
+
+    public function test_public_media_get_blocks_php_files(): void
+    {
+        Storage::disk('ftp_public')->put('uploads/executable.php', '<?php echo "unexpected";');
+        $this->get('/uploads/executable.php')->assertNotFound();
+    }
+
 }
