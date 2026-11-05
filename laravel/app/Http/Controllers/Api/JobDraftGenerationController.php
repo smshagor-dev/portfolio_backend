@@ -46,7 +46,7 @@ class JobDraftGenerationController extends Controller
             .'Job: '.json_encode($job->only(['title', 'company', 'location', 'description'])).'. '
             .'Extra instructions: '.($input['instructions'] ?? '');
         try {
-            $body = Str::limit($ai->reply($prompt), 10000, '');
+            $body = Str::limit($ai->reply($prompt, true), 10000, '');
         } catch (\Throwable $error) {
             report($error);
             return response()->json(['message' => 'AI draft could not be generated. Check configured provider.'], 503);

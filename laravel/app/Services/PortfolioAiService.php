@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\AiProvider;
 use App\Models\AiSettings;
 use App\Models\AiTrainingEntry;
+use App\Models\JobAgentAiSetting;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\ResearchPublication;
@@ -34,8 +35,30 @@ class PortfolioAiService
         return Str::limit(json_encode($selected, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 18000, '');
     }
 
-    private function provider(): array
+    private function provider(bool $jobAgent = false): array
     {
+        if ($jobAgent) {
+            $jobSettings = JobAgentAiSetting::find(1);
+            if ($jobSettings) {
+                $name = strtolower((string) $jobSettings->aiProvider);
+                $attribute = match ($name) {
+                    'openai' => 'openaiApiKeyEncrypted',
+                    'deepseek' => 'deepseekApiKeyEncrypted',
+                    'gemini' => 'geminiApiKeyEncrypted',
+                    default => throw new \RuntimeException('Unsupported Job Agent AI provider.'),
+                };
+                $key = LegacyCredentialCodec::storedSecret($jobSettings, $attribute);
+                if (!$key) {
+                    throw new \RuntimeException('Job Agent AI provider is not configured.');
+                }
+                $base = match ($name) {
+                    'openai' => 'https://api.openai.com/v1',
+                    'deepseek' => 'https://api.deepseek.com/v1',
+                    'gemini' => 'https://generativelanguage.googleapis.com/v1beta',
+                };
+                return [$name, $key, (string) ($jobSettings->aiModel ?: config('services.portfolio_ai.model')), $base];
+            }
+        }
         $settings = AiSettings::find(1);
         $name = strtolower((string) ($settings?->activeProvider ?: 'openai'));
         $provider = AiProvider::where('name', $name)->where('is_active', true)->first();
@@ -58,9 +81,9 @@ class PortfolioAiService
         return [$name, $key, $model, $urls[$name]];
     }
 
-    public function reply(string $message): string
+    public function reply(string $message, bool $jobAgent = false): string
     {
-        [$provider, $key, $model, $base] = $this->provider();
+        [$provider, $key, $model, $base] = $this->provider($jobAgent);
         $system = 'You are an assistant for the portfolio owner. Only use grounded context. Do not invent facts or imply you can act for the owner. Context: '.$this->context($message);
         if ($provider === 'gemini') {
             $payload = Http::timeout(30)->withHeaders(['x-goog-api-key' => $key])->post(

@@ -165,7 +165,7 @@ class JobSettingsController extends Controller
                 'Write a professional, accurate '.$data['kind'].' draft based on the portfolio facts only. '
                 .'Do not invent credentials or work history. Job: '.$data['jobTitle'].
                 ' Company: '.$data['company'].' Description: '.$data['description']
-            );
+            , true);
             return response()->json(['preview' => $result]);
         } catch (\Throwable $error) {
             report($error);

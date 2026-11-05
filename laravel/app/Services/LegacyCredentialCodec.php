@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AdminUser;
 use App\Models\AiProvider;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 
 final class LegacyCredentialCodec
@@ -60,18 +61,28 @@ final class LegacyCredentialCodec
         return $plain;
     }
 
-    public static function aiProviderKey(AiProvider $provider): string
+    public static function storedSecret(Model $model, string $attribute): string
     {
-        $stored = (string) $provider->apiKey;
+        $allowed = ['apiKey', 'gmailRefreshToken', 'smtpPasswordEncrypted',
+            'openaiApiKeyEncrypted', 'deepseekApiKeyEncrypted', 'geminiApiKeyEncrypted'];
+        if (!in_array($attribute, $allowed, true)) {
+            throw new \InvalidArgumentException('Unsupported credential field.');
+        }
+        $stored = (string) $model->getAttribute($attribute);
         if ($stored === '') {
             return '';
         }
         if (preg_match('/^[0-9a-f]{32}:[0-9a-f]{32}:/iD', $stored) === 1) {
             $secret = (string) config('services.portfolio_ai.legacy_encryption_secret', '');
             $key = self::decryptLegacyAesGcm($stored, $secret);
-            $provider->forceFill(['apiKey' => Crypt::encryptString($key)])->save();
+            $model->forceFill([$attribute => Crypt::encryptString($key)])->save();
             return $key;
         }
         return Crypt::decryptString($stored);
+    }
+
+    public static function aiProviderKey(AiProvider $provider): string
+    {
+        return self::storedSecret($provider, 'apiKey');
     }
 }

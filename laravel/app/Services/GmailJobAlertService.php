@@ -6,6 +6,7 @@ use App\Models\JobAgentSettings;
 use App\Models\JobPost;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
+use App\Services\LegacyCredentialCodec;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -96,7 +97,7 @@ class GmailJobAlertService
         if (!$settings?->gmailRefreshToken) {
             throw new \RuntimeException('Gmail is not connected.');
         }
-        $refresh = Crypt::decryptString($settings->gmailRefreshToken);
+        $refresh = LegacyCredentialCodec::storedSecret($settings, 'gmailRefreshToken');
         $response = Http::asForm()->timeout(15)->post('https://oauth2.googleapis.com/token', [
             'refresh_token' => $refresh,
             'client_id' => config('services.gmail.client_id'),
