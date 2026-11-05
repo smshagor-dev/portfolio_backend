@@ -45,10 +45,14 @@ class FeedbackController extends Controller
                 abort_unless($parent->status === 'published', 404);
             }
             $allowed = (new $commentModel)->getFillable();
+            $content = array_intersect_key($input, array_flip($allowed));
+            if ($parentModel === Service::class) {
+                $content = array_merge(['photo' => '', 'impression' => ''], $content);
+            }
             return $commentModel::create(array_merge([
                 $foreignKey => $parent->id,
                 'sortOrder' => (int) $commentModel::where($foreignKey, $parent->id)->max('sortOrder') + 1,
-            ], array_intersect_key($input, array_flip($allowed))));
+            ], $content));
         }, 3);
         return response()->json(['message' => 'Comment created.', 'comment' => $saved], 201);
     }
@@ -58,7 +62,7 @@ class FeedbackController extends Controller
         abort_unless(isset(self::TYPES[$type]), 404);
         [$parentModel, $commentModel, $replyModel, $foreignKey] = self::TYPES[$type];
         $input = $request->validate([
-            'name' => ['sometimes', 'string', 'max:191'],
+            'name' => [$type === 'services' ? 'sometimes' : 'required', 'string', 'max:191'],
             'reply' => ['required', 'string', 'max:4000'],
             'impression' => ['sometimes', 'string', 'max:1000'],
         ]);
@@ -66,10 +70,14 @@ class FeedbackController extends Controller
             $parent = $parentModel::where('slug', $slug)->lockForUpdate()->firstOrFail();
             $comment = $commentModel::where($foreignKey, $parent->id)->findOrFail($commentId);
             $allowed = (new $replyModel)->getFillable();
+            $content = array_intersect_key($input, array_flip($allowed));
+            if ($parentModel === Service::class) {
+                $content = array_merge(['impression' => ''], $content);
+            }
             return $replyModel::create(array_merge([
                 'commentId' => $comment->id,
                 'sortOrder' => (int) $replyModel::where('commentId', $comment->id)->max('sortOrder') + 1,
-            ], array_intersect_key($input, array_flip($allowed))));
+            ], $content));
         }, 3);
         return response()->json(['message' => 'Reply created.', 'reply' => $saved], 201);
     }
