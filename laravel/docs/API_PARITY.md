@@ -1,6 +1,6 @@
 # Express => Laravel API parity tracker (5 Nov 2026)
 
-**Code present does not imply tested or feature-complete.** Root Express/Vercel production remains unchanged.
+**148/148 Express HTTP route shapes are now represented in Laravel (some by explicit 501 responses); this is a static match only, not functional parity. Code present does not imply tested or feature-complete.** Root Express/Vercel production remains unchanged.
 
 | Module | New Laravel code now includes | Remaining before 1:1 sign-off |
 |---|---|---|
