@@ -79,6 +79,16 @@ class IsolatedMongoIntegrationTest extends TestCase
             $token = (string) $response->json('token');
             // Pinpoint token parsing vs polymorphic owner resolution; never
             // print the sensitive token or credential in test logs.
+            [$claimedId, $plainSecret] = explode('|', $token, 2);
+            $hashedToken = hash('sha256', $plainSecret);
+            $rawToken = DB::connection('mongodb')->getClient()
+                ->selectDatabase('portfolio_ci')
+                ->selectCollection('personal_access_tokens')
+                ->findOne(['token' => $hashedToken]);
+            $this->assertNotNull($rawToken, 'Sanctum token SHA-256 hash missing from MongoDB document.');
+            $this->assertSame((string) $rawToken['_id'], $claimedId, 'Sanctum token prefix differs from BSON _id.');
+            $byHash = PersonalAccessToken::query()->where('token', $hashedToken)->first();
+            $this->assertNotNull($byHash, 'Sanctum token exists in BSON but model hash lookup failed.');
             $stored = PersonalAccessToken::findToken($token);
             $this->assertNotNull($stored, 'Sanctum token hash/ID lookup failed.');
             $this->assertInstanceOf(AdminUser::class, $stored->tokenable, 'Sanctum token owner failed to resolve.');
