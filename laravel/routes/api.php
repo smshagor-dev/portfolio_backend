@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\AdminOperationsController;
+use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\AnalyticsController;
@@ -52,6 +54,21 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('t
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('me', [AdminAuthController::class, 'me']);
+    Route::get('dashboard', [AdminOperationsController::class, 'dashboard']);
+    Route::get('analytics', [AdminOperationsController::class, 'analytics']);
+    Route::get('messages', [AdminOperationsController::class, 'messages']);
+    Route::get('messages/{messageId}', [AdminOperationsController::class, 'message'])->whereNumber('messageId');
+    Route::post('messages/{messageId}/reply', [AdminOperationsController::class, 'reply'])->whereNumber('messageId');
+    Route::patch('messages/{messageId}/status', [AdminOperationsController::class, 'updateStatus'])->whereNumber('messageId');
+    Route::delete('messages/{messageId}', [AdminOperationsController::class, 'deleteMessage'])->whereNumber('messageId');
+    Route::get('notifications', [AdminOperationsController::class, 'notifications']);
+    Route::get('notifications/unread-count', [AdminOperationsController::class, 'unreadCount']);
+    Route::patch('notifications/read-all', [AdminOperationsController::class, 'readAll']);
+    Route::patch('notifications/{id}/read', [AdminOperationsController::class, 'readOne']);
+    Route::delete('notifications/{id}', [AdminOperationsController::class, 'deleteNotification']);
+    Route::post('upload-image', [UploadController::class, 'image']);
+    Route::post('upload-resume', [UploadController::class, 'resume']);
+    Route::post('upload-verification-file', [UploadController::class, 'verification']);
     Route::get('job-agent', [JobAgentController::class, 'index']);
     Route::get('job-agent/overview', [JobAgentController::class, 'overview']);
     Route::get('job-agent/jobs', [JobAgentController::class, 'jobs']);
