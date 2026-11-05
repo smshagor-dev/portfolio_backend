@@ -39,3 +39,7 @@ API: http://localhost:8080/api/health
 See `docs/DEPLOYMENT.md`, `docs/MIGRATION_PLAN.md`, `docs/API_PARITY.md` and `docs/DATA_IMPORT.md` for milestones and scope.
 
 Windows setup: docs/LOCAL_WINDOWS.md. The Node/Vercel production backend remains unchanged.
+
+## Read-only checks
+
+After migrations: `php artisan portfolio:preflight --strict`. From repository root: `node laravel/tools/audit-route-parity.js` to compare HTTP route shapes with Express. These checks are not substitutes for end-to-end tests.
