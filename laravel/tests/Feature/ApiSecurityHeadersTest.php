@@ -12,6 +12,6 @@ class ApiSecurityHeadersTest extends TestCase
             ->assertStatus(404)
             ->assertHeader('X-Content-Type-Options', 'nosniff')
             ->assertHeader('X-Frame-Options', 'DENY')
-            ->assertHeader('Cache-Control', 'private, no-store, max-age=0');
+            ->assertHeader('Cache-Control', 'max-age=0, no-store, private');
     }
 }

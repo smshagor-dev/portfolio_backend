@@ -53,6 +53,8 @@ jobs:
         run: composer validate --no-check-publish
       - name: Install dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Prepare isolated test dotenv
+        run: touch .env
       - name: Node-to-Laravel HTTP route shape audit
         run: node tools/audit-route-parity.js
       - name: PHP syntax check

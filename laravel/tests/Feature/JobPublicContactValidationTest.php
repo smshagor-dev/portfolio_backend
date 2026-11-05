@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\JobPost;
 use App\Services\JobPublicContactService;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 class JobPublicContactValidationTest extends TestCase
 {
