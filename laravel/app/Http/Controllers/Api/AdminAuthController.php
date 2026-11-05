@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\AdminUser;
 use App\Support\Totp;
 use App\Services\LegacyCredentialCodec;
+use App\Support\LegacyBcryptPassword;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ class AdminAuthController extends Controller
         ]);
 
         $admin = AdminUser::where('email', strtolower($input['email']))->first();
-        if (!$admin || !Hash::check($input['password'], $admin->passwordHash)) {
+        if (!$admin || !LegacyBcryptPassword::check($input['password'], $admin->passwordHash)) {
             return response()->json(['message' => 'Invalid email or password.'], 401);
         }
 
@@ -43,6 +44,11 @@ class AdminAuthController extends Controller
             if (!$secret || !Totp::verify($secret, $input['twoFactorCode'])) {
                 return response()->json(['message' => 'Invalid 2FA code.'], 401);
             }
+        }
+
+        // Upgrade Node.js bcryptjs hashes only after password and 2FA succeed.
+        if (LegacyBcryptPassword::needsRehash($admin->passwordHash)) {
+            $admin->forceFill(['passwordHash' => Hash::make($input['password'])])->save();
         }
 
         $token = $admin->createToken('portfolio-admin', ['admin'], now()->addDays(7));
@@ -86,7 +92,7 @@ class AdminAuthController extends Controller
             'newPassword' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()],
         ]);
         $admin = $request->user();
-        if (!Hash::check($input['currentPassword'], $admin->passwordHash)) {
+        if (!LegacyBcryptPassword::check($input['currentPassword'], $admin->passwordHash)) {
             return response()->json(['message' => 'Current password is incorrect.'], 422);
         }
         $admin->forceFill(['passwordHash' => Hash::make($input['newPassword'])])->save();
