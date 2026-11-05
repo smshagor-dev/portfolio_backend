@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\AdminNotification;
+use App\Services\AdminNotificationGroups;
 use App\Models\AnalyticsDailyVisit;
 use App\Models\AnalyticsSession;
 use App\Models\Article;
@@ -135,12 +136,30 @@ class AdminOperationsController extends Controller
 
     public function notifications(Request $request): JsonResponse
     {
-        return response()->json(['notifications' => AdminNotification::orderByDesc('createdAt')->paginate(50)]);
+        $input = $request->validate([
+            'page' => ['sometimes', 'integer', 'min:1', 'max:1000'],
+            'limit' => ['sometimes', 'integer', 'min:1', 'max:50'],
+        ]);
+        $page = (int) ($input['page'] ?? 1);
+        $limit = (int) ($input['limit'] ?? 12);
+        $groups = AdminNotificationGroups::all();
+        $total = $groups->count();
+        return response()->json([
+            'notifications' => $groups->slice(($page - 1) * $limit, $limit)->values(),
+            'pagination' => [
+                'page' => $page, 'limit' => $limit, 'total' => $total,
+                'totalPages' => max(1, (int) ceil($total / $limit)),
+            ],
+        ]);
     }
 
     public function unreadCount(): JsonResponse
     {
-        return response()->json(['unreadCount' => AdminNotification::where('isRead', false)->count()]);
+        return response()->json([
+            'count' => AdminNotificationGroups::all()->filter(
+                fn ($group) => $group['unreadCount'] > 0
+            )->count(),
+        ]);
     }
 
     public function readAll(): JsonResponse
@@ -151,15 +170,21 @@ class AdminOperationsController extends Controller
 
     public function readOne(string $id): JsonResponse
     {
-        $entry = AdminNotification::findOrFail($id);
-        $entry->update(['isRead' => true]);
-        return response()->json(['message' => 'Notification read.', 'notification' => $entry]);
+        $group = AdminNotificationGroups::find($id);
+        abort_unless($group, 404, 'Notification group not found.');
+        AdminNotification::whereIn('id', $group['notificationIds'])->update(['isRead' => true]);
+        return response()->json([
+            'message' => 'Notification group marked as read.',
+            'notification' => AdminNotificationGroups::find($id),
+        ]);
     }
 
     public function deleteNotification(string $id): JsonResponse
     {
-        AdminNotification::findOrFail($id)->delete();
-        return response()->json(['message' => 'Notification deleted.']);
+        $group = AdminNotificationGroups::find($id);
+        abort_unless($group, 404, 'Notification group not found.');
+        AdminNotification::whereIn('id', $group['notificationIds'])->delete();
+        return response()->json(['message' => 'Notification group deleted successfully.']);
     }
 
     public function analytics(): JsonResponse
