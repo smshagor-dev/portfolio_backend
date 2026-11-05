@@ -1,20 +1,22 @@
-# Checklist: what remains before full system sign-off
+# Required before "full system ready"
 
-- [ ] End-to-end PHP 8.2 boot test and Composer dependency lock
-- [ ] MySQL schema creation and FK validation on clean DB
-- [ ] MySQL data import dry-run and full table-by-table QA
-- [ ] JWT-to-Sanctum frontend integration tests and 2FA QR support
-- [ ] Research OpenAlex abstract enrichment, author role and sync reconciliation
-- [ ] Real-time Socket.IO compatibility or frontend migration to SSE/Reverb
-- [ ] Contact/admin email notifications
-- [ ] Legacy FTP/public media paths and existing uploads copied securely
-- [ ] Job Agent profile/AI/ML parity, recruiter discovery, company-specific job boards
-- [ ] Gmail OAuth live flow, approved-source sync tests and background scheduler
-- [ ] Job email PDF attachment, event tracking and SMTP delivery dry-run
-- [ ] Analytics GA4 parity and dashboard contract tests
-- [ ] Public/admin file uploads and SEO verification file workflow tests
-- [ ] Article/project/service/comment JSON response parity with current frontend
-- [ ] Security review (rate limits, XSS, SQL/SSRF, secrets, OAuth, file validation)
-- [ ] cPanel deployment rehearsal and rollback test
+The codebase contains Laravel scaffolding and partial implementations, **not a verified, production-ready rewrite**. Checkboxes refer to verified behaviour, not presence of PHP files.
 
-All checks must be **verified** before closing; code presence alone is not a passing check.
+- [ ] Composer lockfile generated on PHP 8.2-compatible dependency environment
+- [ ] Docker PHP 8.2/MySQL build passes, all migrations apply and all tests pass
+- [ ] Complete 1:1 frontend API contracts (request/response shape, errors, URLs and auth)
+- [ ] Actual MongoDB content export/import, 49-table count and foreign-key reconciliation
+- [ ] Sensitive settings, admin identities and old sessions migrated/rotated securely
+- [ ] All existing media/assets migrated with FTP/public path compatibility
+- [ ] Real-time Socket.IO compatibility or frontend transition to Reverb/SSE/polling
+- [ ] Full Job Agent company job boards, recruiter discovery/verification, automatic source scheduling
+- [ ] Gmail OAuth consent and read-only alert ingestion integration tests
+- [ ] SMTP opt-in/approval and daily-limit tests, open/click tracking, CV attachment handling
+- [ ] Job Agent cover-letter PDF rendering, Unicode and private delivery tests
+- [ ] Research ORCID, Crossref and OpenAlex live data quality tests, author role and reconciliation
+- [ ] Real AI provider integrations, verified prompts, fallback behavior and safety limits
+- [ ] Public/admin file validation, SEO verification file approval, analytics and notification parity
+- [ ] Security/rate-limit validation, negative tests, error handling, performance and backup tests
+- [ ] cPanel/PHP-FPM deployment rehearsal, rollback and cutover
+
+Local Windows setup is in docs/LOCAL_WINDOWS.md. The current CI workflow is failing without usable job logs and must not be treated as a passing test.

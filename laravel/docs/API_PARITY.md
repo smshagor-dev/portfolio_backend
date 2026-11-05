@@ -1,31 +1,20 @@
-# Express => Laravel API contract tracker (November 2026)
+# Express => Laravel API parity tracker (5 Nov 2026)
 
-The Laravel 12/PHP 8.2/MySQL rewrite is on a **draft branch** and is not proven runtime-compatible. The root Node/Express backend remains in production. Status below means *code present*, not tested or production-ready.
+**Code present does not imply tested or feature-complete.** Root Express/Vercel production remains unchanged.
 
-| Module | Implemented in new PHP code | Still missing / requires verification |
+| Module | New Laravel code now includes | Remaining before 1:1 sign-off |
 |---|---|---|
-| Laravel platform | Bootstrap, MySQL 8 Docker, Sanctum and 49 Eloquent models | Composer lock, PHP 8.2/MySQL migration test, route tests |
-| Public portfolio | Home, projects/services, articles, pricing, settings, comments, testimonials | Exact frontend JSON contract, DEV feed, public image uploads |
-| Admin CMS | Dashboard, bulk content edits, articles/projects/categories, legal pages, notifications, emergency contacts | Full transactional parity, validation and rich-content sanitization |
-| Authentication | Admin login, Sanctum, bcrypt passwords, TOTP, logout | QR payload image generation, migrations of legacy sessions and passwords, full QA |
-| Contact tickets | Create/read/reply, admin status and replies, private upload downloads | Email delivery, Socket.IO event compatibility |
-| Research | Listing, admin CRUD, optional ORCID/Crossref sync, manual override marker | OpenAlex abstracts, role classification, reconciliation, live tests |
-| AI assistant | Admin provider configuration and OpenAI/DeepSeek/Gemini clients | Live API calls, existing prompt/knowledge parity |
-| Job Agent | Public provider imports, Gmail OAuth2 read-only alert import, job/profile settings, drafts, approval, guarded SMTP, heuristic matching | Real company website adapters, complete recruiter discovery/validation, automated safe scheduling, tracking, PDF letters, full prompts/AI scoring, live OAuth/SMTP tests |
-| Analytics | Visitor heartbeat, totals/trends, admin dashboard | Optional GA4 Data API, legacy UI analytics contract |
-| Uploads | Private contact files; public/admin image and resume endpoints | Legacy FTP media paths, antivirus/image processing, full media migration |
-| Database transfer | Read-only Prisma exporter, JSON import with dry-run | Production record audit, sensitive credential handling, data validation, asset move |
-| Delivery | Docker compose, Windows runbook, PHP CI workflow | CI currently fails before usable test results; local staging execution required |
-| Realtime | None; REST writes exist | Socket.IO / compatible frontend transport, event authorization and notifications |
+| Foundation | Laravel 12, PHP 8.2 Docker, MySQL, 49 Eloquent models, 21 FKs | Composer lock, migrations and tests on real PHP 8.2/MySQL |
+| Public portfolio | Home, projects, articles, services, pricing, feedback uploads and comments | DEV feed, response/error contract tests |
+| Admin CMS | Dashboard, bulk edits, articles, categories, projects, notifications, tickets, uploads | Full validation, article editor and SEO parity |
+| Admin login | Sanctum bearer tokens, bcrypt, TOTP, password management | QR image, migrated legacy auth contract, integration tests |
+| Contacts | Private tickets, messages, admin replies and opt-in email notifications | Socket.IO/real-time compatibility, delivery testing |
+| Research | ORCID/Crossref sync, DOI-based OpenAlex abstracts, admin/listing, editorial overrides | Author roles, metadata reconciliation and API tests |
+| AI | OpenAI, DeepSeek and Gemini providers, context selection, training/settings | Quality and live provider tests |
+| Job Agent | Gmail readonly OAuth, trusted board APIs, manual jobs, recipient approval, guarded SMTP, AI drafts, private PDF cover letters, settings | Company adapters, real recruiting workflows, tracking, attachment delivery and full automation |
+| Analytics | Visitor heartbeat, internal dashboard metrics | GA4 Data API and UI contract parity |
+| Storage | Private CV/ticket media, public uploads, local Docker storage | Legacy public uploads and FTP remote storage migration |
+| Data move | Read-only Prisma exporter, dry-run MySQL importer | Real export/import and data integrity checks |
+| CI | GitHub Actions PHP 8.2/MySQL workflow | Runner checks failing; no passing migration/test evidence |
 
-## Blockers before *claiming* full local readiness
-
-1. Resolve or bypass the unavailable CI runner by executing **composer install, php -l, artisan migrate, route:list and php artisan test** in a genuine PHP 8.2/MySQL Docker environment.
-2. Fix all runtime/migration/test errors detected there. No current source-only review can substitute for this.
-3. Export MongoDB data to isolated MySQL staging and verify every table count and FK. Never wipe existing production data.
-4. Port missing Socket.IO / background jobs / email notifications / PDF generation / FTP storage or update the frontend to compatible replacements.
-5. Compare every request and response shape with the production Express APIs and frontend usage.
-6. Test Gmail OAuth, AI provider keys, SMTP and ORCID API with operator-supplied environment configuration. Keys should never be pasted into Git/Chat.
-7. Perform a complete cPanel/PHP-FPM deployment rehearsal, backup, rollback and security audit before cutover.
-
-**Do not merge this PR as a declaration of feature parity or switch production traffic yet.**
+Do not switch live frontend traffic or merge PR as full migration until the open items and runtime tests pass.
