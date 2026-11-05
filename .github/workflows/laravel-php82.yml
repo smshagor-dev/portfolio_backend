@@ -83,7 +83,7 @@ jobs:
       - name: Check route registration
         run: php artisan route:list
       - name: Isolated regression tests (no real FTP or MongoDB network)
-        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest|LinkedInEmbedValidationTest|ApiSecurityHeadersTest|CompanySourceProbeTest)' --display-warnings
+        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest|LinkedInEmbedValidationTest|ApiSecurityHeadersTest|CompanySourceProbeTest|RepositoryRootLayoutTest)' --display-warnings
 
   mongo-integration:
     runs-on: ubuntu-latest
