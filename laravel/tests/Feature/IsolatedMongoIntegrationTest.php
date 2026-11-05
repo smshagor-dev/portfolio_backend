@@ -6,6 +6,7 @@ use App\Models\AdminUser;
 use App\Models\ContactChatMessage;
 use App\Models\ContactMessage;
 use App\Models\ResearchPublication;
+use App\Models\PersonalAccessToken;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -76,6 +77,11 @@ class IsolatedMongoIntegrationTest extends TestCase
                 'twoFactorCode' => '',
             ])->assertOk()->assertJsonStructure(['token', 'admin' => ['email']]);
             $token = (string) $response->json('token');
+            // Pinpoint token parsing vs polymorphic owner resolution; never
+            // print the sensitive token or credential in test logs.
+            $stored = PersonalAccessToken::findToken($token);
+            $this->assertNotNull($stored, 'Sanctum token hash/ID lookup failed.');
+            $this->assertInstanceOf(AdminUser::class, $stored->tokenable, 'Sanctum token owner failed to resolve.');
             $this->withToken($token)->getJson('/api/admin/me')
                 ->assertOk()
                 ->assertJsonPath('admin.email', 'ci-only-parity@example.test');
