@@ -6,4 +6,10 @@ return [
         'base_url' => env('PORTFOLIO_AI_BASE_URL', 'https://api.openai.com/v1'),
         'model' => env('PORTFOLIO_AI_MODEL', 'gpt-4o-mini'),
     ],
+    'gmail' => [
+        'client_id' => env('GMAIL_CLIENT_ID'),
+        'client_secret' => env('GMAIL_CLIENT_SECRET'),
+        'redirect_uri' => env('GMAIL_REDIRECT_URI'),
+        'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+    ],
 ];

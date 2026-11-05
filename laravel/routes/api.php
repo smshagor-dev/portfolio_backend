@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\GmailController;
 use App\Http\Controllers\Api\AdminResearchController;
 use App\Http\Controllers\Api\AdminOperationsController;
 use App\Http\Controllers\Api\UploadController;
@@ -52,6 +53,8 @@ Route::prefix('research-publications')->group(function (): void {
 
 Route::post('assistant', [AssistantController::class, 'chat'])->middleware('throttle:10,1');
 
+Route::get('admin/job-agent/gmail/callback', [GmailController::class, 'callback'])->middleware('throttle:10,1');
+
 Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
@@ -76,6 +79,11 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::post('upload-verification-file', [UploadController::class, 'verification']);
     Route::get('job-agent', [JobAgentController::class, 'index']);
     Route::get('job-agent/overview', [JobAgentController::class, 'overview']);
+    Route::get('job-agent/gmail/status', [GmailController::class, 'status']);
+    Route::get('job-agent/gmail/auth-url', [GmailController::class, 'connect']);
+    Route::get('job-agent/gmail/connect', [GmailController::class, 'connect']);
+    Route::post('job-agent/gmail/sync', [GmailController::class, 'sync'])->middleware('throttle:2,1');
+    Route::post('job-agent/gmail/disconnect', [GmailController::class, 'disconnect']);
     Route::get('job-agent/jobs', [JobAgentController::class, 'jobs']);
     Route::get('job-agent/jobs/{id}', [JobAgentController::class, 'job'])->whereNumber('id');
     Route::get('job-agent/matches', [JobAgentController::class, 'matches']);
