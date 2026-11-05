@@ -119,8 +119,8 @@ class JobIntegrationController extends Controller
                 $allowed = $label === 'CV' ? ['pdf', 'doc', 'docx'] : ['pdf'];
                 if (!str_starts_with($path, $folder) || str_contains($path, '..')
                     || !in_array($extension, $allowed, true)
-                    || !Storage::disk('local')->exists($path)
-                    || Storage::disk('local')->size($path) > 10 * 1024 * 1024) {
+                    || !app(\App\Services\LegacyFtpStorage::class)->privateDisk()->exists($path)
+                    || app(\App\Services\LegacyFtpStorage::class)->privateDisk()->size($path) > 10 * 1024 * 1024) {
                     return response()->json(['message' => $label.' attachment is missing or invalid.'], 422);
                 }
                 $attachments[] = ['path' => $path, 'name' => $label.'.'.$extension];
@@ -159,7 +159,7 @@ class JobIntegrationController extends Controller
                 $message->to($draft->toEmail)->subject($draft->subject);
                 foreach ($attachments as $file) {
                     $message->attachData(
-                        Storage::disk('local')->get($file['path']),
+                        app(\App\Services\LegacyFtpStorage::class)->privateDisk()->get($file['path']),
                         $file['name']
                     );
                 }
