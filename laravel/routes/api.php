@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\JobIntegrationController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\PublicSiteController;
 use App\Http\Controllers\Api\ResearchController;
+use App\Http\Controllers\Api\ResearchThumbnailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', [StatusController::class, 'health']);
@@ -31,6 +32,7 @@ Route::prefix('site')->group(function (): void {
     Route::get('pricing/{slug}', [PublicSiteController::class, 'pricing']);
     Route::get('projects/{slug}', [PublicSiteController::class, 'project']);
     Route::get('services', [PublicSiteController::class, 'services']);
+    Route::post('services/upload-image', [UploadController::class, 'publicImage'])->middleware('throttle:5,1');
     Route::get('services/{slug}', [PublicSiteController::class, 'service']);
     Route::get('articles', [PublicSiteController::class, 'articles']);
     Route::get('articles/{slug}', [PublicSiteController::class, 'article']);
@@ -41,6 +43,7 @@ Route::prefix('site')->group(function (): void {
     Route::get('contact-ticket/{messageId}/files/{chatId}/{field}', [ContactController::class, 'download'])->whereNumber('messageId')->whereNumber('chatId')->middleware('throttle:30,1');
     Route::post('analytics/heartbeat', [AnalyticsController::class, 'heartbeat'])->middleware('throttle:120,1');
     Route::post('testimonials', [FeedbackController::class, 'testimonial'])->middleware('throttle:5,1');
+    Route::post('testimonials/upload-image', [UploadController::class, 'publicImage'])->middleware('throttle:5,1');
     Route::post('{type}/{slug}/comments', [FeedbackController::class, 'comment'])->whereIn('type', ['projects', 'services', 'articles'])->middleware('throttle:5,1');
     Route::post('{type}/{slug}/comments/{commentId}/replies', [FeedbackController::class, 'reply'])->whereIn('type', ['projects', 'services', 'articles'])->whereNumber('commentId')->middleware('throttle:5,1');
     Route::post('{type}/{slug}/impression', [FeedbackController::class, 'impression'])->whereIn('type', ['projects', 'services', 'articles'])->middleware('throttle:60,1');
@@ -48,6 +51,7 @@ Route::prefix('site')->group(function (): void {
 });
 
 Route::prefix('research-publications')->group(function (): void {
+    Route::get('default-thumbnail.svg', [ResearchThumbnailController::class, 'svg']);
     Route::get('/', [ResearchController::class, 'index']);
     Route::get('featured', [ResearchController::class, 'featured']);
     Route::get('{slug}', [ResearchController::class, 'show']);

@@ -9,6 +9,19 @@ use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
+    public function publicImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+        $path = $request->file('image')->store('uploads/feedback', 'public');
+        return response()->json([
+            'message' => 'Image uploaded successfully.',
+            'path' => '/storage/'.$path,
+            'publicUrl' => Storage::disk('public')->url($path),
+        ], 201);
+    }
+
     public function image(Request $request): JsonResponse
     {
         $request->validate(['image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120']]);
