@@ -61,7 +61,8 @@ class ContentController extends Controller
             'tags' => ['sometimes', 'array'],
             'tags.*' => ['string', 'max:191'],
             'buttons' => ['sometimes', 'array'],
-            'tools' => ['sometimes', 'string', 'max:1000'],
+            'tools' => ['sometimes', 'array', 'max:100'],
+            'tools.*' => ['string', 'max:191'],
             'sortOrder' => ['sometimes', 'integer', 'min:0'],
             'views' => ['sometimes', 'integer', 'min:0'],
             'impressionCount' => ['sometimes', 'integer', 'min:0'],
@@ -77,7 +78,8 @@ class ContentController extends Controller
             'doi' => ['sometimes', 'string', 'max:191'],
             'publicationUrl' => ['sometimes', 'url', 'max:2000'],
             'citationUrl' => ['sometimes', 'nullable', 'url', 'max:2000'],
-            'authors' => ['sometimes', 'string', 'max:10000'],
+            'authors' => ['sometimes', 'array', 'max:100'],
+            'authors.*' => ['string', 'max:191'],
             'myAuthorRole' => ['sometimes', 'nullable', 'string', 'max:191'],
         ]);
         return array_intersect_key($data, array_flip($allowed));
@@ -101,15 +103,50 @@ class ContentController extends Controller
     {
         $model = $this->model($resource);
         abort_unless($model, 404);
+        // Validate required inputs before database insert; never write incomplete
+        // documents with empty title or invalid relation/JSON representations.
+        $createRules = match ($resource) {
+            'projects' => [
+                'name' => ['required', 'string', 'max:191'],
+                'description' => ['required', 'string', 'max:40000'],
+            ],
+            'articles' => [
+                'title' => ['required', 'string', 'max:191'],
+                'shortDescription' => ['required', 'string', 'max:10000'],
+                'content' => ['required', 'string', 'max:200000'],
+                'category' => ['required', 'string', 'max:191'],
+                'author' => ['required', 'string', 'max:191'],
+            ],
+            'article-categories' => ['name' => ['required', 'string', 'max:191']],
+            'research-publications' => [
+                'title' => ['required', 'string', 'max:191'],
+                'shortSummary' => ['required', 'string', 'max:10000'],
+                'publicationType' => ['required', 'string', 'max:191'],
+                'researchArea' => ['required', 'string', 'max:191'],
+                'publisherName' => ['required', 'string', 'max:191'],
+                'publishedDate' => ['required', 'date'],
+                'publicationUrl' => ['required', 'url:http,https', 'max:255'],
+            ],
+            default => [],
+        };
+        $request->validate($createRules);
         $data = $this->validatedPayload($request, $resource);
         if (in_array('slug', $this->allowed($resource), true) && empty($data['slug'])) {
             $data['slug'] = Str::slug($data['title'] ?? $data['name'] ?? '');
         }
-        if ($resource === 'articles') {
+        abort_if(empty($data['slug']), 422, 'Slug cannot be empty.');
+        if ($resource === 'projects') {
             $data += [
-                'title' => '', 'shortDescription' => '', 'content' => '', 'category' => '',
-                'metaDescription' => '', 'author' => '', 'status' => 'draft', 'tags' => [],
+                'content' => '', 'tools' => [], 'role' => '',
+                'code' => '', 'demo' => '',
+                'sortOrder' => (int) Project::max('sortOrder') + 1,
             ];
+        }
+        if ($resource === 'articles') {
+            $data += ['tags' => [], 'metaDescription' => '', 'status' => 'draft'];
+        }
+        if ($resource === 'research-publications') {
+            $data['status'] ??= 'draft'; // Editorial approval before public listing.
         }
         $record = $model::create($data);
         return response()->json(['message' => 'Created successfully.', 'data' => $record], 201);

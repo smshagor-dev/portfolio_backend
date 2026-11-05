@@ -141,7 +141,13 @@ class JobAgentController extends Controller
     {
         $draft = DB::transaction(function () use ($id, $request) {
             $draft = JobEmailDraft::lockForUpdate()->findOrFail($id);
-            abort_if(in_array($draft->status, ['SENT', 'OPENED', 'CLICKED'], true), 409);
+            abort_if(in_array($draft->status, ['SENT', 'OPENED', 'CLICKED', 'SENDING'], true), 409);
+            $contact = $draft->recruiterContactId
+                ? \App\Models\RecruiterContact::where('jobPostId', $draft->jobPostId)->find($draft->recruiterContactId)
+                : null;
+            abort_unless($contact && $contact->verified && $contact->contactEmailStatus === 'approved'
+                && strcasecmp((string) $contact->email, (string) $draft->toEmail) === 0, 422,
+                'A verified recipient is required before approval.');
             $draft->update([
                 'approvalStatus' => 'APPROVED',
                 'approvedAt' => now(),

@@ -13,6 +13,22 @@ class GmailJobAlertService
 {
     private const QUERY = 'from:(linkedin.com OR indeed.com OR glassdoor.com) subject:(job OR jobs OR alert) newer_than:30d';
 
+    public static function isApprovedSender(string $header): bool
+    {
+        // Parse the actual mailbox, not a substring of a display name or
+        // a lookalike domain such as linkedin.com.attacker.example.
+        if (preg_match('/<([^<>]+)>/', $header, $match)) {
+            $header = $match[1];
+        }
+        $address = strtolower(trim($header, " \t\n\r\0\x0B\"'"));
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+        $domain = substr(strrchr($address, '@'), 1);
+        return in_array($domain, ['linkedin.com', 'indeed.com', 'glassdoor.com'], true);
+    }
+
+
     public function status(): array
     {
         $settings = JobAgentSettings::find(1);
@@ -122,7 +138,7 @@ class GmailJobAlertService
             );
             $subject = trim((string) data_get($headers->get('subject'), 'value', ''));
             $from = strtolower((string) data_get($headers->get('from'), 'value', ''));
-            if (!$subject || !preg_match('/@(linkedin\.com|indeed\.com|glassdoor\.com)\b/i', $from)) {
+            if (!$subject || !self::isApprovedSender($from)) {
                 $skipped++;
                 continue;
             }
