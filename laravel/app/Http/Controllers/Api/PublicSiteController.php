@@ -18,6 +18,8 @@ use App\Models\Skill;
 use App\Models\StatsCounter;
 use App\Models\Testimonial;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Routing\Controller;
 
 class PublicSiteController extends Controller
@@ -75,7 +77,7 @@ class PublicSiteController extends Controller
             'pricings' => Pricing::where('status', true)->orderByDesc('isPopular')->orderBy('sortOrder')->get(),
             'faqs' => Faq::where('status', true)->orderBy('sortOrder')->get(),
             'testimonials' => Testimonial::where('status', true)->orderBy('sortOrder')->get(),
-            'blogs' => [],
+            'blogs' => $this->blogFeed($profile->devUsername),
             'articles' => $articles,
             'emergencyContacts' => EmergencyContact::orderBy('sortOrder')->get(),
         ]);
@@ -171,9 +173,32 @@ class PublicSiteController extends Controller
         ]);
     }
 
+    private function blogFeed(?string $username): array
+    {
+        $username = trim((string) $username);
+        if (!$username || !preg_match('/^[a-zA-Z0-9_-]{1,60}$/D', $username)) {
+            return [];
+        }
+        return Cache::remember('devto:articles:'.sha1(strtolower($username)), now()->addMinutes(15), function () use ($username): array {
+            try {
+                $response = Http::timeout(4)->withoutRedirecting()->acceptJson()
+                    ->get('https://dev.to/api/articles', ['username' => $username, 'per_page' => 50]);
+                if (!$response->successful()) {
+                    return [];
+                }
+                $articles = $response->json();
+                return is_array($articles)
+                    ? array_values(array_filter($articles, fn ($item) => is_array($item) && !empty($item['cover_image'])))
+                    : [];
+            } catch (\Throwable $error) {
+                report($error);
+                return [];
+            }
+        });
+    }
+
     public function blogs(): JsonResponse
     {
-        // Old service fetched external DEV articles; backend parity is pending.
-        return response()->json([]);
+        return response()->json($this->blogFeed($this->profile()?->devUsername));
     }
 }

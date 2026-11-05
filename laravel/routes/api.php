@@ -98,10 +98,15 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('research-publications', [AdminResearchController::class, 'index']);
     Route::get('research-publications/sync-status', [AdminResearchController::class, 'status']);
     Route::post('research-publications/sync', [AdminResearchController::class, 'sync'])->middleware('throttle:2,1');
+    Route::get('research-publications/{id}', fn (int $id) => app(ContentController::class)->show('research-publications', $id))->whereNumber('id');
+    Route::post('research-publications', fn (\Illuminate\Http\Request $request) => app(ContentController::class)->store($request, 'research-publications'));
+    Route::put('research-publications/{id}', fn (\Illuminate\Http\Request $request, int $id) => app(ContentController::class)->update($request, 'research-publications', $id))->whereNumber('id');
+    Route::delete('research-publications/{id}', fn (int $id) => app(ContentController::class)->destroy('research-publications', $id))->whereNumber('id');
     Route::get('analytics', [AdminOperationsController::class, 'analytics']);
     Route::get('messages', [AdminOperationsController::class, 'messages']);
     Route::get('messages/{messageId}', [AdminOperationsController::class, 'message'])->whereNumber('messageId');
     Route::post('messages/{messageId}/reply', [AdminOperationsController::class, 'reply'])->whereNumber('messageId');
+    Route::post('messages/{messageId}/replies', [AdminOperationsController::class, 'reply'])->whereNumber('messageId');
     Route::patch('messages/{messageId}/status', [AdminOperationsController::class, 'updateStatus'])->whereNumber('messageId');
     Route::delete('messages/{messageId}', [AdminOperationsController::class, 'deleteMessage'])->whereNumber('messageId');
     Route::get('notifications', [AdminOperationsController::class, 'notifications']);
