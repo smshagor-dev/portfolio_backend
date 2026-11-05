@@ -103,6 +103,25 @@ class ImportPortfolioJson extends Command
                 $plan[$modelName] = $records;
                 $count += count($records);
             }
+            // Never silently discard an export collection because an importer
+            // ordering list has not been updated.
+            $order = [
+                'SiteSettings','AiTrainingEntry','Profile','Skill','Experience','Education',
+                'StatsCounter','Achievement','ServiceSection','Service','ServiceComment',
+                'ServiceReply','Project','ProjectComment','ProjectReply','Pricing','Faq',
+                'Testimonial','Article','ResearchPublication','ResearchComment','ResearchReply',
+                'ArticleComment','ArticleReply','ArticleCategory','ArticleCategoryAssignment',
+                'ContactMessage','ContactChatMessage','AdminNotification','EmergencyContact',
+                'AnalyticsSession','AnalyticsDailyVisit','AnalyticsPageView','CvProfile',
+                'JobSource','JobPost','JobSearchPreference','JobBoardSource','JobSourceImportRun',
+                'JobMatch','RecruiterContact','JobEmailDraft','JobAgentEmailEvent',
+            ];
+            $notIncluded = array_diff(array_keys($plan), $order);
+            if ($notIncluded) {
+                throw new \InvalidArgumentException(
+                    'Importer does not support exported collections: '.implode(', ', $notIncluded)
+                );
+            }
             $this->info('Validated '.$count.' records in '.count($plan).' model collections.');
             if (!$this->option('commit')) {
                 $this->warn('DRY RUN only. Use --commit to insert missing IDs into the target MySQL database.');
@@ -112,16 +131,6 @@ class ImportPortfolioJson extends Command
                 $this->warn('Cancelled.');
                 return self::SUCCESS;
             }
-            // Ordering follows the source Prisma schema declaration, parents before children.
-            $order = [
-                'SiteSettings','Profile','Skill','Experience','Education','StatsCounter','Achievement','ServiceSection',
-                'Service','ServiceComment','ServiceReply','Project','ProjectComment','ProjectReply',
-                'Pricing','Faq','Testimonial','Article','ResearchPublication','ResearchComment','ResearchReply',
-                'ArticleComment','ArticleReply','ArticleCategory','ArticleCategoryAssignment',
-                'ContactMessage','ContactChatMessage','AdminNotification','EmergencyContact','AnalyticsSession',
-                'AnalyticsDailyVisit','AnalyticsPageView','CvProfile','JobSource','JobPost','JobSearchPreference',
-                'JobBoardSource','JobSourceImportRun','JobMatch','RecruiterContact','JobEmailDraft','JobAgentEmailEvent',
-            ];
             $inserted = 0;
             DB::transaction(function () use ($order, $plan, &$inserted): void {
                 foreach ($order as $name) {

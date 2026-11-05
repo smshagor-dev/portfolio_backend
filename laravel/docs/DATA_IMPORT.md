@@ -12,3 +12,5 @@ The source Express backend uses MongoDB. Import only into a new isolated MySQL d
 8. Validate all row counts, foreign keys, media URLs, privacy and frontend API contracts before cutover.
 
 The export contains personal data and ticket tokens. Keep it on a secure host; never commit or share it.
+
+Importer checks that every exported model collection has an import handler; unknown/missing mappings fail instead of silently dropping records. AiTrainingEntry is included.
