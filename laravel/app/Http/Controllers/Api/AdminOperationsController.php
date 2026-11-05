@@ -165,9 +165,25 @@ class AdminOperationsController extends Controller
     public function analytics(): JsonResponse
     {
         $now = now();
-        $growth = AnalyticsDailyVisit::selectRaw('DATE(visitDate) as date, COUNT(*) as users')
-            ->where('visitDate', '>=', $now->copy()->subDays(29))
-            ->groupByRaw('DATE(visitDate)')->orderBy('date')->get();
+        // Prisma stores visitDate as a BSON Date. SQL DATE()/GROUP BY
+        // expressions do not work with the MongoDB query builder.
+        $database = DB::connection('mongodb')->getClient()
+            ->selectDatabase((string) config('database.connections.mongodb.database'));
+        $rows = $database->selectCollection('AnalyticsDailyVisit')->aggregate([
+            ['$match' => ['visitDate' => ['$gte' => new \MongoDB\BSON\UTCDateTime(
+                $now->copy()->subDays(29)->startOfDay()->getTimestamp() * 1000
+            )]]],
+            ['$group' => [
+                '_id' => ['$dateToString' => [
+                    'format' => '%Y-%m-%d', 'date' => '$visitDate', 'timezone' => 'UTC',
+                ]],
+                'users' => ['$sum' => 1],
+            ]],
+            ['$sort' => ['_id' => 1]],
+        ]);
+        $growth = collect(iterator_to_array($rows, false))->map(
+            fn ($row) => ['date' => (string) $row['_id'], 'users' => (int) $row['users']]
+        );
         $visitors = AnalyticsSession::orderByDesc('lastSeenAt')->limit(20)->get()->map(
             fn ($row) => [
                 'id' => $row->id, 'userId' => $row->sessionId,
@@ -179,7 +195,8 @@ class AdminOperationsController extends Controller
         return response()->json([
             'source' => 'internal', 'connected' => true,
             'activeUsers' => AnalyticsSession::where('lastSeenAt', '>=', now()->subMinutes(5))->count(),
-            'todayUsers' => AnalyticsDailyVisit::whereDate('visitDate', today())->count(),
+            'todayUsers' => AnalyticsDailyVisit::where('visitDate', '>=', today('UTC')->startOfDay())
+                ->where('visitDate', '<', today('UTC')->addDay()->startOfDay())->count(),
             'last7DaysUsers' => AnalyticsDailyVisit::where('visitDate', '>=', now()->subDays(7))->count(),
             'last30DaysUsers' => AnalyticsDailyVisit::where('visitDate', '>=', now()->subDays(30))->count(),
             'growth' => $growth, 'weekly' => $growth->take(-7)->values(),

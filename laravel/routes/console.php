@@ -32,8 +32,12 @@ Artisan::command('portfolio:status', function (): void {
 // The optional schedules below are unrelated and require an external cron
 // running "php /path/to/artisan schedule:run" every minute.
 if (config('research.enabled')) {
+    // Run at the configured interval on an absolute UTC hour boundary.
+    // Avoid a hard-coded twiceDaily schedule that ignores the .env setting.
     \Illuminate\Support\Facades\Schedule::command('portfolio:sync-research')
-        ->twiceDaily(0, 12)->withoutOverlapping();
+        ->hourly()
+        ->when(fn (): bool => intdiv(time(), 3600) % max(1, min(168, (int) config('research.interval_hours', 12))) === 0)
+        ->withoutOverlapping();
 }
 if (config('job_agent.source_sync_enabled')) {
     \Illuminate\Support\Facades\Schedule::command('portfolio:sync-job-sources')

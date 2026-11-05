@@ -133,8 +133,8 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::post('job-agent/company-sources', [JobCompatibilityController::class, 'addCompany']);
     Route::put('job-agent/company-sources/{id}', [JobCompatibilityController::class, 'updateCompany'])->whereNumber('id');
     Route::delete('job-agent/company-sources/{id}', [JobCompatibilityController::class, 'deleteCompany'])->whereNumber('id');
-    Route::post('job-agent/company-sources/{id}/test', [JobCompatibilityController::class, 'unsupportedCompany'])->whereNumber('id');
-    Route::post('job-agent/company-sources/{id}/import', [JobCompatibilityController::class, 'unsupportedCompany'])->whereNumber('id');
+    Route::post('job-agent/company-sources/{id}/test', [JobCompatibilityController::class, 'testCompany'])->whereNumber('id');
+    Route::post('job-agent/company-sources/{id}/import', [JobCompatibilityController::class, 'importCompany'])->whereNumber('id');
     Route::post('job-agent/jobs/manual-import', [JobAgentController::class, 'manualJob']);
     Route::put('job-agent/jobs/{id}/description', [JobCompatibilityController::class, 'updateDescription'])->whereNumber('id');
     Route::delete('job-agent/jobs/{id}', [JobCompatibilityController::class, 'deleteJob'])->whereNumber('id');

@@ -12,7 +12,9 @@ class ContactMessage extends Model
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'int';
-    public $timestamps = false;
+    public $timestamps = true;
+    const CREATED_AT = 'createdAt';
+    const UPDATED_AT = null;
     protected $hidden = ['ticketToken'];
     protected $fillable = ['name', 'email', 'subject', 'message', 'photo', 'file', 'status', 'ticketToken'];
 
