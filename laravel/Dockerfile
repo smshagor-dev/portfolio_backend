@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     $PHPIZE_DEPS git unzip libonig-dev libzip-dev libicu-dev libxml2-dev libsqlite3-dev libssl-dev \
     && pecl install mongodb \
     && docker-php-ext-enable mongodb \
-    && docker-php-ext-install pdo_sqlite mbstring zip intl bcmath opcache dom xml xmlreader xmlwriter \
+    && docker-php-ext-install ftp pdo_sqlite mbstring zip intl bcmath opcache dom xml xmlreader xmlwriter \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
