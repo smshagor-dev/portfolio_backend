@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\ContactController;
+use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\AnalyticsController;
+use App\Http\Controllers\Api\AssistantController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\PublicSiteController;
 use App\Http\Controllers\Api\ResearchController;
@@ -19,6 +23,16 @@ Route::prefix('site')->group(function (): void {
     Route::get('articles', [PublicSiteController::class, 'articles']);
     Route::get('articles/{slug}', [PublicSiteController::class, 'article']);
     Route::get('blogs', [PublicSiteController::class, 'blogs']);
+    Route::post('contact', [ContactController::class, 'create'])->middleware('throttle:5,1');
+    Route::get('contact-ticket/{messageId}', [ContactController::class, 'show'])->whereNumber('messageId')->middleware('throttle:30,1');
+    Route::post('contact-ticket/{messageId}/messages', [ContactController::class, 'reply'])->whereNumber('messageId')->middleware('throttle:10,1');
+    Route::get('contact-ticket/{messageId}/files/{chatId}/{field}', [ContactController::class, 'download'])->whereNumber('messageId')->whereNumber('chatId')->middleware('throttle:30,1');
+    Route::post('analytics/heartbeat', [AnalyticsController::class, 'heartbeat'])->middleware('throttle:120,1');
+    Route::post('testimonials', [FeedbackController::class, 'testimonial'])->middleware('throttle:5,1');
+    Route::post('{type}/{slug}/comments', [FeedbackController::class, 'comment'])->whereIn('type', ['projects', 'services', 'articles'])->middleware('throttle:5,1');
+    Route::post('{type}/{slug}/comments/{commentId}/replies', [FeedbackController::class, 'reply'])->whereIn('type', ['projects', 'services', 'articles'])->whereNumber('commentId')->middleware('throttle:5,1');
+    Route::post('{type}/{slug}/impression', [FeedbackController::class, 'impression'])->whereIn('type', ['projects', 'services', 'articles'])->middleware('throttle:60,1');
+    Route::post('articles/{slug}/share', [FeedbackController::class, 'articleShare'])->middleware('throttle:30,1');
 });
 
 Route::prefix('research-publications')->group(function (): void {
@@ -27,7 +41,11 @@ Route::prefix('research-publications')->group(function (): void {
     Route::get('{slug}', [ResearchController::class, 'show']);
     Route::post('{slug}/impression', [ResearchController::class, 'impression'])->middleware('throttle:60,1');
     Route::post('{slug}/share', [ResearchController::class, 'share'])->middleware('throttle:20,1');
+    Route::post('{slug}/comments', fn (\Illuminate\Http\Request $request, string $slug) => app(FeedbackController::class)->comment($request, 'research-publications', $slug))->middleware('throttle:5,1');
+    Route::post('{slug}/comments/{commentId}/replies', fn (\Illuminate\Http\Request $request, string $slug, int $commentId) => app(FeedbackController::class)->reply($request, 'research-publications', $slug, $commentId))->whereNumber('commentId')->middleware('throttle:5,1');
 });
+
+Route::post('assistant', [AssistantController::class, 'chat'])->middleware('throttle:10,1');
 
 Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
 

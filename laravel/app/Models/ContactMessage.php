@@ -15,4 +15,9 @@ class ContactMessage extends Model
     protected $casts = [
         'createdAt' => 'datetime',
     ];
+    public function chatMessages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ContactChatMessage::class, 'contactMessageId')->orderBy('createdAt');
+    }
+
 }
