@@ -35,14 +35,37 @@ router.get("/site/founder-projects", async (_req, res) => {
   try {
     const { projects } = await getCurrent();
     return res.json({ success: true, initialized: projects !== null,
-      data: sortFounderProjects((projects || []).filter((p) => p.status !== false)) });
+      data: sortFounderProjects((projects || []).filter((p) => p.status !== false)),
+      section: (await prisma.siteSettings.findUnique({ where: { id: 1 }, select: { founderSection: true } }))?.founderSection || null });
   } catch (error) { return failure(res, error); }
 });
 router.get("/admin/founder-projects", requireAdmin, async (_req, res) => {
   try {
     const { projects } = await getCurrent();
     return res.json({ success: true, initialized: projects !== null,
-      data: sortFounderProjects(projects || []) });
+      data: sortFounderProjects(projects || []),
+      section: (await prisma.siteSettings.findUnique({ where: { id: 1 }, select: { founderSection: true } }))?.founderSection || null });
+  } catch (error) { return failure(res, error); }
+});
+router.put("/admin/founder-section", requireAdmin, async (req, res) => {
+  try {
+    const limits = { eyebrow: 120, title: 300, description: 800, badge: 200, footer: 500 };
+    const section = {};
+    for (const [key,max] of Object.entries(limits)) {
+      const value = req.body?.[key];
+      if (typeof value !== "string" || value.length > max ||
+        (["eyebrow","title","description"].includes(key) && !value.trim())) {
+        return res.status(422).json({ success: false, message: "Invalid founder section field: " + key });
+      }
+      section[key] = value.trim();
+    }
+    const existing = await prisma.siteSettings.findUnique({ where: { id: 1 }, select: { id: true } });
+    if (existing) {
+      await prisma.siteSettings.update({ where: { id: 1 }, data: { founderSection: section } });
+    } else {
+      await prisma.siteSettings.create({ data: { ...getDefaultSiteSettings(), founderSection: section } });
+    }
+    return res.json({ success: true, message: "Founder section updated.", section });
   } catch (error) { return failure(res, error); }
 });
 router.put("/admin/founder-projects", requireAdmin, async (req, res) => {
