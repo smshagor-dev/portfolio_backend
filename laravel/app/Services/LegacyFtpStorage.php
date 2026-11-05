@@ -60,6 +60,15 @@ class LegacyFtpStorage
         return Storage::disk('ftp_private');
     }
 
+    public function deletePrivate(string $path): void
+    {
+        $this->assertPrivateReady();
+        if (!preg_match('~^job-(?:cv|cover-letters)/[a-zA-Z0-9._-]+$~D', $path)) {
+            throw new \InvalidArgumentException('Invalid private FTP deletion path.');
+        }
+        $this->operation('delete', fn () => Storage::disk('ftp_private')->delete($path));
+    }
+
     public function publicDisk(): \Illuminate\Contracts\Filesystem\Filesystem
     {
         $this->assertPublicReady();
@@ -107,7 +116,7 @@ class LegacyFtpStorage
         $this->assertPublicReady();
         $private = trim((string) config('filesystems.disks.ftp_private.root', ''), '/');
         $public = trim((string) config('filesystems.disks.ftp_public.root', ''), '/');
-        if ($private === '' || $private === $public
+        if ($private === '' || $public === '' || $private === $public
             || ($public !== '' && str_starts_with($private.'/', $public.'/'))
             || str_contains($private, '..')) {
             throw new ServiceUnavailableHttpException(null, 'Private FTP storage is not configured outside the public root.');
