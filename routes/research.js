@@ -505,7 +505,7 @@ router.get("/admin/research-publications", requireAdmin, async (request, respons
   }
 });
 
-router.get("/admin/research-publications/sync-status", requireAdmin, async (_request, response) => {
+router.get(["/admin/research-publications/sync-status", "/admin/research-sync/status"], requireAdmin, async (_request, response) => {
   return response.json(
     buildResearchSuccessResponse(
       "Research synchronization status loaded.",
@@ -514,7 +514,7 @@ router.get("/admin/research-publications/sync-status", requireAdmin, async (_req
   );
 });
 
-router.post("/admin/research-publications/sync", requireAdmin, async (request, response) => {
+router.post(["/admin/research-publications/sync", "/admin/research-sync"], requireAdmin, async (request, response) => {
   try {
     const result = await syncResearchPublications({ reason: "admin-manual" });
     request.app.get("io")?.emit("content:updated", {
