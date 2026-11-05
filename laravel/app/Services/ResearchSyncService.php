@@ -88,8 +88,9 @@ class ResearchSyncService
         $day = (int) ($work['publication-date']['day']['value'] ?? 1);
         $year = max(1900, min(2100, $year));
         $month = max(1, min(12, $month));
-        $day = max(1, min(28, $day));
-        $date = Carbon::create($year, $month, $day, 0, 0, 0, 'UTC');
+        $day = max(1, min(31, $day));
+        $lastDay = Carbon::create($year, $month, 1, 0, 0, 0, 'UTC')->daysInMonth;
+        $date = Carbon::create($year, $month, min($day, $lastDay), 0, 0, 0, 'UTC');
         $publicationUrl = (string) ($work['url']['value'] ?? ($doi ? 'https://doi.org/'.$doi : 'https://orcid.org/'.config('research.orcid_id')));
         $abstract = '';
         $authors = [];

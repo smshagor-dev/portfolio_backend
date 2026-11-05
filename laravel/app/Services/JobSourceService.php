@@ -74,7 +74,8 @@ class JobSourceService
                 || !is_string($title) || !$title) {
                 continue;
             }
-            if (JobPost::where('sourceUrl', $jobUrl)->exists()) {
+            $normalizedUrl = Str::limit($jobUrl, 255, '');
+            if (JobPost::where('sourceUrl', $normalizedUrl)->exists()) {
                 $duplicates++;
                 continue;
             }
@@ -83,7 +84,7 @@ class JobSourceService
                 'title' => Str::limit(strip_tags($title), 190, ''),
                 'company' => Str::limit(strip_tags((string) $company), 190, ''),
                 'location' => Str::limit(strip_tags((string) $location), 190, ''),
-                'sourceUrl' => Str::limit($jobUrl, 255, ''),
+                'sourceUrl' => $normalizedUrl,
                 'applyUrl' => Str::limit($jobUrl, 255, ''),
                 'companyUrl' => '',
                 'sourceType' => $source->sourceType,

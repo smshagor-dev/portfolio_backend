@@ -18,7 +18,7 @@ class ResearchSyncParsingTest extends TestCase
         config()->set('research.orcid_id', '0000-0002-1825-0097');
         config()->set('research.author_name', '');
         Http::fake([
-            'pub.orcid.org/*' => Http::response(['group' => [[
+            'https://pub.orcid.org/*' => Http::response(['group' => [[
                 'work-summary' => [[
                     'title' => ['title' => ['value' => 'A Reproducible Software Study']],
                     'journal-title' => ['value' => 'Example Journal'],
