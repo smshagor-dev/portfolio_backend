@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\BulkContentController;
 use App\Http\Controllers\Api\GmailController;
 use App\Http\Controllers\Api\AdminResearchController;
 use App\Http\Controllers\Api\AdminOperationsController;
@@ -110,6 +111,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('legal-pages', [ContentController::class, 'legalPages']);
     Route::put('legal-pages', [ContentController::class, 'updateLegalPages']);
     Route::put('profile', [ContentController::class, 'updateProfile']);
+    Route::put('content', [BulkContentController::class, 'update']);
 
     Route::get('content/{resource}', [ContentController::class, 'index']);
     Route::get('content/{resource}/{id}', [ContentController::class, 'show'])->whereNumber('id');

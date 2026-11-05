@@ -22,20 +22,33 @@ class AdminOperationsController extends Controller
 {
     public function dashboard(): JsonResponse
     {
-        return response()->json([
+        $siteSettings = \App\Models\SiteSettings::find(1)?->toArray() ?? [];
+        unset($siteSettings['smtpPass']);
+        $data = [
+            'profile' => \App\Models\Profile::find(1),
+            'siteSettings' => $siteSettings,
+            'serviceSection' => \App\Models\ServiceSection::find(1),
+            'services' => Service::with('comments.replies')->orderBy('sortOrder')->get(),
+            'statsCounters' => \App\Models\StatsCounter::orderBy('sortOrder')->get(),
+            'achievements' => \App\Models\Achievement::orderBy('sortOrder')->get(),
+            'skills' => \App\Models\Skill::orderBy('sortOrder')->get(),
+            'experiences' => \App\Models\Experience::orderBy('sortOrder')->get(),
+            'educations' => \App\Models\Education::orderBy('sortOrder')->get(),
             'projects' => Project::orderBy('sortOrder')->get(),
-            'services' => Service::orderBy('sortOrder')->get(),
-            'articles' => Article::orderByDesc('createdAt')->limit(100)->get(),
-            'researchPublications' => ResearchPublication::orderByDesc('publishedDate')->limit(100)->get(),
-            'messages' => ContactMessage::orderByDesc('createdAt')->limit(100)->get(),
-            'notifications' => AdminNotification::orderByDesc('createdAt')->limit(100)->get(),
-            'counts' => [
-                'projects' => Project::count(), 'services' => Service::count(),
-                'articles' => Article::count(), 'research' => ResearchPublication::count(),
-                'messages' => ContactMessage::count(),
-                'drafts' => JobEmailDraft::count(),
-            ],
-        ]);
+            'pricings' => \App\Models\Pricing::orderBy('sortOrder')->get(),
+            'faqs' => \App\Models\Faq::orderBy('sortOrder')->get(),
+            'testimonials' => \App\Models\Testimonial::orderBy('sortOrder')->get(),
+            'messages' => ContactMessage::orderByDesc('createdAt')->limit(50)->get(),
+        ];
+        $data['dashboardSummary'] = [
+            'projects' => count($data['projects']),
+            'services' => count($data['services']),
+            'articles' => Article::count(),
+            'researchPublications' => ResearchPublication::count(),
+            'messages' => count($data['messages']),
+            'pendingMessages' => ContactMessage::where('status', 'not_solved')->count(),
+        ];
+        return response()->json($data);
     }
 
     public function messages(): JsonResponse
