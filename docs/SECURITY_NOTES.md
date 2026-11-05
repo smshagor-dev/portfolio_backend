@@ -10,4 +10,4 @@
 - Docker context excludes .env, data imports, logs, vendor and SQL dumps.
 - Root Vercel production remains Express; this Laravel PR is draft and should not be merged before verified staging tests.
 
-Before production: enable HTTPS, secure credentials and logs, rotate secrets, use a limited MySQL user, review rate limits and request origins, run input sanitization and file/content security tests, add monitoring and backups.
+Before production: enable HTTPS, secure credentials and logs, rotate secrets, use a least-privilege MongoDB Atlas user, review rate limits and request origins, run input sanitization and file/content security tests, add monitoring and backups.
