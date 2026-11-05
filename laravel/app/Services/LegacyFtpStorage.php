@@ -123,7 +123,7 @@ class LegacyFtpStorage
         }
     }
 
-    private function filename(string $original, string $fallback, bool $preserve): string
+    private function filename(string $original, string $fallback, bool $preserve = false): string
     {
         $ext = strtolower(pathinfo($original, PATHINFO_EXTENSION));
         // Upload endpoints validate MIME and acceptable extensions before this call.
