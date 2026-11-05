@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AssistantController;
 use App\Http\Controllers\Api\JobAgentController;
+use App\Http\Controllers\Api\JobTrackingController;
 use App\Http\Controllers\Api\JobCompatibilityController;
 use App\Http\Controllers\Api\JobPdfController;
 use App\Http\Controllers\Api\JobSettingsController;
@@ -62,6 +63,9 @@ Route::prefix('research-publications')->group(function (): void {
     Route::post('{slug}/comments', fn (\Illuminate\Http\Request $request, string $slug) => app(FeedbackController::class)->comment($request, 'research-publications', $slug))->middleware('throttle:5,1');
     Route::post('{slug}/comments/{commentId}/replies', fn (\Illuminate\Http\Request $request, string $slug, int $commentId) => app(FeedbackController::class)->reply($request, 'research-publications', $slug, $commentId))->whereNumber('commentId')->middleware('throttle:5,1');
 });
+
+Route::get('job-agent/track/open/{trackingId}.png', [JobTrackingController::class, 'open'])->middleware('throttle:60,1');
+Route::get('job-agent/track/click/{trackingId}', [JobTrackingController::class, 'click'])->middleware('throttle:60,1');
 
 Route::post('assistant', [AssistantController::class, 'chat'])->middleware('throttle:10,1');
 
