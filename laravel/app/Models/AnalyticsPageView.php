@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class AnalyticsPageView extends Model
 {
-    protected $table = 'analytics_page_views';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'AnalyticsPageView';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = false;
     protected $fillable = ['sessionRef', 'path', 'firstViewedAt', 'lastViewedAt', 'viewCount'];
 

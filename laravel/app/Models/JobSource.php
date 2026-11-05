@@ -2,20 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class JobSource extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'job_sources';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
     protected $fillable = ['name', 'type', 'provider', 'status', 'config', 'lastSyncedAt'];
 
     protected $casts = [
-        'config' => 'array',
+
         'lastSyncedAt' => 'datetime',
         'createdAt' => 'datetime',
         'updatedAt' => 'datetime',
