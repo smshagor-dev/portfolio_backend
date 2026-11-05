@@ -112,6 +112,9 @@ class ResearchSyncService
             }
         }
 
+        if (!$abstract && $doi) {
+            $abstract = app(OpenAlexAbstractService::class)->byDoi($doi);
+        }
         $slug = Str::slug($title);
         if (!$slug) {
             $stats['skipped']++;
