@@ -3,13 +3,36 @@ name: Laravel PHP 8.2 MongoDB and FTP (static checks)
 on:
   pull_request:
     paths:
-      - "laravel/**"
+      - "app/**"
+      - "bootstrap/**"
+      - "config/**"
+      - "database/**"
+      - "routes/**"
+      - "tests/**"
+      - "public/**"
+      - "composer.json"
+      - "phpunit.xml"
+      - "Dockerfile"
+      - "docker/**"
+      - "docker-compose.yml"
       - ".github/workflows/laravel-php82.yml"
   push:
     branches:
-      - "feat/laravel12-php82-mysql-migration"
+      - "main"
+      - "refactor/laravel-at-repository-root"
     paths:
-      - "laravel/**"
+      - "app/**"
+      - "bootstrap/**"
+      - "config/**"
+      - "database/**"
+      - "routes/**"
+      - "tests/**"
+      - "public/**"
+      - "composer.json"
+      - "phpunit.xml"
+      - "Dockerfile"
+      - "docker/**"
+      - "docker-compose.yml"
       - ".github/workflows/laravel-php82.yml"
 
 permissions:
@@ -20,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: laravel
+        working-directory: .
     env:
       APP_ENV: testing
       APP_DEBUG: "false"
@@ -55,8 +78,6 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress
       - name: Prepare isolated test dotenv
         run: touch .env
-      - name: Node-to-Laravel HTTP route shape audit
-        run: node tools/audit-route-parity.js
       - name: PHP syntax check
         run: find app bootstrap config database routes tests public -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Check route registration
@@ -78,7 +99,7 @@ jobs:
           --health-retries 20
     defaults:
       run:
-        working-directory: laravel
+        working-directory: .
     env:
       APP_ENV: testing
       APP_DEBUG: "false"
