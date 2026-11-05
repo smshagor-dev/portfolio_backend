@@ -39,7 +39,10 @@ class PortfolioAiService
         $settings = AiSettings::find(1);
         $name = strtolower((string) ($settings?->activeProvider ?: 'openai'));
         $provider = AiProvider::where('name', $name)->where('isActive', true)->first();
-        $key = $provider?->apiKey ? Crypt::decryptString($provider->apiKey) : (string) config('services.portfolio_ai.api_key');
+        // Never send a default OpenAI credential to a different AI provider.
+        $key = $provider?->apiKey
+            ? Crypt::decryptString($provider->apiKey)
+            : ($name === 'openai' ? (string) config('services.portfolio_ai.api_key') : '');
         $model = (string) ($settings?->modelName ?: config('services.portfolio_ai.model'));
         $urls = [
             'openai' => 'https://api.openai.com/v1',
