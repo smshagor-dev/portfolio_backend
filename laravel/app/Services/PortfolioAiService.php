@@ -8,7 +8,7 @@ use App\Models\AiTrainingEntry;
 use App\Models\Profile;
 use App\Models\Project;
 use App\Models\ResearchPublication;
-use Illuminate\Support\Facades\Crypt;
+use App\Services\LegacyCredentialCodec;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -41,7 +41,7 @@ class PortfolioAiService
         $provider = AiProvider::where('name', $name)->where('is_active', true)->first();
         // Never send a default OpenAI credential to a different AI provider.
         $key = $provider?->apiKey
-            ? Crypt::decryptString($provider->apiKey)
+            ? LegacyCredentialCodec::aiProviderKey($provider)
             : ($name === 'openai' ? (string) config('services.portfolio_ai.api_key') : '');
         $model = (string) ($settings?->modelName ?: config('services.portfolio_ai.model'));
         $urls = [

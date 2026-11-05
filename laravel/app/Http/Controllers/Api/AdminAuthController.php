@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\AdminUser;
 use App\Support\Totp;
+use App\Services\LegacyCredentialCodec;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -37,7 +39,7 @@ class AdminAuthController extends Controller
             if (empty($input['twoFactorCode'])) {
                 return response()->json(['requiresTwoFactor' => true, 'message' => 'Enter your 2FA code to continue.']);
             }
-            $secret = $admin->twoFactorSecret ? Crypt::decryptString($admin->twoFactorSecret) : '';
+            $secret = $admin->twoFactorSecret ? LegacyCredentialCodec::totpSecret($admin) : '';
             if (!$secret || !Totp::verify($secret, $input['twoFactorCode'])) {
                 return response()->json(['message' => 'Invalid 2FA code.'], 401);
             }
@@ -56,10 +58,14 @@ class AdminAuthController extends Controller
     {
         $input = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:191'],
-            'email' => ['sometimes', 'required', 'email', 'max:191', 'unique:admin_users,email,'.$request->user()->id],
+            'email' => ['sometimes', 'required', 'email', 'max:191'],
         ]);
         if (isset($input['email'])) {
-            $input['email'] = strtolower($input['email']);
+            $input['email'] = strtolower(trim($input['email']));
+            $other = AdminUser::where('email', $input['email'])->first();
+            if ($other && (string) $other->getKey() !== (string) $request->user()->getKey()) {
+                throw ValidationException::withMessages(['email' => 'This email is already in use.']);
+            }
         }
         $request->user()->update($input);
         return response()->json(['admin' => $this->publicAdmin($request->user()->fresh())]);
@@ -98,7 +104,7 @@ class AdminAuthController extends Controller
     {
         $request->validate(['code' => ['required', 'digits:6']]);
         $admin = $request->user();
-        $secret = $admin->twoFactorSecret ? Crypt::decryptString($admin->twoFactorSecret) : '';
+        $secret = $admin->twoFactorSecret ? LegacyCredentialCodec::totpSecret($admin) : '';
         if ($admin->twoFactorEnabled || !$secret || !Totp::verify($secret, $request->string('code')->toString())) {
             return response()->json(['message' => 'Invalid setup or verification code.'], 422);
         }
@@ -110,7 +116,7 @@ class AdminAuthController extends Controller
     {
         $request->validate(['code' => ['required', 'digits:6']]);
         $admin = $request->user();
-        $secret = $admin->twoFactorSecret ? Crypt::decryptString($admin->twoFactorSecret) : '';
+        $secret = $admin->twoFactorSecret ? LegacyCredentialCodec::totpSecret($admin) : '';
         if (!$admin->twoFactorEnabled || !$secret || !Totp::verify($secret, $request->string('code')->toString())) {
             return response()->json(['message' => 'Invalid 2FA code.'], 422);
         }
