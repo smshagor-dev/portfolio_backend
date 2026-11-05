@@ -25,14 +25,17 @@ Artisan::command('portfolio:admin {email} {name}', function (): void {
 })->purpose('Create or reset a portfolio admin interactively');
 
 Artisan::command('portfolio:status', function (): void {
-    $this->info('Laravel 12 MySQL portfolio backend installed.');
-});
+    $this->info('Laravel 12 / MongoDB Atlas portfolio backend configured.');
+})->purpose('Show the configured Laravel backend type');
 
-// Server cron: * * * * * php /path/to/laravel/artisan schedule:run
-\Illuminate\Support\Facades\Schedule::command('portfolio:sync-research')->twiceDaily(0, 12)->withoutOverlapping();
-
-
-// Production scheduler requires a real external cron entry:
-// * * * * * php /var/www/html/artisan schedule:run
-\Illuminate\Support\Facades\Schedule::command('portfolio:sync-job-sources')
-    ->everySixHours()->withoutOverlapping();
+// FTP uploads are HTTP multipart requests: NO FTP cron, queue, or browser FTP credentials.
+// The optional schedules below are unrelated and require an external cron
+// running "php /path/to/artisan schedule:run" every minute.
+if (config('research.enabled')) {
+    \Illuminate\Support\Facades\Schedule::command('portfolio:sync-research')
+        ->twiceDaily(0, 12)->withoutOverlapping();
+}
+if (config('job_agent.source_sync_enabled')) {
+    \Illuminate\Support\Facades\Schedule::command('portfolio:sync-job-sources')
+        ->everySixHours()->withoutOverlapping();
+}

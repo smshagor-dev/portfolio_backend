@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 class SyncResearchPublications extends Command
 {
     protected $signature = 'portfolio:sync-research';
-    protected $description = 'Synchronize ORCID and available Crossref metadata with MySQL';
+    protected $description = 'Synchronize ORCID and available Crossref metadata with MongoDB';
 
     public function handle(ResearchSyncService $service): int
     {
