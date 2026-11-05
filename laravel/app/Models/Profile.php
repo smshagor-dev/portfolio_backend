@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Profile extends Model
 {
-    protected $table = 'profiles';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'Profile';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
     protected $fillable = ['name', 'profile', 'designation', 'description', 'email', 'phone', 'address', 'github', 'facebook', 'linkedIn', 'twitter', 'stackOverflow', 'leetcode', 'socialLinks', 'devUsername', 'resume', 'heroSkills', 'hardWorker', 'quickLearner', 'problemSolver'];
 
     protected $casts = [
-        'socialLinks' => 'array',
-        'heroSkills' => 'array',
+
+
         'hardWorker' => 'boolean',
         'quickLearner' => 'boolean',
         'problemSolver' => 'boolean',
