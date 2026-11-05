@@ -1,6 +1,6 @@
 # FTP-based uploads (same keys as previous Express uploader)
 
-Set these only in your server's private laravel/.env; never commit credentials.
+Set these only in your server's private .env; never commit credentials.
 The Laravel FTP adapter uses the official league/flysystem-ftp ^3.0 package and
 requires PHP ext-ftp enabled in both CLI and web/FPM.
 
@@ -14,13 +14,13 @@ UPLOAD_STORAGE_FTP_PASSWORD=your-password
 UPLOAD_STORAGE_FTP_SECURE=true
 UPLOAD_STORAGE_FTP_BASE_DIR=public_html
 
-These values directly mirror the existing Node backend's UPLOAD_STORAGE_* keys.
+These values directly mirror the former Express backend's UPLOAD_STORAGE_* keys.
 If BASE_DIR is already the FTP account's public web root, leave it empty.
 The relative path /uploads/abc.jpg is saved on the remote FTP server at
 BASE_DIR/uploads/abc.jpg. The returned publicUrl uses the origin of
-UPLOAD_STORAGE_PUBLIC_BASE_URL; it never points to the Laravel staging host.
+UPLOAD_STORAGE_PUBLIC_BASE_URL; it never points to the Laravel API host.
 
-IMPORTANT: new public uploads NEVER go into laravel/public or Laravel storage.
+IMPORTANT: new public uploads NEVER go into public or Laravel storage.
 If FTP is not configured/accessible, uploads fail with HTTP 503. There is no
 local fallback and no silent success.
 
@@ -29,7 +29,7 @@ UPLOAD_STORAGE_FTP_PRIVATE_BASE_DIR pointing to an actual private folder
 outside BASE_DIR / the FTP-served public website. Until it is configured,
 private CV/PDF operations return 503. Do not put confidential CVs in public_html.
 
-The old Express backend also supports TLS_SERVERNAME and ALLOW_INVALID_CERT.
+The former Express backend supported TLS_SERVERNAME and ALLOW_INVALID_CERT.
 Flysystem's PHP FTP adapter does not implement the old Node TLS option mapping.
 Use a valid FTPS certificate; do not rely on ALLOW_INVALID_CERT=true. Test on
 your staging host before a production change.
