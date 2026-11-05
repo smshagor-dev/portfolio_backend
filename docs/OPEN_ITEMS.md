@@ -1,31 +1,17 @@
-# Required before "full system ready"
+# Remaining verification before production deployment
 
-The codebase contains Laravel scaffolding and partial implementations, **not a verified, production-ready rewrite**. Checkboxes refer to verified behaviour, not presence of PHP files.
+The repository contains a single Laravel 12 PHP backend at its root, backed by existing MongoDB Atlas collections. Removing Express and the original MySQL migration plan does not itself prove runtime or data compatibility.
 
-- [ ] Composer lockfile generated on PHP 8.2-compatible dependency environment
-- [ ] Docker PHP 8.2/MySQL build passes, all migrations apply and all tests pass
-- [ ] Complete 1:1 frontend API contracts (request/response shape, errors, URLs and auth)
-- [ ] Actual MongoDB content export/import, 49-table count and foreign-key reconciliation
-- [ ] Sensitive settings, admin identities and old sessions migrated/rotated securely
-- [x] Laravel public file upload routes target old FTP path/URL contract in code (not live verified)
-- [ ] Actual FTPS upload/download/delete and historical FTP media URL parity verified on staging
-- [ ] Real-time Socket.IO compatibility or frontend transition to Reverb/SSE/polling
-- [ ] Full Job Agent company job boards, recruiter discovery/verification, automatic source scheduling
-- [ ] Gmail OAuth consent and read-only alert ingestion integration tests
-- [ ] SMTP opt-in/approval and daily-limit tests, open/click tracking, CV attachment handling
-- [ ] Job Agent cover-letter PDF rendering, Unicode and private delivery tests
-- [ ] Research ORCID, Crossref and OpenAlex live data quality tests, author role and reconciliation
-- [ ] Real AI provider integrations, verified prompts, fallback behavior and safety limits
-- [ ] Public/admin file validation, SEO verification file approval, analytics and notification parity
-- [ ] Security/rate-limit validation, negative tests, error handling, performance and backup tests
-- [ ] cPanel/PHP-FPM deployment rehearsal, FTP/PHP extension checks, rollback and cutover
+- [ ] Produce and commit a fully tested composer.lock for PHP 8.2.
+- [ ] Run the root-level PHP 8.2 CI checks including route/list and isolated MongoDB integration tests.
+- [ ] Check the deployed Apache/cPanel document root is the repository public/ directory, not the source root.
+- [ ] Test API status, login, bcrypt legacy users, TOTP 2FA and Sanctum token issuance on staging.
+- [ ] Verify all public frontend JSON contracts, founder section CRUD, uploads, research status and job-agent endpoints.
+- [ ] Validate Atlas collections, numeric IDs, write paths, date mapping and permissions with a staging database.
+- [ ] Test FTPS upload/read, private job-agent storage and remote media URL consistency.
+- [ ] Verify historical public uploads (images and PDFs), founder WebP previews, research SVG and Google verification.
+- [ ] Test background research sync, scheduling, Gmail OAuth, notifications and mail safety on staging.
+- [ ] Review security headers, negative tests, asset MIME types, rate limiting, error JSON, backup and recovery.
+- [ ] Run a full production cutover rehearsal, including rollback from backup/pre-laravel-root-20261106.
 
-Local Windows setup is in docs/LOCAL_WINDOWS.md. The current CI workflow is failing without usable job logs and must not be treated as a passing test.
-
-
-## Current code progress (not runtime evidence)
-- Guarded Lever/Greenhouse public ATS adapters and an opt-in six-hour scheduled source sync have been added.
-- Laravel public asset copy command has a dry-run and preserves /uploads and /research paths.
-- Content CRUD input validation, Gmail sender domain parsing and private CV/PDF email attachment opt-in have been strengthened.
-- HTTP route shape coverage was static-only; many advanced job recruiting endpoints still deliberately report unsupported.
-- Newly added tests cover AT​S URL parsing, job source import, nested ORCID journal fields and safe attachment gates.
+The old Express/Prisma server is intentionally absent. The obsolete MySQL import/export commands and Node route parity audit are removed. Root-level deployment instructions are in docs/DEPLOYMENT.md.
