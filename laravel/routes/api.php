@@ -79,6 +79,7 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('t
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'adminIndex']);
+    Route::put('founder-section', [\App\Http\Controllers\Api\FounderProjectsController::class, 'updateSection']);
     Route::put('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'replace']);
     Route::post('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'store']);
     Route::put('founder-projects/{slug}', [\App\Http\Controllers\Api\FounderProjectsController::class, 'update']);
