@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class JobAgentSettings extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'job_agent_settings';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -21,7 +24,7 @@ class JobAgentSettings extends Model
         'sendLimitDate' => 'datetime',
         'autoSendEnabled' => 'boolean',
         'defaultCvProfileId' => 'integer',
-        'approvedApiSources' => 'array',
+
         'createdAt' => 'datetime',
         'updatedAt' => 'datetime',
     ];
