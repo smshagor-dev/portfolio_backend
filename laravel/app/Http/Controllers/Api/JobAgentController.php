@@ -159,6 +159,11 @@ class JobAgentController extends Controller
         ]);
     }
 
+    public function job(int $id): JsonResponse
+    {
+        return response()->json(['job' => JobPost::findOrFail($id)]);
+    }
+
     public function matches(): JsonResponse
     {
         return response()->json(['matches' => JobMatch::orderByDesc('createdAt')->limit(200)->get()]);
