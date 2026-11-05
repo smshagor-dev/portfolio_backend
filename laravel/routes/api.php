@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\AnalyticsController;
 use App\Http\Controllers\Api\AssistantController;
+use App\Http\Controllers\Api\JobAgentController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\PublicSiteController;
 use App\Http\Controllers\Api\ResearchController;
@@ -51,6 +52,19 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('t
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('me', [AdminAuthController::class, 'me']);
+    Route::get('job-agent', [JobAgentController::class, 'index']);
+    Route::get('job-agent/overview', [JobAgentController::class, 'overview']);
+    Route::get('job-agent/jobs', [JobAgentController::class, 'jobs']);
+    Route::get('job-agent/jobs/{id}', [JobAgentController::class, 'job'])->whereNumber('id');
+    Route::get('job-agent/matches', [JobAgentController::class, 'matches']);
+    Route::get('job-agent/drafts', [JobAgentController::class, 'drafts']);
+    Route::get('job-agent/sources', [JobAgentController::class, 'sources']);
+    Route::get('job-agent/search/preferences', [JobAgentController::class, 'preferences']);
+    Route::post('job-agent/jobs/manual', [JobAgentController::class, 'manualJob']);
+    Route::post('job-agent/jobs/{id}/draft', [JobAgentController::class, 'createDraft'])->whereNumber('id');
+    Route::post('job-agent/drafts/{id}/approve', [JobAgentController::class, 'approve'])->whereNumber('id');
+    Route::post('job-agent/drafts/{id}/reject', [JobAgentController::class, 'reject'])->whereNumber('id');
+    Route::post('job-agent/email/send/{id}', [JobAgentController::class, 'sendingUnavailable'])->whereNumber('id');
     Route::put('me', [AdminAuthController::class, 'updateMe']);
     Route::put('me/password', [AdminAuthController::class, 'updatePassword']);
     Route::post('logout', [AdminAuthController::class, 'logout']);
