@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Models\JobBoardSource;
 use App\Models\JobEmailDraft;
 use App\Models\JobPost;
+use App\Models\JobSource;
+use App\Services\JobPublicContactService;
 use App\Models\RecruiterContact;
 use App\Services\JobSourceService;
 use App\Services\CompanyCareerSourceService;
@@ -262,6 +264,62 @@ class JobCompatibilityController extends Controller
             fn ($message) => $message->to($request->user()->email)->subject('Portfolio backend SMTP test')
         );
         return response()->json(['message' => 'SMTP test passed to the mail transport; inbox delivery is not guaranteed.']);
+    }
+
+    public function discoverContacts(int $id, JobPublicContactService $service): JsonResponse
+    {
+        $job = JobPost::findOrFail($id);
+        $result = $service->discover($job);
+        return response()->json(array_merge([
+            'message' => $result['contacts']
+                ? 'Found public company contacts; manual recipient approval is required.'
+                : 'No validated public company contact found.',
+        ], $result));
+    }
+
+    public function revalidateContact(int $id, JobPublicContactService $service): JsonResponse
+    {
+        $contact = RecruiterContact::findOrFail($id);
+        $job = JobPost::findOrFail($contact->jobPostId);
+        $result = $service->evaluate((string) $contact->email, $job);
+        if (!$result['accepted']) {
+            // Do not retain sending permission for a now-invalid recipient.
+            $contact->verified = false;
+            $contact->contactEmailStatus = 'rejected';
+            JobEmailDraft::where('recruiterContactId', $contact->id)
+                ->whereIn('status', ['DRAFT', 'READY'])
+                ->update(['approvalStatus' => 'PENDING', 'status' => 'DRAFT']);
+        }
+        $contact->forceFill([
+            'validationStatus' => $result['accepted'] ? 'valid' : 'rejected',
+            'confidenceScore' => $result['confidenceScore'],
+            'errorMessage' => $result['accepted'] ? '' : implode('; ', $result['reasons']),
+            'lastVerifiedAt' => now(),
+        ])->save();
+        return response()->json(['message' => 'Contact revalidated.', 'contact' => $contact->fresh()]);
+    }
+
+    public function apiPlaceholder(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['sometimes', 'string', 'max:191'],
+            'provider' => ['sometimes', 'string', 'max:191'],
+            'baseUrl' => ['nullable', 'url:https', 'max:255'],
+            'notes' => ['sometimes', 'string', 'max:2000'],
+        ]);
+        // This only records the integration request; it NEVER fetches the
+        // supplied URL or enables unreviewed provider network access.
+        $source = JobSource::create([
+            'name' => $data['name'] ?? 'Approved public job API',
+            'type' => 'api_placeholder',
+            'provider' => $data['provider'] ?? 'public-approved',
+            'status' => 'placeholder',
+            'config' => [
+                'baseUrl' => $data['baseUrl'] ?? '',
+                'notes' => $data['notes'] ?? 'Review provider API terms before integration.',
+            ],
+        ]);
+        return response()->json(['message' => 'API source placeholder saved.', 'source' => $source], 201);
     }
 
     public function notYetSupported(): JsonResponse

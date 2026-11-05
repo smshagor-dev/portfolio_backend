@@ -138,13 +138,13 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::post('job-agent/jobs/manual-import', [JobAgentController::class, 'manualJob']);
     Route::put('job-agent/jobs/{id}/description', [JobCompatibilityController::class, 'updateDescription'])->whereNumber('id');
     Route::delete('job-agent/jobs/{id}', [JobCompatibilityController::class, 'deleteJob'])->whereNumber('id');
-    Route::post('job-agent/jobs/{id}/contact-discovery', [JobCompatibilityController::class, 'notYetSupported'])->whereNumber('id');
-    Route::post('job-agent/contacts/{id}/revalidate', [JobCompatibilityController::class, 'notYetSupported'])->whereNumber('id');
+    Route::post('job-agent/jobs/{id}/contact-discovery', [JobCompatibilityController::class, 'discoverContacts'])->whereNumber('id');
+    Route::post('job-agent/contacts/{id}/revalidate', [JobCompatibilityController::class, 'revalidateContact'])->whereNumber('id');
     Route::post('job-agent/contacts/{id}/reject', [JobCompatibilityController::class, 'rejectContact'])->whereNumber('id');
     Route::post('job-agent/drafts/collect-emails', [JobCompatibilityController::class, 'collectEmails']);
     Route::post('job-agent/drafts/approve-all', [JobCompatibilityController::class, 'approveAll'])->middleware('throttle:3,1');
-    Route::post('job-agent/drafts/{id}/approve-send', [JobCompatibilityController::class, 'notYetSupported'])->whereNumber('id');
-    Route::post('job-agent/sources/api-placeholder', [JobCompatibilityController::class, 'notYetSupported']);
+    Route::post('job-agent/drafts/{id}/approve-send', [JobIntegrationController::class, 'send'])->whereNumber('id');
+    Route::post('job-agent/sources/api-placeholder', [JobCompatibilityController::class, 'apiPlaceholder']);
     Route::get('job-agent/overview', [JobAgentController::class, 'overview']);
     Route::get('job-agent/profile-context', [JobSettingsController::class, 'profile']);
     Route::put('job-agent/profile-context/notes', [JobSettingsController::class, 'notes']);
