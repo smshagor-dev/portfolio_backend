@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\AdminResearchController;
 use App\Http\Controllers\Api\AdminOperationsController;
 use App\Http\Controllers\Api\UploadController;
 use App\Http\Controllers\Api\ContactController;
@@ -55,6 +56,9 @@ Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('t
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::get('me', [AdminAuthController::class, 'me']);
     Route::get('dashboard', [AdminOperationsController::class, 'dashboard']);
+    Route::get('research-publications', [AdminResearchController::class, 'index']);
+    Route::get('research-publications/sync-status', [AdminResearchController::class, 'status']);
+    Route::post('research-publications/sync', [AdminResearchController::class, 'sync'])->middleware('throttle:2,1');
     Route::get('analytics', [AdminOperationsController::class, 'analytics']);
     Route::get('messages', [AdminOperationsController::class, 'messages']);
     Route::get('messages/{messageId}', [AdminOperationsController::class, 'message'])->whereNumber('messageId');

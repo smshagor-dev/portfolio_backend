@@ -27,3 +27,6 @@ Artisan::command('portfolio:admin {email} {name}', function (): void {
 Artisan::command('portfolio:status', function (): void {
     $this->info('Laravel 12 MySQL portfolio backend installed.');
 });
+
+// Server cron: * * * * * php /path/to/laravel/artisan schedule:run
+\Illuminate\Support\Facades\Schedule::command('portfolio:sync-research')->twiceDaily(0, 12)->withoutOverlapping();

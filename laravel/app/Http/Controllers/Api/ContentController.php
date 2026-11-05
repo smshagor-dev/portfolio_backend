@@ -113,7 +113,15 @@ class ContentController extends Controller
         $model = $this->model($resource);
         abort_unless($model, 404);
         $record = $model::findOrFail($id);
-        $record->update($this->validatedPayload($request, $resource));
+        $payload = $this->validatedPayload($request, $resource);
+        // Explicit editorial changes are authoritative over ORCID/Crossref sync.
+        if ($resource === 'research-publications') {
+            $original = (string) ($payload['content'] ?? $record->content ?? '');
+            if (!str_contains($original, \App\Services\ResearchSyncService::OVERRIDE_MARKER)) {
+                $payload['content'] = \App\Services\ResearchSyncService::OVERRIDE_MARKER."\n".$original;
+            }
+        }
+        $record->update($payload);
         return response()->json(['message' => 'Updated successfully.', 'data' => $record->fresh()]);
     }
 
