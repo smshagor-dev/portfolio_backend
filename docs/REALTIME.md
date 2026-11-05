@@ -23,7 +23,7 @@ Event: ticket:message. Reconnect with Last-Event-ID set to the last received num
 - This is **poll-based SSE**, not Socket.IO or a WebSocket implementation.
 - The request stays connected for up to 20 seconds and the client must reconnect automatically.
 - Each concurrent stream occupies a PHP-FPM worker; configure FPM limits and Nginx buffering, and use Reverb/Redis or dedicated event infrastructure before high-traffic deployment.
-- Notification records are persisted in MySQL, so a reconnect can resume without a distributed in-memory queue.
+- Notification records are persisted in MongoDB, so a reconnect can resume without a distributed in-memory queue.
 - The streams publish no automatic external emails or pushes.
 
 The bundled Nginx configuration preserves dynamic /api/research-publications/default-thumbnail.svg routing while enforcing a restrictive CSP for static SVG files.
