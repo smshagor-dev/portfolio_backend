@@ -7,6 +7,7 @@ use App\Models\JobEmailDraft;
 use App\Models\JobPost;
 use App\Models\RecruiterContact;
 use App\Services\JobSourceService;
+use App\Services\CompanyCareerSourceService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -81,17 +82,25 @@ class JobCompatibilityController extends Controller
             'careersUrl' => ['required', 'url:https', 'max:255'],
             'region' => ['sometimes', 'string', 'max:191'],
         ]);
+        $adapter = CompanyCareerSourceService::recognize($input['careersUrl']);
         $source = JobBoardSource::create([
-            'sourceName' => $input['companyName'], 'companyName' => $input['companyName'],
+            'sourceName' => $input['companyName'],
+            'companyName' => $input['companyName'],
             'region' => $input['region'] ?? '',
             'sourceType' => 'COMPANY_CAREER_SITE',
-            'baseUrl' => $input['careersUrl'], 'careersUrl' => $input['careersUrl'],
-            'detectedProvider' => 'UNTESTED', 'extractionStatus' => 'UNSUPPORTED',
-            'extractionMessage' => 'Company adapter not yet implemented. URL stored without crawling.',
-            'enabled' => false, 'status' => 'Planned',
+            'baseUrl' => $adapter['apiUrl'] ?? $input['careersUrl'],
+            'careersUrl' => $input['careersUrl'],
+            'detectedProvider' => $adapter['provider'] ?? 'UNSUPPORTED',
+            'extractionStatus' => $adapter ? 'READY_TO_TEST' : 'UNSUPPORTED',
+            'extractionMessage' => $adapter
+                ? 'Supported public ATS. Administrator must enable source before import.'
+                : 'No approved API adapter. URL saved without crawling.',
+            'enabled' => false,
+            'status' => 'Planned',
         ]);
         return response()->json([
-            'message' => 'Company source saved, but not enabled for crawling.', 'source' => $source,
+            'message' => 'Company source saved disabled; inspect before enabling.',
+            'source' => $source,
         ], 201);
     }
 
@@ -103,15 +112,19 @@ class JobCompatibilityController extends Controller
             'careersUrl' => ['sometimes', 'url:https', 'max:255'],
             'region' => ['sometimes', 'string', 'max:191'],
             'notes' => ['sometimes', 'string', 'max:2000'],
+            'enabled' => ['sometimes', 'boolean'],
         ]);
-        $source->fill($input);
-        if (isset($input['companyName'])) {
-            $source->sourceName = $input['companyName'];
+        $url = $input['careersUrl'] ?? $source->careersUrl;
+        $adapter = CompanyCareerSourceService::recognize($url);
+        if (!empty($input['enabled']) && !$adapter) {
+            return response()->json(['message' => 'This career site has no approved public API adapter.'], 422);
         }
-        if (isset($input['careersUrl'])) {
-            $source->baseUrl = $input['careersUrl'];
-        }
-        $source->enabled = false;
+        $source->fill(array_intersect_key($input, array_flip(['companyName','careersUrl','region','notes'])));
+        $source->sourceName = $input['companyName'] ?? $source->sourceName;
+        $source->baseUrl = $adapter['apiUrl'] ?? $url;
+        $source->detectedProvider = $adapter['provider'] ?? 'UNSUPPORTED';
+        $source->extractionStatus = $adapter ? 'READY_TO_TEST' : 'UNSUPPORTED';
+        $source->enabled = (bool) ($input['enabled'] ?? false);
         $source->save();
         return response()->json(['source' => $source->fresh()]);
     }
@@ -122,13 +135,36 @@ class JobCompatibilityController extends Controller
         return response()->json(['message' => 'Company source deleted.']);
     }
 
-    public function unsupportedCompany(int $id): JsonResponse
+    public function testCompany(int $id): JsonResponse
     {
-        JobBoardSource::where('sourceType', 'COMPANY_CAREER_SITE')->findOrFail($id);
+        $source = JobBoardSource::where('sourceType', 'COMPANY_CAREER_SITE')->findOrFail($id);
+        $adapter = CompanyCareerSourceService::recognize((string) $source->careersUrl);
+        if (!$adapter) {
+            return response()->json([
+                'supported' => false, 'message' => 'This career site requires a separate reviewed adapter.',
+            ], 501);
+        }
         return response()->json([
-            'supported' => false,
-            'message' => 'No verified adapter for this career site; import was not attempted.',
-        ], 501);
+            'supported' => true, 'provider' => $adapter['provider'],
+            'endpoint' => $adapter['apiUrl'], 'enabled' => (bool) $source->enabled,
+            'message' => 'Recognized approved public API. No network request was performed.',
+        ]);
+    }
+
+    public function importCompany(int $id, JobSourceService $service): JsonResponse
+    {
+        $source = JobBoardSource::where('sourceType', 'COMPANY_CAREER_SITE')->findOrFail($id);
+        abort_unless($source->enabled, 409, 'Enable the verified source before import.');
+        $adapter = CompanyCareerSourceService::recognize((string) $source->careersUrl);
+        abort_unless($adapter && hash_equals($adapter['apiUrl'], (string) $source->baseUrl),
+            422, 'Source API URL does not match the approved provider.');
+        try {
+            $result = $service->sync($source);
+            return response()->json(['sourceId' => $source->id, 'result' => $result]);
+        } catch (\Throwable $error) {
+            report($error);
+            return response()->json(['message' => 'Company source import failed. See server logs.'], 502);
+        }
     }
 
     public function updateDescription(Request $request, int $id): JsonResponse

@@ -30,3 +30,9 @@ Artisan::command('portfolio:status', function (): void {
 
 // Server cron: * * * * * php /path/to/laravel/artisan schedule:run
 \Illuminate\Support\Facades\Schedule::command('portfolio:sync-research')->twiceDaily(0, 12)->withoutOverlapping();
+
+
+// Production scheduler requires a real external cron entry:
+// * * * * * php /var/www/html/artisan schedule:run
+\Illuminate\Support\Facades\Schedule::command('portfolio:sync-job-sources')
+    ->everySixHours()->withoutOverlapping();
