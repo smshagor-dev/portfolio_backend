@@ -25,4 +25,9 @@ class Article extends Model
         'createdAt' => 'datetime',
         'updatedAt' => 'datetime',
     ];
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ArticleComment::class, 'articleId');
+    }
+
 }

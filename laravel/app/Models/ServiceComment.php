@@ -20,4 +20,9 @@ class ServiceComment extends Model
         'createdAt' => 'datetime',
         'updatedAt' => 'datetime',
     ];
+    public function replies(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ServiceReply::class, 'commentId');
+    }
+
 }

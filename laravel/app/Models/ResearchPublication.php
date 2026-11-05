@@ -24,4 +24,9 @@ class ResearchPublication extends Model
         'createdAt' => 'datetime',
         'updatedAt' => 'datetime',
     ];
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ResearchComment::class, 'publicationId');
+    }
+
 }
