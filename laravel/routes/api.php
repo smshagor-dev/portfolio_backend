@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/health', [StatusController::class, 'health']);
 
 Route::prefix('site')->group(function (): void {
+    Route::get('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'publicIndex']);
     Route::get('home', [PublicSiteController::class, 'home']);
     Route::get('settings', [PublicSiteController::class, 'settingsJson']);
     Route::get('pricing', [PublicSiteController::class, 'pricings']);
@@ -76,6 +77,10 @@ Route::get('admin/job-agent/gmail/callback', [GmailController::class, 'callback'
 Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
+    Route::get('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'adminIndex']);
+    Route::post('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'store']);
+    Route::put('linkedin-posts/{postId}', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'update']);
+    Route::delete('linkedin-posts/{postId}', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'destroy']);
     Route::get('me', [AdminAuthController::class, 'me']);
     Route::get('dashboard', [AdminOperationsController::class, 'dashboard']);
     Route::get('articles', [AdminCmsCompatibilityController::class, 'articles']);
