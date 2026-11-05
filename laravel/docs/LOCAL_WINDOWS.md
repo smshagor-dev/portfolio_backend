@@ -17,6 +17,7 @@ Laravel uses a separate MySQL database; the Node/Vercel production backend is no
     docker compose exec app php artisan storage:link
     docker compose exec app php artisan route:list
     docker compose exec app php artisan test
+    docker compose exec app php artisan portfolio:preflight
 
 6. Open http://localhost:8080/api/health and verify status ok.
 
@@ -48,3 +49,5 @@ Legacy media (dry-run first, then confirm):
     docker compose exec app php artisan portfolio:import-assets --commit
 
 The Docker Compose stack mounts the old ../public/ directory read-only at /var/www/legacy-public, so both commands work inside the container. Imported files are copied only into laravel/public, which is backed by a local volume.
+
+The local Docker build installs Composer dev dependencies (including PHPUnit) and PDO SQLite for in-memory test isolation. Production builds default to no-dev. When a verified composer.lock becomes available, commit it to pin exact dependency versions before deployment.
