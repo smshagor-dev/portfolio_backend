@@ -480,6 +480,8 @@ model SiteSettings {
   contactEmail               String
   mobileNumber               String
   footerText                 String
+  founderProjects            Json?
+  founderSection             Json?
   privacyPolicyHtml          String
   termsConditionsHtml        String
   canonicalUrl               String

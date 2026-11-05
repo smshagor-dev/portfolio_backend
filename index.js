@@ -17,6 +17,7 @@ const jobAgentRoutes = require("./routes/job-agent");
 const jobAgentTrackingRoutes = require("./routes/job-agent-tracking");
 const researchRoutes = require("./routes/research");
 const siteRoutes = require("./routes/site");
+const founderProjectsRoutes = require("./routes/founder-projects");
 
 const app = express();
 const port = Number(process.env.PORT || 5000);
@@ -497,6 +498,7 @@ app.get("/health", (_request, response) => {
 });
 
 app.use("/api/site", siteRoutes);
+app.use("/api", founderProjectsRoutes);
 app.use("/api/job-agent", jobAgentTrackingRoutes);
 app.use("/api/admin/job-agent", jobAgentRoutes);
 app.use("/api/admin", adminRoutes);

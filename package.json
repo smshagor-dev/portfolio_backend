@@ -14,7 +14,8 @@
     "smoke:job-agent-prompt": "node scripts/job-agent-prompt-smoke.js",
     "dev": "node scripts/stop-port-process.js 5000 && npm run db:setup && nodemon --exec \"node -r ./routes/linkedin-posts\" index.js",
     "start": "npm run db:prepare && node -r ./routes/linkedin-posts index.js",
-    "vercel-build": "npm run db:generate"
+    "vercel-build": "npm run db:generate",
+    "test:founder": "node --test tests/founder-projects.test.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",

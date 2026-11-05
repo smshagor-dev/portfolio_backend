@@ -15,10 +15,12 @@ class SiteSettings extends Model
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
-    protected $fillable = ['websiteTitle', 'websiteDescription', 'navTitle', 'navSubtitle', 'seoTitle', 'seoDescription', 'seoKeywords', 'seoImage', 'websiteIcon', 'heroHeaderText', 'heroDescription', 'heroImage', 'contactEmail', 'mobileNumber', 'footerText', 'privacyPolicyHtml', 'termsConditionsHtml', 'canonicalUrl', 'googleSiteVerification', 'googleVerificationFilePath', 'googleAnalyticsId', 'googleTagManagerId', 'adsenseHeadCode', 'adsensePageTopCode', 'adsenseBetweenSectionsCode', 'adsensePageBottomCode', 'robotsIndexingEnabled', 'robotsFollowEnabled', 'smtpHost', 'smtpPort', 'smtpUser', 'smtpSecure', 'smtpFromEmail', 'smtpFromName', 'smtpReplyToEmail', 'smtpToEmail'];
+    protected $fillable = ['websiteTitle', 'websiteDescription', 'navTitle', 'navSubtitle', 'seoTitle', 'seoDescription', 'seoKeywords', 'seoImage', 'websiteIcon', 'heroHeaderText', 'heroDescription', 'heroImage', 'contactEmail', 'mobileNumber', 'footerText', 'founderProjects', 'founderSection', 'privacyPolicyHtml', 'termsConditionsHtml', 'canonicalUrl', 'googleSiteVerification', 'googleVerificationFilePath', 'googleAnalyticsId', 'googleTagManagerId', 'adsenseHeadCode', 'adsensePageTopCode', 'adsenseBetweenSectionsCode', 'adsensePageBottomCode', 'robotsIndexingEnabled', 'robotsFollowEnabled', 'smtpHost', 'smtpPort', 'smtpUser', 'smtpSecure', 'smtpFromEmail', 'smtpFromName', 'smtpReplyToEmail', 'smtpToEmail'];
     protected $hidden = ['smtpPass'];
 
     protected $casts = [
+        'founderProjects' => 'array',
+        'founderSection' => 'array',
         'robotsIndexingEnabled' => 'boolean',
         'robotsFollowEnabled' => 'boolean',
         'smtpPort' => 'integer',
