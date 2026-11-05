@@ -32,6 +32,7 @@ Route::get('/health', [StatusController::class, 'health']);
 Route::prefix('site')->group(function (): void {
     Route::get('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'publicIndex']);
     Route::get('home', [PublicSiteController::class, 'home']);
+    Route::get('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'publicIndex']);
     Route::get('settings', [PublicSiteController::class, 'settingsJson']);
     Route::get('pricing', [PublicSiteController::class, 'pricings']);
     Route::get('pricing/{slug}', [PublicSiteController::class, 'pricing']);
@@ -77,6 +78,11 @@ Route::get('admin/job-agent/gmail/callback', [GmailController::class, 'callback'
 Route::post('admin/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
 
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
+    Route::get('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'adminIndex']);
+    Route::put('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'replace']);
+    Route::post('founder-projects', [\App\Http\Controllers\Api\FounderProjectsController::class, 'store']);
+    Route::put('founder-projects/{slug}', [\App\Http\Controllers\Api\FounderProjectsController::class, 'update']);
+    Route::delete('founder-projects/{slug}', [\App\Http\Controllers\Api\FounderProjectsController::class, 'destroy']);
     Route::get('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'adminIndex']);
     Route::post('linkedin-posts', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'store']);
     Route::put('linkedin-posts/{postId}', [\App\Http\Controllers\Api\LinkedInPostsController::class, 'update']);
