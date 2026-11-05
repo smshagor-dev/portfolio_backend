@@ -62,12 +62,13 @@ class JobIntegrationController extends Controller
     public function addContact(Request $request): JsonResponse
     {
         $input = $request->validate([
-            'jobPostId' => ['required', 'integer', 'exists:job_posts,id'],
+            'jobPostId' => ['required', 'integer', 'min:1'],
             'name' => ['sometimes', 'string', 'max:191'],
             'email' => ['required', 'email', 'max:191'],
             'companyDomain' => ['required', 'string', 'max:191'],
             'sourceUrl' => ['required', 'url:https', 'max:255'],
         ]);
+        \App\Models\JobPost::findOrFail($input['jobPostId']);
         $contact = RecruiterContact::create(array_merge([
             'companyName' => '', 'source' => 'manual',
             'verification' => 'manual', 'verified' => false,

@@ -217,7 +217,7 @@ class JobAgentController extends Controller
     {
         $job = JobPost::findOrFail($id);
         $input = $request->validate([
-            'recruiterContactId' => ['required', 'integer', 'exists:recruiter_contacts,id'],
+            'recruiterContactId' => ['required', 'integer', 'min:1'],
             'toEmail' => ['required', 'email', 'max:191'],
             'subject' => ['required', 'string', 'max:191'],
             'body' => ['required', 'string', 'max:20000'],

@@ -55,15 +55,20 @@ class AdminOperationsController extends Controller
 
     public function messages(): JsonResponse
     {
+        $page = ContactMessage::orderByDesc('createdAt')->paginate(50);
         return response()->json([
-            'messages' => ContactMessage::orderByDesc('createdAt')->paginate(50),
+            'messages' => $page->items(),
+            'pagination' => [
+                'page' => $page->currentPage(), 'limit' => $page->perPage(),
+                'total' => $page->total(), 'totalPages' => max(1, $page->lastPage()),
+            ],
         ]);
     }
 
     public function message(int $messageId): JsonResponse
     {
         $ticket = ContactMessage::with('chatMessages')->findOrFail($messageId);
-        return response()->json(['data' => $ticket]);
+        return response()->json(['message' => $ticket, 'data' => $ticket]);
     }
 
     public function reply(Request $request, int $messageId, LegacyFtpStorage $ftp): JsonResponse

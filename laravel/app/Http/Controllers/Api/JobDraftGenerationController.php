@@ -31,7 +31,7 @@ class JobDraftGenerationController extends Controller
     {
         $job = JobPost::findOrFail($id);
         $input = $request->validate([
-            'recruiterContactId' => ['required', 'integer', 'exists:recruiter_contacts,id'],
+            'recruiterContactId' => ['required', 'integer', 'min:1'],
             'instructions' => ['sometimes', 'string', 'max:1200'],
         ]);
         $contact = RecruiterContact::where('jobPostId', $job->id)->findOrFail($input['recruiterContactId']);
@@ -68,7 +68,7 @@ class JobDraftGenerationController extends Controller
         $input = $request->validate([
             'subject' => ['sometimes', 'string', 'min:1', 'max:191'],
             'body' => ['sometimes', 'string', 'min:1', 'max:20000'],
-            'recruiterContactId' => ['sometimes', 'integer', 'exists:recruiter_contacts,id'],
+            'recruiterContactId' => ['sometimes', 'integer', 'min:1'],
         ]);
         $draft = JobEmailDraft::findOrFail($id);
         abort_unless(in_array($draft->status, ['DRAFT', 'READY', 'REJECTED'], true), 409);
