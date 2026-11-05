@@ -2,58 +2,79 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\SiteSettings;
+use App\Services\LegacyFtpStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Storage;
 
 class UploadController extends Controller
 {
-    public function publicImage(Request $request): JsonResponse
+    public function publicImage(Request $request, LegacyFtpStorage $ftp): JsonResponse
     {
         $request->validate([
-            'image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
         ]);
-        $path = $request->file('image')->store('uploads/feedback', 'public');
+        $stored = $ftp->uploadPublic($request->file('image'), 'image');
         return response()->json([
             'message' => 'Image uploaded successfully.',
-            'path' => '/storage/'.$path,
-            'publicUrl' => Storage::disk('public')->url($path),
+            'path' => $stored['path'],
+            'publicUrl' => $stored['publicUrl'],
         ], 201);
     }
 
-    public function image(Request $request): JsonResponse
+    public function image(Request $request, LegacyFtpStorage $ftp): JsonResponse
     {
-        $request->validate(['image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120']]);
-        $path = $request->file('image')->store('uploads', 'public');
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp,gif', 'max:5120'],
+        ]);
+        $stored = $ftp->uploadPublic($request->file('image'), 'profile-image');
         return response()->json([
             'message' => 'Image uploaded successfully.',
-            'path' => '/storage/'.$path,
-            'publicUrl' => Storage::disk('public')->url($path),
+            'path' => $stored['path'],
+            'publicUrl' => $stored['publicUrl'],
         ], 201);
     }
 
-    public function resume(Request $request): JsonResponse
+    public function resume(Request $request, LegacyFtpStorage $ftp): JsonResponse
     {
-        $request->validate(['resume' => ['required', 'file', 'mimes:pdf', 'max:10240']]);
-        $path = $request->file('resume')->store('resumes', 'public');
+        $request->validate([
+            'resume' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+        ]);
+        $stored = $ftp->uploadPublic($request->file('resume'), 'resume');
         return response()->json([
             'message' => 'Resume uploaded successfully.',
-            'path' => '/storage/'.$path,
-            'publicUrl' => Storage::disk('public')->url($path),
+            'path' => $stored['path'],
+            'publicUrl' => $stored['publicUrl'],
         ], 201);
     }
 
-    public function verification(Request $request): JsonResponse
+    public function verification(Request $request, LegacyFtpStorage $ftp): JsonResponse
     {
         $request->validate([
             'verificationFile' => ['required', 'file', 'mimes:html,txt', 'max:1024'],
         ]);
-        // Stored privately; manual approval required before any root-level placement.
-        $path = $request->file('verificationFile')->store('verification-pending', 'local');
+        $file = $request->file('verificationFile');
+        $name = $file->getClientOriginalName();
+        $body = file_get_contents($file->getRealPath());
+        // Root-level verification files are active web content; only publish
+        // narrowly scoped Google text verification, never arbitrary HTML.
+        abort_unless(
+            preg_match('/^google[a-zA-Z0-9_-]+\.html$/D', $name)
+            && is_string($body)
+            && preg_match('/^google-site-verification:\s*google[a-zA-Z0-9_-]+\.html\s*$/D', trim($body)),
+            422,
+            'Only plain-text Google verification HTML files can be published to the FTP web root.'
+        );
+        $stored = $ftp->uploadPublic($file, 'google-verification', '', true);
+        $canonical = rtrim((string) (SiteSettings::find(1)?->canonicalUrl ?? ''), '/');
+        $publicUrl = $canonical !== '' && filter_var($canonical, FILTER_VALIDATE_URL)
+            ? $canonical.$stored['path']
+            : $stored['publicUrl'];
         return response()->json([
-            'message' => 'Verification file saved for review. It has not been published.',
-            'path' => $path,
+            'message' => 'Verification file uploaded successfully.',
+            'path' => $stored['path'],
+            'publicUrl' => $publicUrl,
         ], 201);
     }
 }
