@@ -27,7 +27,7 @@ class AdminNotification extends Model
     {
         static::creating(function ($model): void {
             if (!$model->id) {
-                $model->id = (string) \Illuminate\Support\Str::uuid();
+                $model->id = (string) \Illuminate\Support\Str::orderedUuid();
             }
         });
     }

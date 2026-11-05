@@ -46,7 +46,7 @@ class LiveEventsController extends Controller
     public function admin(Request $request): StreamedResponse
     {
         $lastId = (string) ($request->header('Last-Event-ID') ?: $request->query('lastEventId', ''));
-        $lastId = preg_match('/^[a-f0-9-]{36}$/iD', $lastId) ? $lastId : '';
+        $lastId = preg_match('/^[a-zA-Z0-9_-]{10,64}$/D', $lastId) ? $lastId : '';
         $previous = $lastId ? AdminNotification::find($lastId) : null;
         $since = $previous?->createdAt ?? now()->startOfSecond();
 
