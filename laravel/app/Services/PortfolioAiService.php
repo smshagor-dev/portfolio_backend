@@ -19,8 +19,8 @@ class PortfolioAiService
         $profile = Profile::find(1)?->only(['name', 'profile', 'designation', 'description', 'email', 'github', 'linkedIn']) ?? [];
         $terms = collect(preg_split('/[^\pL\pN]+/u', Str::lower($message)))->filter(fn ($s) => mb_strlen($s) > 3)->unique()->values();
         $projects = Project::orderByDesc('updatedAt')->limit(100)->get(['name', 'description', 'tools', 'role', 'demo']);
-        $research = ResearchPublication::where('status', 'published')->orderByDesc('publishedDate')->limit(80)->get(['title', 'shortSummary', 'doi', 'publicationUrl']);
-        $training = AiTrainingEntry::where('isActive', true)->limit(100)->get(['question', 'answer']);
+        $research = ResearchPublication::where('status', 'published')->orderByDesc('published_date')->limit(80)->get(['title', 'short_summary', 'doi', 'publication_url']);
+        $training = AiTrainingEntry::where('is_active', true)->limit(100)->get(['question', 'answer']);
         $score = function ($item) use ($terms): int {
             $text = mb_strtolower(implode(' ', array_filter(array_values($item->toArray()), 'is_string')));
             return $terms->sum(fn ($term) => str_contains($text, $term) ? 1 : 0);

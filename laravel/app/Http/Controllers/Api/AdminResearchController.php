@@ -13,7 +13,7 @@ class AdminResearchController extends Controller
     {
         return response()->json([
             'success' => true, 'message' => 'Research publications loaded.',
-            'data' => ResearchPublication::orderByDesc('publishedDate')->limit(300)->get(),
+            'data' => ResearchPublication::orderByDesc('published_date')->limit(300)->get(),
             'sync' => $service->status(),
             'mode' => 'orcid-crossref',
         ]);
