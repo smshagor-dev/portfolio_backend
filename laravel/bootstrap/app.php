@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // Admin API uses Sanctum bearer tokens, not stateful cookie sessions.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Always render API failures as JSON, including validation, throttling,
+        // authentication and 404/500 errors. This prevents the login UI from
+        // attempting to parse an HTML Laravel exception page as JSON.
+        $exceptions->shouldRenderJsonWhen(
+            fn (\Illuminate\Http\Request $request, \Throwable $e): bool =>
+                $request->is('api/*') || $request->expectsJson()
+        );
     })
     ->create();
