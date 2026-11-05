@@ -82,7 +82,7 @@ class ResearchSyncService
                 break;
             }
         }
-        $publisher = trim((string) ($work['journal-title'] ?? ''));
+        $publisher = trim((string) data_get($work, 'journal-title.value', ''));
         $year = (int) ($work['publication-date']['year']['value'] ?? date('Y'));
         $month = (int) ($work['publication-date']['month']['value'] ?? 1);
         $day = (int) ($work['publication-date']['day']['value'] ?? 1);
@@ -141,7 +141,7 @@ class ResearchSyncService
             'publicationUrl' => $publicationUrl,
             'citationUrl' => $doi ? 'https://doi.org/'.$doi : null,
             'authors' => $authors,
-            'myAuthorRole' => null,
+            'myAuthorRole' => $this->authorRole($authors) ?? $existing?->myAuthorRole,
             'thumbnailImage' => '/api/research-publications/default-thumbnail.svg',
             'status' => 'published',
         ];
@@ -154,4 +154,24 @@ class ResearchSyncService
             $stats['created']++;
         }
     }
+
+    private function authorRole(array $authors): ?string
+    {
+        $authorName = trim((string) config('research.author_name', ''));
+        if (!$authorName || !$authors) {
+            return null;
+        }
+        $normalized = mb_strtolower(preg_replace('/\s+/u', ' ', $authorName));
+        foreach ($authors as $index => $name) {
+            if (mb_strtolower(preg_replace('/\s+/u', ' ', trim((string) $name))) !== $normalized) {
+                continue;
+            }
+            if (count($authors) === 1) {
+                return 'Sole author';
+            }
+            return $index === 0 ? 'First author' : ($index === count($authors) - 1 ? 'Last author' : 'Co-author');
+        }
+        return null; // Never invent author positions when metadata is incomplete.
+    }
+
 }

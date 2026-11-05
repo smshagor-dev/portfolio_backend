@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use App\Models\CvProfile;
 
 class JobIntegrationController extends Controller
 {
@@ -86,8 +88,43 @@ class JobIntegrationController extends Controller
 
     public function send(Request $request, int $id): JsonResponse
     {
+        $request->validate([
+            'attachCv' => ['sometimes', 'boolean'],
+            'attachCoverLetter' => ['sometimes', 'boolean'],
+        ]);
+        $wantsCv = $request->boolean('attachCv');
+        $wantsLetter = $request->boolean('attachCoverLetter');
+        if (($wantsCv || $wantsLetter) && !config('job_agent.allow_attachments')) {
+            return response()->json(['message' => 'Attachments are disabled by server configuration.'], 422);
+        }
         if (!config('job_agent.allow_sending') || config('mail.default') !== 'smtp') {
             return response()->json(['message' => 'SMTP sending disabled by server configuration.'], 503);
+        }
+
+        // Attach only explicitly requested files from private, known folders.
+        // Check paths and size before reserving a daily send slot.
+        $attachments = [];
+        if ($wantsCv || $wantsLetter) {
+            $preview = JobEmailDraft::findOrFail($id);
+            $sources = [];
+            if ($wantsCv) {
+                $sources['CV'] = (string) ($preview->cvUrl ?: CvProfile::where('isDefault', true)->value('resumeUrl'));
+            }
+            if ($wantsLetter) {
+                $sources['Cover letter'] = (string) $preview->coverLetterPdfUrl;
+            }
+            foreach ($sources as $label => $path) {
+                $folder = $label === 'CV' ? 'job-cv/' : 'job-cover-letters/';
+                $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                $allowed = $label === 'CV' ? ['pdf', 'doc', 'docx'] : ['pdf'];
+                if (!str_starts_with($path, $folder) || str_contains($path, '..')
+                    || !in_array($extension, $allowed, true)
+                    || !Storage::disk('local')->exists($path)
+                    || Storage::disk('local')->size($path) > 10 * 1024 * 1024) {
+                    return response()->json(['message' => $label.' attachment is missing or invalid.'], 422);
+                }
+                $attachments[] = ['path' => $path, 'name' => $label.'.'.$extension];
+            }
         }
 
         $draft = DB::transaction(function () use ($id) {
@@ -117,10 +154,15 @@ class JobIntegrationController extends Controller
         }, 3);
 
         try {
-            // Only the server's configured SMTP transport is used. No third-party
-            // sender addresses, SMTP credentials or unreviewed attachments.
-            Mail::raw($draft->body, function ($message) use ($draft): void {
+            // SMTP is opt-in and attachments are independently opt-in for each send.
+            Mail::raw($draft->body, function ($message) use ($draft, $attachments): void {
                 $message->to($draft->toEmail)->subject($draft->subject);
+                foreach ($attachments as $file) {
+                    $message->attachData(
+                        Storage::disk('local')->get($file['path']),
+                        $file['name']
+                    );
+                }
             });
             $draft->forceFill(['status' => 'SENT', 'sendStatus' => 'sent', 'sentAt' => now()])->save();
             JobAgentEmailEvent::create([

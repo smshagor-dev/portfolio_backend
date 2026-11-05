@@ -13,7 +13,7 @@ final class CompanyCareerSourceService
         $parts = parse_url(trim($careersUrl));
         if (!is_array($parts)
             || strtolower((string) ($parts['scheme'] ?? '')) !== 'https'
-            || isset($parts['user'], $parts['pass'])
+            || isset($parts['user']) || isset($parts['pass'])
             || isset($parts['port'])
             || empty($parts['host'])) {
             return null;
