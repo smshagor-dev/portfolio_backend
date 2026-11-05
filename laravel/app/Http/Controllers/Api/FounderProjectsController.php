@@ -125,7 +125,9 @@ class FounderProjectsController extends Controller
                     $validator->errors()->add($key, 'Enter a valid HTTPS URL or an allowed local image path.');
                     continue;
                 }
-                if (!$allowedPath && !str_starts_with(strtolower($url), 'https://')) {
+                if (!$allowedPath && (!str_starts_with(strtolower($url), 'https://')
+                    || parse_url($url, PHP_URL_USER) !== null
+                    || parse_url($url, PHP_URL_PASS) !== null)) {
                     $validator->errors()->add($key, 'Only HTTPS external URLs are allowed.');
                 }
             }
@@ -141,7 +143,7 @@ class FounderProjectsController extends Controller
         }
         $project['principles'] = $this->objects($input['principles'] ?? [], ['title', 'description']);
         $project['journey'] = $this->objects($input['journey'] ?? [],
-            ['step', 'title', 'status', 'lead', 'result', 'details']);
+            ['step', 'title', 'status', 'lead', 'result']);
         // Journey details are an array of paragraphs; preserve as strings.
         foreach ($project['journey'] as $index => &$stage) {
             $stage['details'] = $this->strings($input['journey'][$index]['details'] ?? []);
@@ -165,7 +167,7 @@ class FounderProjectsController extends Controller
 
     public function replace(Request $request): JsonResponse
     {
-        $input = $request->validate(['projects' => ['required', 'array', 'max:'.self::MAX_PROJECTS]]);
+        $input = $request->validate(['projects' => ['present', 'array', 'max:'.self::MAX_PROJECTS]]);
         $projects = [];
         $slugs = [];
         foreach ($input['projects'] as $entry) {
