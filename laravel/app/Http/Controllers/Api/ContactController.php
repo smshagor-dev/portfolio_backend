@@ -15,7 +15,7 @@ class ContactController extends Controller
 {
     private function ticket(Request $request, int $id): ContactMessage
     {
-        $token = (string) $request->query('token', '');
+        $token = (string) ($request->header('X-Ticket-Token') ?: $request->query('token', ''));
         abort_if(!$token || strlen($token) > 200, 404);
         $ticket = ContactMessage::findOrFail($id);
         abort_unless(hash_equals($ticket->ticketToken, $token), 404);

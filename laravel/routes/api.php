@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\LiveEventsController;
 use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\AdminCmsCompatibilityController;
 use App\Http\Controllers\Api\AdminAiController;
@@ -42,6 +43,7 @@ Route::prefix('site')->group(function (): void {
     Route::get('blogs', [PublicSiteController::class, 'blogs']);
     Route::post('contact', [ContactController::class, 'create'])->middleware('throttle:5,1');
     Route::get('contact-ticket/{messageId}', [ContactController::class, 'show'])->whereNumber('messageId')->middleware('throttle:30,1');
+    Route::get('contact-ticket/{messageId}/events', [LiveEventsController::class, 'ticket'])->whereNumber('messageId')->middleware('throttle:30,1');
     Route::post('contact-ticket/{messageId}/messages', [ContactController::class, 'reply'])->whereNumber('messageId')->middleware('throttle:10,1');
     Route::get('contact-ticket/{messageId}/files/{chatId}/{field}', [ContactController::class, 'download'])->whereNumber('messageId')->whereNumber('chatId')->middleware('throttle:30,1');
     Route::post('analytics/heartbeat', [AnalyticsController::class, 'heartbeat'])->middleware('throttle:120,1');
@@ -115,6 +117,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function (): void {
     Route::patch('messages/{messageId}/status', [AdminOperationsController::class, 'updateStatus'])->whereNumber('messageId');
     Route::delete('messages/{messageId}', [AdminOperationsController::class, 'deleteMessage'])->whereNumber('messageId');
     Route::get('notifications', [AdminOperationsController::class, 'notifications']);
+    Route::get('live-events', [LiveEventsController::class, 'admin'])->middleware('throttle:30,1');
     Route::get('notifications/unread-count', [AdminOperationsController::class, 'unreadCount']);
     Route::patch('notifications/read-all', [AdminOperationsController::class, 'readAll']);
     Route::patch('notifications/{id}/read', [AdminOperationsController::class, 'readOne']);

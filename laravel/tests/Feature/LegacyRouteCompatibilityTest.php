@@ -17,6 +17,8 @@ class LegacyRouteCompatibilityTest extends TestCase
             ['GET', '/api/research-publications'],
             ['POST', '/api/research-publications/example/comments'],
             ['GET', '/api/admin/dashboard'],
+            ['GET', '/api/admin/live-events'],
+            ['GET', '/api/site/contact-ticket/1/events'],
             ['POST', '/api/admin/messages/1/replies'],
             ['GET', '/api/admin/research-publications/1'],
             ['POST', '/api/admin/research-publications'],
