@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class AdminNotification extends Model
 {
-    protected $table = 'admin_notifications';
+    protected $table = 'AdminNotification';
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';

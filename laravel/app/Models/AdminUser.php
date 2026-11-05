@@ -2,21 +2,23 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use MongoDB\Laravel\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class AdminUser extends Authenticatable
 {
 
     use HasApiTokens;
+    use \App\Models\Concerns\UsesPrismaNumericId;
 
     public function getAuthPassword(): string
     {
         return $this->passwordHash;
     }
-    protected $table = 'admin_users';
+    protected $table = 'AdminUser';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';

@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class JobPost extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'job_posts';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -16,7 +19,7 @@ class JobPost extends Model
 
     protected $casts = [
         'sourceId' => 'integer',
-        'extractedUrls' => 'array',
+
         'lastContactDiscoveryAt' => 'datetime',
         'receivedAt' => 'datetime',
         'createdAt' => 'datetime',

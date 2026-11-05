@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class ArticleCategoryAssignment extends Model
 {
-    protected $table = 'article_category_assignments';
+    protected $table = 'ArticleCategoryAssignment';
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -18,12 +18,4 @@ class ArticleCategoryAssignment extends Model
         'categoryId' => 'integer',
     ];
 
-    protected static function booted(): void
-    {
-        static::creating(function ($model): void {
-            if (!$model->id) {
-                $model->id = (string) \Illuminate\Support\Str::uuid();
-            }
-        });
-    }
 }

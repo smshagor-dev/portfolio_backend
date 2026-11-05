@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class ContactChatMessage extends Model
 {
-    protected $table = 'contact_chat_messages';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'ContactChatMessage';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = false;
     protected $fillable = ['contactMessageId', 'senderType', 'senderName', 'message', 'photo', 'file'];
 

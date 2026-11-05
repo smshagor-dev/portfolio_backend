@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Achievement extends Model
 {
-    protected $table = 'achievements';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'Achievement';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';

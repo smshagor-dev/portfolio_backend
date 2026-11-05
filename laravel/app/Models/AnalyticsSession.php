@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class AnalyticsSession extends Model
 {
-    protected $table = 'analytics_sessions';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'AnalyticsSession';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = false;
     protected $fillable = ['sessionId', 'firstPath', 'lastPath', 'ipAddress', 'country', 'region', 'city', 'userAgent', 'lastSeenAt'];
 

@@ -1,14 +1,15 @@
 {
   "name": "smshagor/portfolio-backend",
   "type": "project",
-  "description": "Laravel 12 / PHP 8.2 / MySQL migration of the existing Express portfolio API",
+  "description": "Laravel 12 / PHP 8.2 portfolio API backed by existing Prisma MongoDB Atlas data",
   "license": "proprietary",
   "require": {
     "barryvdh/laravel-dompdf": "^3.1.2",
     "laravel/framework": "^12.0",
     "laravel/sanctum": "^4.0",
     "laravel/tinker": "^2.10",
-    "php": "^8.2"
+    "php": "^8.2",
+    "mongodb/laravel-mongodb": "^5.12"
   },
   "require-dev": {
     "fakerphp/faker": "^1.23",

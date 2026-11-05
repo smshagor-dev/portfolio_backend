@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class JobMatch extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'job_matches';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -18,9 +21,9 @@ class JobMatch extends Model
         'jobPostId' => 'integer',
         'cvProfileId' => 'integer',
         'score' => 'integer',
-        'matchedSkills' => 'array',
-        'missingSkills' => 'array',
-        'aiAnalysis' => 'array',
+
+
+
         'createdAt' => 'datetime',
         'updatedAt' => 'datetime',
     ];

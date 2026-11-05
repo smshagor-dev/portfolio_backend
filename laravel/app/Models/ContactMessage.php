@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class ContactMessage extends Model
 {
-    protected $table = 'contact_messages';
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
+    protected $table = 'ContactMessage';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = false;
     protected $hidden = ['ticketToken'];
     protected $fillable = ['name', 'email', 'subject', 'message', 'photo', 'file', 'status', 'ticketToken'];

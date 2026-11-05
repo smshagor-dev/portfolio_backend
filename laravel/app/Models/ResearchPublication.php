@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class ResearchPublication extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'research_publications';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -16,7 +19,7 @@ class ResearchPublication extends Model
 
     protected $casts = [
         'publishedDate' => 'datetime',
-        'authors' => 'array',
+
         'views' => 'integer',
         'impressionCount' => 'integer',
         'shareCount' => 'integer',

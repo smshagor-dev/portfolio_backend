@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class RecruiterContact extends Model
 {
+    use \App\Models\Concerns\UsesPrismaNumericId;
+
     protected $table = 'recruiter_contacts';
     protected $primaryKey = 'id';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = true;
     const CREATED_AT = 'createdAt';
     const UPDATED_AT = 'updatedAt';
@@ -19,7 +22,7 @@ class RecruiterContact extends Model
         'confidenceScore' => 'integer',
         'isRecruiter' => 'boolean',
         'isHiringManager' => 'boolean',
-        'evidence' => 'array',
+
         'lastVerifiedAt' => 'datetime',
         'verified' => 'boolean',
         'createdAt' => 'datetime',
