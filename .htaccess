@@ -1,10 +1,10 @@
-# The Laravel repository root is private application source, NOT the web root.
-# Configure Apache DocumentRoot to the public/ directory.
-# If Apache is mistakenly pointed here, fail closed to avoid leaking .env and source.
-<IfModule mod_authz_core.c>
-    Require all denied
-</IfModule>
-<IfModule !mod_authz_core.c>
-    Order allow,deny
-    Deny from all
+# This Laravel source directory must never be the Apache DocumentRoot.
+# Access is allowed only when the site is configured to serve public/.
+# The rule also protects against accidental repository-root document roots.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{DOCUMENT_ROOT} !/public/?$ [NC]
+    RewriteRule ^ - [F,L]
 </IfModule>
