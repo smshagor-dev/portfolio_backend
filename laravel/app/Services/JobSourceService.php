@@ -24,7 +24,7 @@ class JobSourceService
         if (parse_url($url, PHP_URL_SCHEME) !== 'https' || !in_array($host, self::HOSTS, true)) {
             throw new \InvalidArgumentException('Only approved HTTPS job provider APIs are supported.');
         }
-        $response = Http::timeout(15)->withHeaders(['User-Agent' => 'PortfolioJobAgent/1.0'])->get($url);
+        $response = Http::timeout(15)->withoutRedirecting()->withHeaders(['User-Agent' => 'PortfolioJobAgent/1.0'])->get($url);
         $response->throw();
         if (strlen($response->body()) > 4 * 1024 * 1024) {
             throw new \RuntimeException('Job API response too large.');

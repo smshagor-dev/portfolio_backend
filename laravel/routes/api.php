@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminAuthController;
+use App\Http\Controllers\Api\StatusController;
 use App\Http\Controllers\Api\AdminCmsCompatibilityController;
 use App\Http\Controllers\Api\AdminAiController;
 use App\Http\Controllers\Api\BulkContentController;
@@ -21,7 +22,7 @@ use App\Http\Controllers\Api\PublicSiteController;
 use App\Http\Controllers\Api\ResearchController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/health', fn () => response()->json(['status' => 'ok', 'message' => 'server ready']));
+Route::get('/health', [StatusController::class, 'health']);
 
 Route::prefix('site')->group(function (): void {
     Route::get('home', [PublicSiteController::class, 'home']);
