@@ -46,7 +46,15 @@ class AdminAuthController extends Controller
         }
 
         $token = $admin->createToken('portfolio-admin', ['admin'], now()->addDays(7));
-        return response()->json(['token' => $token->plainTextToken, 'admin' => $this->publicAdmin($admin)]);
+        $bearerToken = $token->plainTextToken;
+        // MongoDB can return an empty getKey() after inserting a BSON _id.
+        // This yields a broken token with an empty ID prefix. Sanctum also
+        // supports bearer tokens containing only the raw secret, whose hash
+        // is still verified using the database's SHA-256 token field.
+        if (str_starts_with($bearerToken, '|')) {
+            $bearerToken = substr($bearerToken, 1);
+        }
+        return response()->json(['token' => $bearerToken, 'admin' => $this->publicAdmin($admin)]);
     }
 
     public function me(Request $request): JsonResponse
