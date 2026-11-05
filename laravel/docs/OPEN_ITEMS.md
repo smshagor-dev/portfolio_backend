@@ -20,3 +20,11 @@ The codebase contains Laravel scaffolding and partial implementations, **not a v
 - [ ] cPanel/PHP-FPM deployment rehearsal, rollback and cutover
 
 Local Windows setup is in docs/LOCAL_WINDOWS.md. The current CI workflow is failing without usable job logs and must not be treated as a passing test.
+
+
+## Current code progress (not runtime evidence)
+- Guarded Lever/Greenhouse public ATS adapters and an opt-in six-hour scheduled source sync have been added.
+- Laravel public asset copy command has a dry-run and preserves /uploads and /research paths.
+- Content CRUD input validation, Gmail sender domain parsing and private CV/PDF email attachment opt-in have been strengthened.
+- HTTP route shape coverage was static-only; many advanced job recruiting endpoints still deliberately report unsupported.
+- Newly added tests cover AT​S URL parsing, job source import, nested ORCID journal fields and safe attachment gates.
