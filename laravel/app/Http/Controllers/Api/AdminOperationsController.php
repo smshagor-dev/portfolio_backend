@@ -9,6 +9,7 @@ use App\Models\Article;
 use App\Models\ContactChatMessage;
 use App\Models\ContactMessage;
 use App\Services\ContactNotificationService;
+use App\Services\LegacyFtpStorage;
 use App\Models\JobEmailDraft;
 use App\Models\Project;
 use App\Models\ResearchPublication;
@@ -17,7 +18,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class AdminOperationsController extends Controller
 {
@@ -65,7 +65,7 @@ class AdminOperationsController extends Controller
         return response()->json(['data' => $ticket]);
     }
 
-    public function reply(Request $request, int $messageId): JsonResponse
+    public function reply(Request $request, int $messageId, LegacyFtpStorage $ftp): JsonResponse
     {
         $input = $request->validate([
             'message' => ['required', 'string', 'max:20000'],
@@ -74,15 +74,28 @@ class AdminOperationsController extends Controller
         ]);
         $ticket = ContactMessage::findOrFail($messageId);
         abort_if($ticket->status === 'solved', 409, 'Ticket is closed.');
-        $files = [
-            'photo' => $request->hasFile('photo') ? $request->file('photo')->store('contacts', 'local') : '',
-            'file' => $request->hasFile('file') ? $request->file('file')->store('contacts', 'local') : '',
-        ];
-        $reply = ContactChatMessage::create([
-            'contactMessageId' => $ticket->id, 'senderType' => 'admin',
-            'senderName' => (string) $request->user()->name, 'message' => $input['message'],
-            'photo' => $files['photo'], 'file' => $files['file'],
-        ]);
+        $files = ['photo' => '', 'file' => ''];
+        try {
+            foreach (['photo', 'file'] as $field) {
+                if ($request->hasFile($field)) {
+                    $files[$field] = $ftp->uploadPublic($request->file($field), 'admin-chat-'.$field)['path'];
+                }
+            }
+            $reply = ContactChatMessage::create([
+                'contactMessageId' => $ticket->id, 'senderType' => 'admin',
+                'senderName' => (string) $request->user()->name, 'message' => $input['message'],
+                'photo' => $files['photo'], 'file' => $files['file'],
+            ]);
+        } catch (\Throwable $e) {
+            foreach (array_filter($files) as $file) {
+                try {
+                    $ftp->deletePublic($file);
+                } catch (\Throwable $cleanupError) {
+                    logger()->warning('FTP reply cleanup failed', ['type' => get_class($cleanupError)]);
+                }
+            }
+            throw $e;
+        }
         app(ContactNotificationService::class)->onAdminReply($ticket);
         return response()->json(['message' => 'Reply saved.', 'data' => $reply], 201);
     }
@@ -95,18 +108,29 @@ class AdminOperationsController extends Controller
         return response()->json(['message' => 'Ticket status updated.', 'data' => $ticket->fresh()]);
     }
 
-    public function deleteMessage(int $messageId): JsonResponse
+    public function deleteMessage(int $messageId, LegacyFtpStorage $ftp): JsonResponse
     {
-        DB::transaction(function () use ($messageId): void {
-            $ticket = ContactMessage::with('chatMessages')->findOrFail($messageId);
-            // Deletes files only from this ticket's dedicated private folder.
-            $paths = $ticket->chatMessages->flatMap(
-                fn ($item) => [$item->photo, $item->file]
-            )->filter(fn ($path) => is_string($path) && str_starts_with($path, 'contacts/'));
-            $ticket->delete();
-            Storage::disk('local')->delete($paths->all());
-        });
-        return response()->json(['message' => 'Ticket deleted.']);
+        $ticket = ContactMessage::with('chatMessages')->findOrFail($messageId);
+        $paths = $ticket->chatMessages->flatMap(
+            fn ($item) => [$item->photo, $item->file]
+        )->merge([$ticket->photo, $ticket->file])
+            ->filter(fn ($path) => is_string($path) && preg_match('~^/uploads/[a-zA-Z0-9._-]+$~D', $path))
+            ->unique()->values()->all();
+        // Database deletion and remote FTP are separate resources.
+        DB::transaction(fn () => $ticket->delete());
+        $failed = 0;
+        foreach ($paths as $file) {
+            try {
+                $ftp->deletePublic($file);
+            } catch (\Throwable $error) {
+                $failed++;
+                logger()->warning('FTP ticket file deletion failed', ['type' => get_class($error)]);
+            }
+        }
+        return response()->json([
+            'message' => $failed ? 'Ticket deleted; some remote files require manual cleanup.' : 'Ticket deleted.',
+            'ftpDeletionFailures' => $failed,
+        ]);
     }
 
     public function notifications(Request $request): JsonResponse

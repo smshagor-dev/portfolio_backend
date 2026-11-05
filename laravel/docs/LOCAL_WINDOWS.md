@@ -1,53 +1,38 @@
-# Windows PowerShell local setup
+# Laravel MongoDB local setup — Windows / PowerShell
 
-Laravel uses a separate MySQL database; the Node/Vercel production backend is not changed.
+The Laravel backend uses MongoDB Atlas via `DATABASE_URL` and `MONGODB_DATABASE`. It does **not** require MySQL or import the old MongoDB JSON dump.
 
-1. Install Docker Desktop with WSL2 and start Docker Desktop.
-2. cd .\laravel
-3. Copy-Item .env.example .env
-4. Edit .env and replace both example MySQL passwords; leave DB_HOST=mysql.
-5. Run each command:
+## Native PHP (XAMPP PHP 8.2)
 
-    docker compose up -d --build
-    docker compose exec app php artisan key:generate
-    docker compose restart app
-    docker compose exec app php artisan migrate --force
-    docker compose exec app php artisan db:seed
-    docker compose exec app php artisan portfolio:admin admin@example.com Administrator
-    docker compose exec app php artisan storage:link
-    docker compose exec app php artisan route:list
-    docker compose exec app php artisan test
-    docker compose exec app php artisan portfolio:preflight
+```powershell
+cd E:\portfolio_backend\laravel
+php -v
+php -m | Select-String 'mongodb|ftp'
+composer install
+php artisan key:generate
+# Set UPLOAD_STORAGE_* FTP settings in laravel/.env (see docs/FTP_UPLOAD.md).
+php artisan optimize:clear
+php artisan portfolio:preflight
+php artisan serve
+```
 
-6. Open http://localhost:8080/api/health and verify status ok.
+Configure `laravel/.env` first: `DB_CONNECTION=mongodb`, `DATABASE_URL=<secret Atlas URI>`, `MONGODB_DATABASE=<exact Prisma database name>`. For production, use a least-privilege, separate DB/user and set `APP_DEBUG=false`. Never send URLs containing passwords into chat or commit them.
 
-For old MongoDB content export, from the repository root with DATABASE_URL configured:
+`php -m` must show the `mongodb` extension. CLI and Apache can use different `php.ini` files: check `php --ini` and the web runtime. Composer must install `mongodb/laravel-mongodb`; do not ignore `ext-mongodb` requirements.
 
-    node laravel/tools/export-prisma.js
+## Docker development
 
-The output is laravel/storage/app/imports/portfolio-export.json and includes private personal data. Never commit it. Import dry run and then, only if expected, confirm the import:
+```powershell
+cd E:\portfolio_backend\laravel
+docker compose up -d --build
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan optimize:clear
+docker compose exec app php artisan portfolio:preflight
+docker compose exec app php artisan route:list
+```
 
-    docker compose exec app php artisan portfolio:import portfolio-export.json
-    docker compose exec app php artisan portfolio:import portfolio-export.json --commit
+Welcome page: `http://127.0.0.1:8000/` with `php artisan serve`; Docker: `http://localhost:8080/`. Health endpoint: `/api/health`. It returns 503 when MongoDB cannot be reached, without exposing credentials.
 
-The import does not overwrite existing numeric IDs. Credentials/admins are excluded and must be configured separately.
+**Do not run** `php artisan migrate`, `php artisan db:seed`, `portfolio:import` or `migrate:fresh` against the existing Atlas database. Existing Prisma collections are the source of truth.
 
-Backend: http://localhost:8080/api
-MySQL: 127.0.0.1:3307 (local loopback only)
-
-Debugging:
-
-    docker compose logs --tail=120 app
-    docker compose logs --tail=120 mysql
-    docker compose exec app php artisan migrate:status
-
-Never run migrate:fresh or db:wipe on the production database. Read docs/API_PARITY.md before frontend switch.
-
-Legacy media (dry-run first, then confirm):
-
-    docker compose exec app php artisan portfolio:import-assets
-    docker compose exec app php artisan portfolio:import-assets --commit
-
-The Docker Compose stack mounts the old ../public/ directory read-only at /var/www/legacy-public, so both commands work inside the container. Imported files are copied only into laravel/public, which is backed by a local volume.
-
-The local Docker build installs Composer dev dependencies (including PHPUnit) and PDO SQLite for in-memory test isolation. Production builds default to no-dev. When a verified composer.lock becomes available, commit it to pin exact dependency versions before deployment.
+Legacy media: existing FTP-hosted files are served from the original asset host; do NOT copy them into Laravel storage. The optional `portfolio:import-assets` command is only for old tracked Git media and is not needed for new FTP uploads. Test FTP uploads live on staging before cutover.

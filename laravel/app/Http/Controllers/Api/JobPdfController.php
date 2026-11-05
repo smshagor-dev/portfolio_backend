@@ -33,7 +33,7 @@ class JobPdfController extends Controller
             .'</style></head><body><h1>'.$name.'</h1><h2>'.$role.' at '.$company.'</h2><p>'.$text.'</p></body></html>';
         $bytes = Pdf::loadHTML($html)->setPaper('a4')->output();
         $filename = 'job-cover-letters/cover-letter-'.$draft->id.'.pdf';
-        Storage::disk('local')->put($filename, $bytes);
+        app(\App\Services\LegacyFtpStorage::class)->putPrivateBytes($filename, $bytes);
         $draft->forceFill([
             'coverLetterPdfUrl' => $filename,
         ])->save();
@@ -48,7 +48,7 @@ class JobPdfController extends Controller
     {
         $draft = JobEmailDraft::findOrFail($id);
         $path = (string) $draft->coverLetterPdfUrl;
-        abort_unless(str_starts_with($path, 'job-cover-letters/') && Storage::disk('local')->exists($path), 404);
-        return Storage::disk('local')->download($path, 'cover-letter-'.$draft->id.'.pdf', ['Content-Type' => 'application/pdf']);
+        abort_unless(str_starts_with($path, 'job-cover-letters/') && app(\App\Services\LegacyFtpStorage::class)->privateDisk()->exists($path), 404);
+        return app(\App\Services\LegacyFtpStorage::class)->privateDisk()->download($path, 'cover-letter-'.$draft->id.'.pdf', ['Content-Type' => 'application/pdf']);
     }
 }

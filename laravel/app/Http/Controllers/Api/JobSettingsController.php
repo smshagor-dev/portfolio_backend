@@ -46,20 +46,25 @@ class JobSettingsController extends Controller
         return response()->json(['cvProfile' => $profile->fresh()]);
     }
 
-    public function uploadCv(Request $request): JsonResponse
+    public function uploadCv(Request $request, \App\Services\LegacyFtpStorage $ftp): JsonResponse
     {
         $request->validate([
             'cv' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
         ]);
         $file = $request->file('cv');
-        $path = $file->store('job-cv', 'local');
-        $profile = CvProfile::firstOrNew(['id' => 1]);
-        $profile->fill([
-            'title' => 'Default CV Profile', 'isDefault' => true, 'extraNotes' => $profile->extraNotes ?? '',
-            'resumeUrl' => $path, 'resumeFileName' => $file->getClientOriginalName(),
-            'resumeUpdatedAt' => now(),
-        ])->save();
-        return response()->json(['message' => 'CV stored privately.', 'cvProfile' => $profile->fresh()], 201);
+        $path = $ftp->uploadPrivate($file, 'job-cv');
+        try {
+            $profile = CvProfile::firstOrNew(['id' => 1]);
+            $profile->fill([
+                'title' => 'Default CV Profile', 'isDefault' => true, 'extraNotes' => $profile->extraNotes ?? '',
+                'resumeUrl' => $path, 'resumeFileName' => $file->getClientOriginalName(),
+                'resumeUpdatedAt' => now(),
+            ])->save();
+        } catch (\Throwable $error) {
+            $ftp->deletePrivate($path);
+            throw $error;
+        }
+        return response()->json(['message' => 'CV stored privately on FTP.', 'cvProfile' => $profile->fresh()], 201);
     }
 
     public function general(): JsonResponse

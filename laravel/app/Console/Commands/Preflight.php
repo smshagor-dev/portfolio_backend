@@ -5,10 +5,11 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 class Preflight extends Command
 {
-    protected $signature = 'portfolio:preflight {--strict : Require a lockfile and all required runtime settings}';
+    protected $signature = 'portfolio:preflight {--strict : Require a lockfile and all required runtime settings} {--check-ftp : Read-only FTP connectivity check}';
     protected $description = 'Read-only PHP 8.2, MongoDB Atlas and API configuration audit';
 
     public function handle(): int
@@ -18,6 +19,15 @@ class Preflight extends Command
         $checks = [
             'PHP >= 8.2' => PHP_VERSION_ID >= 80200,
             'MongoDB extension' => extension_loaded('mongodb'),
+            'FTP extension' => extension_loaded('ftp'),
+            'FTP package' => class_exists(\League\Flysystem\Ftp\FtpAdapter::class),
+            'FTP-only uploads' => config('filesystems.default') === 'ftp_public',
+            'FTP server credentials configured' => (bool) config('filesystems.disks.ftp_public.host')
+                && (bool) config('filesystems.disks.ftp_public.username')
+                && (bool) config('filesystems.disks.ftp_public.password'),
+            'FTP public URL' => filter_var(
+                (string) config('filesystems.disks.ftp_public.url'), FILTER_VALIDATE_URL
+            ) !== false,
             'mbstring' => extension_loaded('mbstring'),
             'OpenSSL' => extension_loaded('openssl'),
             'zip' => extension_loaded('zip'),
@@ -52,6 +62,24 @@ class Preflight extends Command
                 report($e);
                 $this->error('FAIL MongoDB ping. Check URI, Atlas IP access, DNS and credentials.');
                 $failures++;
+            }
+        }
+
+        if ($this->option('check-ftp')) {
+            if (!$checks['FTP extension'] || !$checks['FTP package']
+                || !$checks['FTP server credentials configured']) {
+                $this->error('FAIL FTP connectivity check requires PHP ext-ftp and configured FTP disk');
+                $failures++;
+            } else {
+                try {
+                    // Listing the configured root is read-only; no test file is uploaded.
+                    Storage::disk('ftp_public')->directories('');
+                    $this->info('PASS remote FTP login and directory listing');
+                } catch (\Throwable $e) {
+                    logger()->error('Preflight FTP connectivity failed', ['type' => get_class($e)]);
+                    $this->error('FAIL FTP connection. Check host, login, TLS, base directory and firewall.');
+                    $failures++;
+                }
             }
         }
 

@@ -18,3 +18,5 @@ Only common public media types are copied; active SVG content, symlinks, hidden 
 IMPORTANT: Old backend FTP/public user uploads may exist outside Git and are NOT included here. Back them up through the original hosting account and migrate separately. Never import the old SQL dump or expose .env, database exports or credential files through the public folder.
 
 Google site verification HTML is not copied automatically. It must be reviewed and configured manually.
+
+Current Laravel public uploads use the original remote FTP host; no local uploads are needed. `portfolio:import-assets` remains an optional manual one-time copy of Git-tracked public media only; it is NOT run by the upload code or deployment flow. If all historical URLs resolve on the existing FTP asset host, do not use this import command.

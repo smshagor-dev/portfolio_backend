@@ -9,7 +9,9 @@
     "laravel/sanctum": "^4.0",
     "laravel/tinker": "^2.10",
     "php": "^8.2",
-    "mongodb/laravel-mongodb": "^5.12"
+    "mongodb/laravel-mongodb": "^5.12",
+    "league/flysystem-ftp": "^3.0",
+    "ext-ftp": "*"
   },
   "require-dev": {
     "fakerphp/faker": "^1.23",

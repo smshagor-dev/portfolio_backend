@@ -1,47 +1,43 @@
-# Portfolio backend — Laravel migration
+# Portfolio backend — Laravel 12 / PHP 8.2 / MongoDB Atlas
 
-This is an **isolated Laravel 12 / PHP 8.2 / MySQL replacement project** under `laravel/`. The existing Express/Vercel project at repository root is unchanged. This is a staged migration, **not a full production cutover**.
+This is an **isolated, unverified migration candidate** under `laravel/`. The original Node/Express/Vercel backend at the repository root remains untouched.
 
 ## Requirements
-- PHP 8.2 or newer (target/runtime: PHP 8.2), Composer 2
-- MySQL 8.0+ (or compatible MySQL), extensions: pdo_mysql, mbstring, intl, zip, bcmath, openssl
-- Laravel 12, Sanctum for admin API tokens
 
-## Install without Docker
-```bash
-cd laravel
+- PHP 8.2+ and Composer 2
+- PHP extension `mongodb` (and mbstring, intl, zip, bcmath, openssl)
+- Laravel 12, `mongodb/laravel-mongodb` 5.12+, Laravel Sanctum
+- Atlas URI in private `laravel/.env`, plus the exact `MONGODB_DATABASE` used by Prisma
+
+## Local install (Windows PowerShell)
+
+```powershell
+cd E:\portfolio_backend\laravel
 composer install
-cp .env.example .env
+# Create / edit your private .env from .env.example
+# DB_CONNECTION=mongodb
+# DATABASE_URL=your MongoDB Atlas URI
+# MONGODB_DATABASE=the existing Prisma database name
 php artisan key:generate
-# Configure DB_HOST, DB_DATABASE, DB_USERNAME, DB_PASSWORD in .env
-php artisan migrate
-php artisan db:seed
-php artisan portfolio:admin admin@example.com Administrator
-php artisan storage:link
+php artisan optimize:clear
+php artisan portfolio:preflight
 php artisan serve
 ```
 
+The health endpoint `/api/health` performs a live MongoDB ping; `/` shows the API welcome dashboard. The app uses existing MongoDB collections directly, **not MySQL migrations or a JSON import**. Validate collection mapping, IDs, relationships and write paths on a staging database before production.
+
 ## Docker development
-```bash
-cd laravel
-cp .env.example .env
-# Set unique DB_PASSWORD and MYSQL_ROOT_PASSWORD in laravel/.env
+
+```powershell
 docker compose up -d --build
 docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate
-docker compose exec app php artisan db:seed
-docker compose exec app php artisan storage:link
+docker compose exec app php artisan portfolio:preflight
 ```
-API: http://localhost:8080/api/health
 
-**Important**: Database credentials and APP_KEY belong in environment variables, never in Git. Existing MongoDB data is **not migrated automatically**. Run MySQL migrations on a separate database and validate API parity before switching traffic.
+Docker Compose now contains only `app` and `nginx`, not MySQL.
 
-See `docs/DEPLOYMENT.md`, `docs/MIGRATION_PLAN.md`, `docs/API_PARITY.md` and `docs/DATA_IMPORT.md` for milestones and scope.
+## Deployment and legacy FTP warning
 
-Windows setup: docs/LOCAL_WINDOWS.md. The Node/Vercel production backend remains unchanged.
+**Do not switch production yet.** The Laravel upload controller now uses the old Express FTP settings through `league/flysystem-ftp` and returns `/uploads/*` paths and `publicUrl`; it does not save uploads locally. Remote FTP functionality needs a real staging upload/download test before live cutover. A private FTP root must be explicitly configured for Job Agent CVs and PDFs. See [docs/FTP_UPLOAD.md](docs/FTP_UPLOAD.md).
 
-## Read-only checks
-
-After migrations: `php artisan portfolio:preflight --strict`. From repository root: `node laravel/tools/audit-route-parity.js` to compare HTTP route shapes with Express. These checks are not substitutes for end-to-end tests.
-
-Legacy public asset dry-run: `php artisan portfolio:import-assets`; see `docs/ASSET_MIGRATION.md`.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/LOCAL_WINDOWS.md](docs/LOCAL_WINDOWS.md), [docs/ASSET_MIGRATION.md](docs/ASSET_MIGRATION.md) and [docs/OPEN_ITEMS.md](docs/OPEN_ITEMS.md).
