@@ -18,9 +18,12 @@ class AiProviderIsolationTest extends TestCase
         config()->set('services.portfolio_ai.model', 'gpt-test');
         AiSettings::create(['activeProvider' => 'deepseek', 'modelName' => 'deepseek-chat']);
         Http::fake();
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('AI provider is not configured.');
-        (new PortfolioAiService())->reply('Hello');
+        try {
+            (new PortfolioAiService())->reply('Hello');
+            $this->fail('Cross-provider fallback should be blocked.');
+        } catch (\RuntimeException $error) {
+            $this->assertSame('AI provider is not configured.', $error->getMessage());
+        }
         Http::assertNothingSent();
     }
 }
