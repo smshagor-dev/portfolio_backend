@@ -25,3 +25,5 @@ Event: ticket:message. Reconnect with Last-Event-ID set to the last received num
 - Each concurrent stream occupies a PHP-FPM worker; configure FPM limits and Nginx buffering, and use Reverb/Redis or dedicated event infrastructure before high-traffic deployment.
 - Notification records are persisted in MySQL, so a reconnect can resume without a distributed in-memory queue.
 - The streams publish no automatic external emails or pushes.
+
+The bundled Nginx configuration preserves dynamic /api/research-publications/default-thumbnail.svg routing while enforcing a restrictive CSP for static SVG files.
