@@ -1,0 +1,10 @@
+# This Laravel source directory must never be the Apache DocumentRoot.
+# Access is allowed only when the site is configured to serve public/.
+# The rule also protects against accidental repository-root document roots.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{DOCUMENT_ROOT} !/public/?$ [NC]
+    RewriteRule ^ - [F,L]
+</IfModule>

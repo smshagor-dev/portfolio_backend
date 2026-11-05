@@ -1,2 +1,0 @@
-ALTER TABLE `Experience`
-    ADD COLUMN `location` VARCHAR(191) NOT NULL DEFAULT '';
