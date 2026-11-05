@@ -137,20 +137,35 @@ class JobCompatibilityController extends Controller
         return response()->json(['message' => 'Company source deleted.']);
     }
 
-    public function testCompany(int $id): JsonResponse
+    public function testCompany(int $id, JobSourceService $service): JsonResponse
     {
         $source = JobBoardSource::where('sourceType', 'COMPANY_CAREER_SITE')->findOrFail($id);
-        $adapter = CompanyCareerSourceService::recognize((string) $source->careersUrl);
-        if (!$adapter) {
+        try {
+            $probe = $service->probeCompany($source);
+            $source->forceFill([
+                'extractionStatus' => 'READY',
+                'extractionMessage' => 'Public ATS API reachable; '.$probe['availableJobs'].' jobs found.',
+                'status' => 'READY',
+            ])->save();
             return response()->json([
-                'supported' => false, 'message' => 'This career site requires a separate reviewed adapter.',
-            ], 501);
+                'message' => 'Company source tested.',
+                'source' => $source->fresh(),
+                'test' => $probe,
+            ]);
+        } catch (\InvalidArgumentException $error) {
+            return response()->json([
+                'message' => 'This company source has no approved public API adapter.',
+                'supported' => false,
+            ], 422);
+        } catch (\Throwable $error) {
+            report($error);
+            $source->forceFill([
+                'extractionStatus' => 'FAILED',
+                'extractionMessage' => 'Public ATS API test failed; check server logs.',
+                'status' => 'FAILED',
+            ])->save();
+            return response()->json(['message' => 'Company source API test failed.'], 502);
         }
-        return response()->json([
-            'supported' => true, 'provider' => $adapter['provider'],
-            'endpoint' => $adapter['apiUrl'], 'enabled' => (bool) $source->enabled,
-            'message' => 'Recognized approved public API. No network request was performed.',
-        ]);
     }
 
     public function importCompany(int $id, JobSourceService $service): JsonResponse
