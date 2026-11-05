@@ -1,12 +1,14 @@
 # MySQL data import strategy
 
-The original Node API uses MongoDB and the repository contains a legacy 30 MB SQL dump. Neither is imported automatically or overwritten.
+The source Express backend uses MongoDB. Import only into a new isolated MySQL database after backups.
 
-1. Back up the **actual running source** first, including collections, uploads and metadata. Work on a separate MySQL database.
-2. Export Prisma model records as a JSON object keyed by exact Prisma model names (e.g. Profile, Project, ResearchPublication), containing arrays of objects with camelCase field names. Preserve numeric IDs and relation IDs.
-3. Save the export **outside Git** as laravel/storage/app/imports/export.json with restrictive filesystem permissions. No PII or secret tokens in commits.
-4. Run `php artisan portfolio:import export.json` for JSON structure dry-run. Run `php artisan portfolio:import export.json --commit` only after backup and manual confirmation.
-5. Credential-related models are deliberately rejected: AdminUser, AiProvider, AiSettings, SiteSettings, JobAgentSettings, JobAgentEmailSetting, JobAgentAiSetting. Run `php artisan db:seed` to initialize blank settings and `php artisan portfolio:admin EMAIL NAME` to create admin securely.
-6. The import inserts missing IDs and skips existing records, without truncating or overwriting collections. Verify totals, relationships, timestamps, media paths, and authentication before switching frontend base URL.
+1. From the Node repository root export: node laravel/tools/export-prisma.js
+2. The export is stored privately as laravel/storage/app/imports/portfolio-export.json.
+3. Sensitive models AdminUser, AiProvider, AiSettings and Job Agent credential settings are excluded. SiteSettings exports a whitelist of public website/SEO/legal fields only, not SMTP credentials.
+4. In Laravel run: php artisan migrate, then php artisan db:seed, then php artisan portfolio:import portfolio-export.json for a dry run.
+5. After verification run: php artisan portfolio:import portfolio-export.json --commit and confirm interactively.
+6. New record IDs are inserted, existing IDs skipped. The sole exception is whitelisted SiteSettings fields, which update the blank seeded record id=1.
+7. Configure SMTP, OAuth, AI keys and the admin account manually; never export their credentials.
+8. Validate all row counts, foreign keys, media URLs, privacy and frontend API contracts before cutover.
 
-All 49 model tables exist in Laravel, but the importer's approved non-sensitive model allowlist covers 42 of them; a full production export/import requires review of sensitive models and GDPR/retention rules.
+The export contains personal data and ticket tokens. Keep it on a secure host; never commit or share it.

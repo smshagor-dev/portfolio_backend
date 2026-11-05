@@ -6,9 +6,10 @@ const path = require("node:path");
 const { Prisma } = require("@prisma/client");
 const prisma = require("../../lib/prisma");
 const EXCLUDED = new Set([
-  "AdminUser", "AiProvider", "AiSettings", "SiteSettings",
+  "AdminUser", "AiProvider", "AiSettings",
   "JobAgentSettings", "JobAgentEmailSetting", "JobAgentAiSetting",
 ]);
+const PUBLIC_SITE_SETTINGS = new Set(["websiteTitle","websiteDescription","navTitle","navSubtitle","seoTitle","seoDescription","seoKeywords","seoImage","websiteIcon","heroHeaderText","heroDescription","heroImage","contactEmail","mobileNumber","footerText","privacyPolicyHtml","termsConditionsHtml","canonicalUrl","googleSiteVerification","googleVerificationFilePath","googleAnalyticsId","googleTagManagerId","adsenseHeadCode","adsensePageTopCode","adsenseBetweenSectionsCode","adsensePageBottomCode","robotsIndexingEnabled","robotsFollowEnabled"]);
 const ROOT = path.resolve(__dirname, "../storage/app/imports");
 async function main() {
   const arg = process.argv.indexOf("--output");
@@ -20,6 +21,16 @@ async function main() {
   const result = {};
   for (const model of Prisma.dmmf.datamodel.models) {
     if (EXCLUDED.has(model.name)) continue;
+    if (model.name === "SiteSettings") {
+      const settings = await prisma.siteSettings.findMany({ take: 1 });
+      result.SiteSettings = settings.map((row) =>
+        Object.fromEntries(Object.entries(row)
+          .filter(([key]) => key === "id" || PUBLIC_SITE_SETTINGS.has(key))
+        )
+      );
+      process.stdout.write("SiteSettings: public fields only (SMTP credentials excluded)\n");
+      continue;
+    }
     const delegateName = model.name[0].toLowerCase() + model.name.slice(1);
     const delegate = prisma[delegateName];
     if (!delegate || typeof delegate.findMany !== "function") continue;
