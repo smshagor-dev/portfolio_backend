@@ -1,0 +1,40 @@
+{
+  "name": "developer-portfolio-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "npm run db:generate",
+    "db:generate": "node scripts/run-prisma.js generate",
+    "db:migrate": "node scripts/run-prisma.js db push --accept-data-loss",
+    "db:seed": "node scripts/run-prisma.js db seed",
+    "db:prepare": "node scripts/ensure-db.js && npm run db:generate && npm run db:migrate",
+    "db:setup": "npm run db:prepare && npm run db:seed",
+    "smoke:job-agent-email": "node scripts/job-agent-email-smoke.js",
+    "smoke:job-agent-gmail": "node scripts/job-agent-gmail-smoke.js",
+    "smoke:job-agent-prompt": "node scripts/job-agent-prompt-smoke.js",
+    "dev": "node scripts/stop-port-process.js 5000 && npm run db:setup && nodemon --exec \"node -r ./routes/linkedin-posts\" index.js",
+    "start": "npm run db:prepare && node -r ./routes/linkedin-posts index.js",
+    "vercel-build": "npm run db:generate",
+    "test:founder": "node --test tests/founder-projects.test.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "basic-ftp": "^5.0.5",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "googleapis": "^171.4.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.1",
+    "nodemailer": "^6.9.15",
+    "prisma": "^6.19.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.3",
+    "speakeasy": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

@@ -1,0 +1,1 @@
+ALTER TABLE `job_posts` ADD COLUMN `emailSubject` VARCHAR(191) NOT NULL DEFAULT '';

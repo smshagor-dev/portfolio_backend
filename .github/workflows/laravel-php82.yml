@@ -3,36 +3,13 @@ name: Laravel PHP 8.2 MongoDB and FTP (static checks)
 on:
   pull_request:
     paths:
-      - "app/**"
-      - "bootstrap/**"
-      - "config/**"
-      - "database/**"
-      - "routes/**"
-      - "tests/**"
-      - "public/**"
-      - "composer.json"
-      - "phpunit.xml"
-      - "Dockerfile"
-      - "docker/**"
-      - "docker-compose.yml"
+      - "laravel/**"
       - ".github/workflows/laravel-php82.yml"
   push:
     branches:
-      - "main"
-      - "refactor/laravel-at-repository-root"
+      - "feat/laravel12-php82-mysql-migration"
     paths:
-      - "app/**"
-      - "bootstrap/**"
-      - "config/**"
-      - "database/**"
-      - "routes/**"
-      - "tests/**"
-      - "public/**"
-      - "composer.json"
-      - "phpunit.xml"
-      - "Dockerfile"
-      - "docker/**"
-      - "docker-compose.yml"
+      - "laravel/**"
       - ".github/workflows/laravel-php82.yml"
 
 permissions:
@@ -43,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: .
+        working-directory: laravel
     env:
       APP_ENV: testing
       APP_DEBUG: "false"
@@ -78,12 +55,14 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress
       - name: Prepare isolated test dotenv
         run: touch .env
+      - name: Node-to-Laravel HTTP route shape audit
+        run: node tools/audit-route-parity.js
       - name: PHP syntax check
         run: find app bootstrap config database routes tests public -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Check route registration
         run: php artisan route:list
       - name: Isolated regression tests (no real FTP or MongoDB network)
-        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest|LinkedInEmbedValidationTest|ApiSecurityHeadersTest|CompanySourceProbeTest|RepositoryRootLayoutTest)' --display-warnings
+        run: php artisan test --filter='(LegacyFtpStorageTest|PrismaMongoFieldMappingTest|LegacyCredentialCodecTest|JobPublicContactValidationTest|AdminNotificationGroupsTest|LegacyStaticAssetsTest|TotpTest|SchemaIntegrityTest|RouteMethodIntegrityTest|LinkedInEmbedValidationTest|ApiSecurityHeadersTest|CompanySourceProbeTest)' --display-warnings
 
   mongo-integration:
     runs-on: ubuntu-latest
@@ -99,7 +78,7 @@ jobs:
           --health-retries 20
     defaults:
       run:
-        working-directory: .
+        working-directory: laravel
     env:
       APP_ENV: testing
       APP_DEBUG: "false"

@@ -1,0 +1,2 @@
+ALTER TABLE `Article`
+    ADD COLUMN `shareCount` INTEGER NOT NULL DEFAULT 0;
